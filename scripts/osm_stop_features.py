@@ -154,6 +154,9 @@ def main():
                     help="disable approach-node attribution (reproduces the double-counting 'before' numbers)")
     ap.add_argument("--signals", default="data/osm/signals_ireland.csv")
     ap.add_argument("--bbox", default=None, help="lon_min,lat_min,lon_max,lat_max (default Wicklow)")
+    ap.add_argument("--causes-csv", default=None,
+                    help="optional: per-event log (way_id,dir,vertex_idx,node_id,cause,amount) for bbox ways, "
+                         "used by score_route_stops.py")
     ap.add_argument("--report", default=None, help="also write the markdown output here")
     a = ap.parse_args()
     out = []
@@ -290,6 +293,8 @@ def main():
     sel_p = pos[sel].tolist()
     rb_nodes = set(refs[np.repeat(np.array(W.rb), lens)].tolist())
     ev = np.zeros((nW, 2, len(CAUSES)))
+    ev_log = []  # (way idx, dir, vertex idx, node id, cause, amount) -- only written with --causes-csv
+
     flags = Counter()
     ow = W.ow
     wrank = W.rank
@@ -434,7 +439,7 @@ def main():
                         ds = ev_dir_override.get((nid, w), ds)
                         ok = d in ds
                     if ok:
-                        ev[w, d, CI[cause]] += 1
+                        ev[w, d, CI[cause]] += 1; ev_log.append((w, d, p, nid, cause, 1))
                         if cause == "signal" and qkind is None and ow[w] == 0:
                             flags["signal_two_way_unqualified_event"] += 1
                         done = True
@@ -448,7 +453,7 @@ def main():
                 if wrb[w]:
                     continue  # circulating traffic has priority
                 if hasrb:
-                    ev[w, d, CI["rb_entry"]] += 1
+                    ev[w, d, CI["rb_entry"]] += 1; ev_log.append((w, d, p, nid, "rb_entry", 1))
                     continue
                 if cont:
                     continue
@@ -456,13 +461,13 @@ def main():
                 if wprio[w] and not any(wprio[o] for o in others):
                     continue
                 if (not wprio[w]) and any(wprio[o] for o in others):
-                    ev[w, d, CI["yield_infer"]] += 1
+                    ev[w, d, CI["yield_infer"]] += 1; ev_log.append((w, d, p, nid, "yield_infer", 1))
                     continue
                 best = min(wrank[o] for o in others)
                 if wrank[w] > best:
-                    ev[w, d, CI["yield_infer"]] += 1
+                    ev[w, d, CI["yield_infer"]] += 1; ev_log.append((w, d, p, nid, "yield_infer", 1))
                 elif wrank[w] == best:
-                    ev[w, d, CI["yield_equal"]] += 0.5
+                    ev[w, d, CI["yield_equal"]] += 0.5; ev_log.append((w, d, p, nid, "yield_equal", 0.5))
     t3 = time.time()
 
     # signal-node event semantics flag: count signal nodes on two-way roads w/o qualifier
@@ -591,6 +596,17 @@ def main():
             if W.hw[w] != "service" and L >= 0.05:  # sample CSV: no service ways, no ways < 50 m
                 wr.writerow(row)
                 n_sample += 1
+
+    if a.causes_csv:
+        # one row per stop-cause event: arriving on way_id in direction dir (fwd = increasing OSM node order)
+        # at vertex_idx (node_id). Only ways in the bbox (mid-vertex), same selection as the per-way CSV.
+        bset = set(bi.tolist())
+        with open(a.causes_csv, "w", newline="") as fc:
+            wc = csv.writer(fc)
+            wc.writerow(["way_id", "dir", "vertex_idx", "node_id", "cause", "amount"])
+            for (w, d, p, nid, cause, amt) in ev_log:
+                if w in bset:
+                    wc.writerow([W.id[w], "fwd" if d == 0 else "bwd", p, nid, cause, amt])
 
     P(f"\n### Expected stops/km per way, Wicklow bbox (lon {BBOX[0]}..{BBOX[2]}, lat {BBOX[1]}..{BBOX[3]})\n")
     P(f"{len(bi)} ways (selected by mid-vertex in bbox); sample CSV `{a.csv}` has {n_sample} ways (service ways "
