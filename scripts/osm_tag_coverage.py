@@ -78,7 +78,6 @@ def main():
     print("### Tag coverage (% of length) by highway class\n")
     print("| class | ways | km | " + " | ".join(TAGS) + " |")
     print("|---|---|---|" + "---|" * len(TAGS))
-    tot = Counter()
     for c in CLASSES:
         if not h.km[c]:
             continue

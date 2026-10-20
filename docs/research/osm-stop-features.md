@@ -24,7 +24,7 @@ curl -sL -o data/traffic/sites_2025.geojson 'https://data.smartdublin.ie/dataset
 uv run scripts/scats_recall.py data/traffic/sites_2025.geojson data/osm/signals_ireland.csv > data/samples/scats_recall_dublin.md
 ```
 
-Wall time (macOS arm64, 12 cores): `osm_stop_features.py` on Ireland 108-131 s total (node pass ~24-31 s, way pass ~59-77 s, in-memory junction + attribution + inference ~20-25 s) against a 10 min budget. Outputs: `data/samples/osm_stop_features_ireland.md` (tables below), `data/samples/stops_per_km_wicklow.csv` (8,797 ways, 0.52 MB; `service` ways and ways < 50 m dropped from the sample only, all statistics use all 20,976 bbox ways; the unfiltered CSV is `data/osm/stops_per_km_wicklow_full.csv`, gitignored), `data/samples/scats_recall_dublin.md`, a 172 KB copy of the DCC site file at `data/samples/dcc_traffic_signal_sites_151025.geojson` (CC-BY 4.0, attribution required), and `data/osm/signals_ireland.csv` (gitignored).
+Wall time (macOS arm64, 12 cores): `osm_stop_features.py` on Ireland 84 s total in the final run (earlier runs 72-131 s; node pass ~24-31 s, way pass ~50-77 s, in-memory junction + attribution + inference ~20-25 s) against a 10 min budget. Outputs: `data/samples/osm_stop_features_ireland.md` (tables below), `data/samples/stops_per_km_wicklow.csv` (8,797 ways, 0.52 MB; `service` ways and ways < 50 m dropped from the sample only, all statistics use all 20,976 bbox ways; the unfiltered CSV is `data/osm/stops_per_km_wicklow_full.csv`, gitignored), `data/samples/scats_recall_dublin.md`, a 172 KB copy of the DCC site file at `data/samples/dcc_traffic_signal_sites_151025.geojson` (CC-BY 4.0, attribution required), and `data/osm/signals_ireland.csv` (gitignored).
 
 Method notes. Road-cycling ways = `highway` in {trunk, primary, secondary, tertiary, unclassified, residential, living_street, service}; motorway is excluded, `*_link` ways (trunk/primary/secondary/tertiary) are included as junction participants with their parent's class (primary_link = primary), and `highway=service` only if the `service` tag is absent (so driveways, parking aisles and alleys do not create junctions). A junction is a node shared by >= 2 distinct such ways; for the density tables, plain splits (exactly 2 ways of the same class, the node an end vertex of both, i.e. a way merely cut in two) are excluded (both figures are given). Lengths are haversine. Node/way phases are pyosmium `FileProcessor` passes (tagged nodes first, then ways with node locations); junction membership is computed in memory with numpy. Wicklow ways are selected by their mid-vertex being inside lon -6.5..-6.1, lat 53.0..53.3. Direction 'fwd' means along the OSM way order; one-way ways (`oneway=yes|-1`, roundabouts, unless `oneway:bicycle=no`) only get their legal direction (the other column is blank); contraflow cycling is not modelled.
 
@@ -33,7 +33,7 @@ Method notes. Road-cycling ways = `highway` in {trunk, primary, secondary, terti
 Class hierarchy (highest priority first): **trunk > primary > secondary > tertiary > unclassified > residential > living_street > service**. A cyclist "approaches" a node when travelling towards it: the last vertex of a way is approached in the forward direction, the first vertex in the backward direction, an interior vertex in both. Rules are applied in order; the first that fires decides the event for that (way, direction, node):
 
 1. **Explicit node tag applying to this direction**: `highway=traffic_signals` counts 1 signal; `highway=stop` counts 1 stop; `highway=give_way` counts 1 give-way; `highway=crossing` with `crossing=traffic_signals` counts 1 signal-crossing; `highway=mini_roundabout` counts 1 roundabout entry. A qualifier (`direction`, `stop:direction`, `traffic_signals:direction`, `give_way:direction`) of `forward`/`backward` restricts it to that travel direction relative to the way; `both`, missing, or any other value (compass, `in`...) applies to both directions (flagged assumption; on one-way ways the single legal direction gets it once). If the qualifier excludes this direction the node falls through to rule 2. An explicit tag on the junction node itself suppresses inference at that node for that direction. Most signs are not on the junction node but one or more vertices before it (on the approach), so see rule 1b.
-1b. **Approach-node attribution** (pre-step before the ordered rules): for every `highway=traffic_signals|stop|give_way` node that is on a road way but is NOT itself a junction node, for each direction it applies to (qualifier and oneway as in rule 1), walk along the way in that direction of travel for at most 60 m (haversine) to the next junction node; that (junction, way, direction) is marked explicitly controlled, and rules 2-6 (including roundabout-entry, priority and class terms) are skipped there. If no junction is found ahead within 60 m, the nearest junction within 60 m behind on the same way is marked instead; if none, the sign is "standalone" (counted once on its own way, nothing suppressed). `crossing=traffic_signals` mid-block nodes and mini-roundabouts are not attributed (a pedestrian signal is not a junction control).
+1b. **Approach-node attribution** (pre-step before the ordered rules). Applies to every `highway=traffic_signals|stop|give_way` node that is on a road way but is NOT itself a junction node ("approach node"). For each direction of travel the node applies to (qualifier and oneway as in rule 1): walk along the way in that direction for at most 60 m (haversine) to the next junction node. A walk that reaches the end vertex of a way at a plain-split continuation node (exactly two ways, same class, end vertex of both) crosses onto the continuing way and keeps walking within the same 60 m budget. The (junction, way, direction) reached is marked explicitly controlled and rules 2-6 (including roundabout-entry, priority and class terms) are skipped there. If no junction is reached within 60 m (or the way ends first) the sign is "standalone": it counts once on its own way and suppresses nothing. There is no "behind" fallback. Unqualified `stop`/`give_way` nodes on two-way ways are walked in both directions but attributed only toward the nearer junction, and their event is counted only for that direction (if neither direction reaches a junction they are standalone and counted in both directions, the old assumption); unqualified `traffic_signals` on two-way ways are attributed and counted in both directions (flagged assumption), and any node with a `forward`/`backward`/`both`/other qualifier uses the directions that qualifier gives. `crossing=traffic_signals` mid-block nodes and mini-roundabouts are not attributed (a pedestrian signal is not a junction control). Residual error, measured over the 64,709 Ireland approach events: 95.6% of events end up with their junction approach actually suppressed (99.3% of those events that have a junction within reach); 3.7% are standalone (no junction within 60 m, of which 243 reach a dead end or a non-road way first), and 0.7% (426) name a junction approach that is then not suppressed, 418 of them because the junction node itself carries a second explicit sign for that direction (two mapped signs, both counted) and 8 because the walk entered a one-way against its direction. Raising the cap to 80 / 100 m would lift the share to 96.4% / 96.9% but would increasingly attach mid-block signs to unrelated junctions, so it is kept at 60 m. Two residuals remain: (i) in 966 narrowed unqualified stop/give_way cases a junction lies within 60 m on both sides, so the "nearer junction" choice can pick the wrong side; (ii) the walk crosses only same-class continuation nodes, so 23 signs whose road changes class before the junction leave that junction unsuppressed (0.04% of events, measured independently by the reviewer).
 2. **Not a junction** (fewer than 2 distinct ways at the node): no event.
 3. **Roundabout**: if this way has `junction=roundabout|circular`, circulating traffic has priority: 0. Otherwise, if any way at the node is a roundabout, this is an entry: counts 1 roundabout entry (always yields).
 4. **Continuation**: exactly two ways meet and both only touch the node at an end vertex (the road merely continues or changes class/name): 0.
@@ -92,7 +92,26 @@ Signal nodes on road ways with no direction qualifier (counted for both directio
 
 ### Approach-node attribution of explicit signal/stop/give_way nodes
 
-Mode: enabled. Explicit signal/stop/give_way nodes on road ways: on a junction node 1840; on an approach (non-junction) node 64625. Approach events (node x travel direction): attributed by walking <= 60 m along the way in the direction of travel to the next junction: 64021; attributed to the nearest junction within 60 m behind (no junction ahead within the cap): 4480; standalone (no junction within 60 m): 528. Junction approaches whose inferred yield / equal-class term was suppressed: 63432.
+Mode: enabled. Explicit signal/stop/give_way nodes on road ways: on a junction node 1840; on an approach (non-junction) node 64625. Approach events (node x travel direction it is counted for): 64709.
+
+| attribution outcome | events |
+|---|---|
+| attributed ahead (walk <= 60 m to the next junction on the same way) | 61248 |
+| attributed via continuation (walk crossed >= 1 plain-split node onto the continuing way) | 1057 |
+| standalone (no junction ahead within 60 m; nothing suppressed) | 2404 |
+| ... standalone because the walk reached a way end with no junction (dead end, or only non-road ways beyond) | 243 |
+| ... standalone because the 60 m cap was reached first | 2161 |
+| walk ended on a continuation node (should be 0) | 0 |
+| behind-fallback keys that never match (fallback removed) | 0 |
+| unqualified stop/give_way nodes narrowed to the nearer junction/direction | 4320 |
+| distinct (junction, way, dir) keys suppressed (matched a real junction approach) | 61488 |
+| ... of which controlled by unqualified stop/give_way nodes | 4586 |
+| events whose attributed key matched a real approach (actually suppressed) | 61879 |
+| events with a key that matched no approach (residual double counting) | 426 |
+| ... unmatched: junction node carries its own explicit sign for that direction (two signs, both counted) | 418 |
+| ... unmatched: walk entered a one-way way against its direction | 8 |
+
+**Suppressed share** = events whose junction approach is actually suppressed / all approach events = 61879/64709 = 95.6% (standalone events are 3.7% of events and unmatched keys 0.7%).
 
 traffic_calming on road ways (top 8): hump=14043, table=7754, bump=5737, cushion=2392, rumble_strip=1292, island=743, choker=291, yes=102
 
@@ -136,25 +155,25 @@ Junction nodes: 649296 shared by >= 2 ways, of which 160758 are plain splits (ex
 
 | class | ways | km | median stops/km | p90 stops/km | pooled stops/km | share of ways with 0 stops |
 |---|---|---|---|---|---|---|
-| trunk | 458 | 78 | 1.57 | 7.13 | 4.37 | 32% |
+| trunk | 458 | 78 | 1.57 | 7.13 | 4.33 | 32% |
 | primary | 142 | 21 | 2.23 | 19.13 | 3.32 | 44% |
-| secondary | 2490 | 345 | 1.02 | 10.14 | 3.63 | 45% |
-| tertiary | 1807 | 308 | 0.94 | 8.68 | 3.35 | 44% |
+| secondary | 2490 | 345 | 1.02 | 10.14 | 3.58 | 45% |
+| tertiary | 1807 | 308 | 0.94 | 8.68 | 3.32 | 44% |
 | unclassified | 1115 | 324 | 0.48 | 5.35 | 1.41 | 46% |
-| residential | 7929 | 956 | 4.36 | 9.70 | 5.56 | 17% |
+| residential | 7929 | 956 | 4.35 | 9.68 | 5.53 | 17% |
 | living_street | 12 | 1 | 10.66 | 10.66 | 8.94 | 0% |
-| service | 7023 | 604 | 3.38 | 9.76 | 6.05 | 28% |
+| service | 7023 | 604 | 3.37 | 9.76 | 6.03 | 28% |
 
 Breakdown of expected stops by cause in bbox (sum over travel directions; per-direction km pooled):
 
 | cause | events | per km |
 |---|---|---|
 | signal | 1688 | 0.335 |
-| stop | 1462 | 0.290 |
-| give_way | 781 | 0.155 |
-| yield_infer | 4259 | 0.845 |
-| yield_equal | 12418 | 2.464 |
-| rb_entry | 824 | 0.164 |
+| stop | 1380 | 0.274 |
+| give_way | 776 | 0.154 |
+| yield_infer | 4239 | 0.841 |
+| yield_equal | 12397 | 2.460 |
+| rb_entry | 815 | 0.162 |
 | xing_signal | 1785 | 0.354 |
 
 Pedestrian crossing nodes (no signals) on bbox road ways, not in estimate: 2591.
@@ -165,7 +184,7 @@ Stretch = connected chain of ways with the same `name` (or `ref` when unnamed) j
 
 | # | name | main class | length km | ways | exp. stops | stops/km | first way id |
 |---|---|---|---|---|---|---|---|
-| 1 | Military Road | secondary | 22.9 | 19 | 2.5 | 0.11 | 23051141 |
+| 1 | Military Road | secondary | 22.9 | 19 | 2.2 | 0.10 | 23051141 |
 | 2 | R756 | secondary | 10.3 | 8 | 1.5 | 0.15 | 4629662 |
 | 3 | Shankill Road | unclassified | 9.8 | 12 | 1.2 | 0.13 | 25103496 |
 | 4 | R759 | secondary | 9.3 | 14 | 1.0 | 0.11 | 8908167 |
@@ -188,7 +207,7 @@ Stretch = connected chain of ways with the same `name` (or `ref` when unnamed) j
 
 ### Effect of approach-node attribution (before = double counting; after = attribution on)
 
-Before: the same script with `--no-attribute` (all other changes identical: links, junction definition). Per-class figures over (way, direction) samples for ways >= 0.1 km, Wicklow bbox.
+Before: the same script with `--no-attribute` (all other behaviour identical). Per-class figures over (way, direction) samples for ways >= 0.1 km, Wicklow bbox.
 
 Before (explicit tag only suppresses inference when it sits on the junction node itself):
 
@@ -213,7 +232,7 @@ Before (explicit tag only suppresses inference when it sits on the junction node
 | rb_entry | 906 | 0.180 |
 | xing_signal | 1785 | 0.354 |
 
-After (the tables above): per-class tertiary median 0.95 -> 0.94, p90 9.14 -> 8.68; unclassified median 0.50 -> 0.48, p90 6.36 -> 5.35; residential p90 11.57 -> 9.70; pooled stops/km tertiary 3.68 -> 3.35, unclassified 1.65 -> 1.41, residential 6.07 -> 5.56. 63,432 junction approaches (Ireland) were suppressed; in the bbox this removed about 1,124 inferred 1.0-yields, 679 equal-class events and 82 roundabout entries. The correction is therefore real but modest in aggregate: most signed approaches are on a minor road whose inferred term would be only 0.5 or 0.
+After (the tables above): tertiary median 0.95 -> 0.94, p90 9.14 -> 8.68; unclassified median 0.50 -> 0.48, p90 6.36 -> 5.35; residential p90 11.57 -> 9.68; pooled stops/km tertiary 3.68 -> 3.32, unclassified 1.65 -> 1.41, residential 6.07 -> 5.53. In the bbox the correction removes 1,144 inferred 1.0-yields, 700 equal-class events, 91 roundabout entries, and (via the unqualified stop/give_way direction narrowing, which counts those signs once instead of in both directions) 82 stop and 5 give-way events. The correction is real but modest in aggregate: most signed approaches are on a minor road whose inferred term would only have been 0.5 or 0.
 
 ### Dublin SCATS completeness (OSM recall)
 
@@ -257,7 +276,7 @@ Caveat: a match only says an OSM signal node lies within the radius, not that it
 
 ## Verdict
 
-Usable with caveats. OSM captures signals very well (about 90% of DCC signal sites have a `highway=traffic_signals` node within 30 m, 91% when `crossing=traffic_signals` nodes are included, 94-95% for junction-type sites; 12,118 signal nodes island-wide, 92% of them direction-qualified), and `stop`/`give_way` signs (about 30k nodes each, 85-98% with a `direction`) and roundabouts (7.9k roundabout ways, 1.4k mini-roundabouts) are plentifully and directionally mapped, so these four causes can be used as hard stop costs. What OSM misses or only partly gives: approach-level priority at the great majority of unsigned junctions (only about 60k explicit stop/give-way nodes against 649k junction nodes, 489k of them excluding plain way splits), so most yields have to be inferred from road class; pedestrian crossings are mapped (about 44k on road ways) but cannot say whether traffic actually stops; level crossings, signal phase timing, queueing and traffic-dependent stops are absent; and the inference ignores sight-lines, visibility and actual traffic. The resulting estimate is dominated by inferred yields (mostly the 0.5 equal-class term on residential/service streets; about 3.3 of 4.6 stops/km pooled over the bbox after the double-counting fix), whereas the explicit signal/stop/give-way/roundabout/signal-crossing part (about 1.3 stops/km, unchanged by the fix) is the credible one. An OSM-only estimate is good enough to rank routes coarsely (arterial/rural stretches near 0 stops/km versus built-up areas of 5-6 stops/km) and to generate candidate routes, but the inferred-yield part should not be treated as ground truth for routing until dhy.11 has checked per-feature stop probabilities against observed rides, especially the 0.5 equal-class weight and the "yield = stop" assumption for cyclists, who often only slow down.
+Usable with caveats. OSM captures signals very well (about 90% of DCC signal sites have a `highway=traffic_signals` node within 30 m, 91% when `crossing=traffic_signals` nodes are included, 94-95% for junction-type sites; 12,118 signal nodes island-wide, 92% of them direction-qualified), and `stop`/`give_way` signs (about 30k nodes each, 85-98% with a `direction`) and roundabouts (7.9k roundabout ways, 1.4k mini-roundabouts) are plentifully and directionally mapped, so these four causes can be used as hard stop costs. What OSM misses or only partly gives: approach-level priority at the great majority of unsigned junctions (only about 60k explicit stop/give-way nodes against 649k junction nodes, 489k of them excluding plain way splits), so most yields have to be inferred from road class; pedestrian crossings are mapped (about 44k on road ways) but cannot say whether traffic actually stops; level crossings, signal phase timing, queueing and traffic-dependent stops are absent; and the inference ignores sight-lines, visibility and actual traffic. The resulting estimate is dominated by inferred yields (mostly the 0.5 equal-class term on residential/service streets; about 3.3 of 4.6 stops/km pooled over the bbox after the double-counting fix), whereas the explicit signal/stop/give-way/roundabout/signal-crossing part (about 1.3 stops/km) is the credible one. An OSM-only estimate is good enough to rank routes coarsely (arterial/rural stretches near 0 stops/km versus built-up areas of 5-6 stops/km) and to generate candidate routes, but the inferred-yield part should not be treated as ground truth for routing until dhy.11 has checked per-feature stop probabilities against observed rides, especially the 0.5 equal-class weight and the "yield = stop" assumption for cyclists, who often only slow down.
 
 ## Open questions for Eric
 

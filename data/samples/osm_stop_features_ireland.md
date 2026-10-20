@@ -1,4 +1,4 @@
-<!-- data/osm/ireland.osm.pbf: node pass 24s, way pass 59s, inference 25s, total 108s; 637380 road-cycling ways, 359648 tagged nodes, 649296 junction nodes -->
+<!-- data/osm/ireland.osm.pbf: node pass 16s, way pass 47s, inference 18s, total 81s; 637380 road-cycling ways, 359648 tagged nodes, 649296 junction nodes -->
 
 ### Node feature counts (whole extract; 'on road way' = node is on a road-cycling way)
 
@@ -47,7 +47,26 @@ Signal nodes on road ways with no direction qualifier (counted for both directio
 
 ### Approach-node attribution of explicit signal/stop/give_way nodes
 
-Mode: enabled. Explicit signal/stop/give_way nodes on road ways: on a junction node 1840; on an approach (non-junction) node 64625. Approach events (node x travel direction): attributed by walking <= 60 m along the way in the direction of travel to the next junction: 64021; attributed to the nearest junction within 60 m behind (no junction ahead within the cap): 4480; standalone (no junction within 60 m): 528. Junction approaches whose inferred yield / equal-class term was suppressed: 63432.
+Mode: enabled. Explicit signal/stop/give_way nodes on road ways: on a junction node 1840; on an approach (non-junction) node 64625. Approach events (node x travel direction it is counted for): 64709.
+
+| attribution outcome | events |
+|---|---|
+| attributed ahead (walk <= 60 m to the next junction on the same way) | 61248 |
+| attributed via continuation (walk crossed >= 1 plain-split node onto the continuing way) | 1057 |
+| standalone (no junction ahead within 60 m; nothing suppressed) | 2404 |
+| ... standalone because the walk reached a way end with no junction (dead end, or only non-road ways beyond) | 243 |
+| ... standalone because the 60 m cap was reached first | 2161 |
+| walk ended on a continuation node (should be 0) | 0 |
+| behind-fallback keys that never match (fallback removed) | 0 |
+| unqualified stop/give_way nodes narrowed to the nearer junction/direction | 4320 |
+| distinct (junction, way, dir) keys suppressed (matched a real junction approach) | 61488 |
+| ... of which controlled by unqualified stop/give_way nodes | 4586 |
+| events whose attributed key matched a real approach (actually suppressed) | 61879 |
+| events with a key that matched no approach (residual double counting) | 426 |
+| ... unmatched: junction node carries its own explicit sign for that direction (two signs, both counted) | 418 |
+| ... unmatched: walk entered a one-way way against its direction | 8 |
+
+**Suppressed share** = events whose junction approach is actually suppressed / all approach events = 61879/64709 = 95.6% (standalone events are 3.7% of events and unmatched keys 0.7%).
 
 traffic_calming on road ways (top 8): hump=14043, table=7754, bump=5737, cushion=2392, rumble_strip=1292, island=743, choker=291, yes=102
 
@@ -91,25 +110,25 @@ Junction nodes: 649296 shared by >= 2 ways, of which 160758 are plain splits (ex
 
 | class | ways | km | median stops/km | p90 stops/km | pooled stops/km | share of ways with 0 stops |
 |---|---|---|---|---|---|---|
-| trunk | 458 | 78 | 1.57 | 7.13 | 4.37 | 32% |
+| trunk | 458 | 78 | 1.57 | 7.13 | 4.33 | 32% |
 | primary | 142 | 21 | 2.23 | 19.13 | 3.32 | 44% |
-| secondary | 2490 | 345 | 1.02 | 10.14 | 3.63 | 45% |
-| tertiary | 1807 | 308 | 0.94 | 8.68 | 3.35 | 44% |
+| secondary | 2490 | 345 | 1.02 | 10.14 | 3.58 | 45% |
+| tertiary | 1807 | 308 | 0.94 | 8.68 | 3.32 | 44% |
 | unclassified | 1115 | 324 | 0.48 | 5.35 | 1.41 | 46% |
-| residential | 7929 | 956 | 4.36 | 9.70 | 5.56 | 17% |
+| residential | 7929 | 956 | 4.35 | 9.68 | 5.53 | 17% |
 | living_street | 12 | 1 | 10.66 | 10.66 | 8.94 | 0% |
-| service | 7023 | 604 | 3.38 | 9.76 | 6.05 | 28% |
+| service | 7023 | 604 | 3.37 | 9.76 | 6.03 | 28% |
 
 Breakdown of expected stops by cause in bbox (sum over travel directions; per-direction km pooled):
 
 | cause | events | per km |
 |---|---|---|
 | signal | 1688 | 0.335 |
-| stop | 1462 | 0.290 |
-| give_way | 781 | 0.155 |
-| yield_infer | 4259 | 0.845 |
-| yield_equal | 12418 | 2.464 |
-| rb_entry | 824 | 0.164 |
+| stop | 1380 | 0.274 |
+| give_way | 776 | 0.154 |
+| yield_infer | 4239 | 0.841 |
+| yield_equal | 12397 | 2.460 |
+| rb_entry | 815 | 0.162 |
 | xing_signal | 1785 | 0.354 |
 
 Pedestrian crossing nodes (no signals) on bbox road ways, not in estimate: 2591.
@@ -120,7 +139,7 @@ Stretch = connected chain of ways with the same `name` (or `ref` when unnamed) j
 
 | # | name | main class | length km | ways | exp. stops | stops/km | first way id |
 |---|---|---|---|---|---|---|---|
-| 1 | Military Road | secondary | 22.9 | 19 | 2.5 | 0.11 | 23051141 |
+| 1 | Military Road | secondary | 22.9 | 19 | 2.2 | 0.10 | 23051141 |
 | 2 | R756 | secondary | 10.3 | 8 | 1.5 | 0.15 | 4629662 |
 | 3 | Shankill Road | unclassified | 9.8 | 12 | 1.2 | 0.13 | 25103496 |
 | 4 | R759 | secondary | 9.3 | 14 | 1.0 | 0.11 | 8908167 |

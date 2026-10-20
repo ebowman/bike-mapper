@@ -149,6 +149,7 @@ def main():
     ap.add_argument("--csv", default="data/samples/stops_per_km_wicklow.csv")
     ap.add_argument("--full-csv", default="data/osm/stops_per_km_wicklow_full.csv",
                     help="unfiltered per-way CSV (gitignored); --csv drops service ways and ways < 50 m")
+    ap.add_argument("--cap", type=float, default=60.0, help="approach-attribution walk cap in metres")
     ap.add_argument("--no-attribute", action="store_true",
                     help="disable approach-node attribution (reproduces the double-counting 'before' numbers)")
     ap.add_argument("--signals", default="data/osm/signals_ireland.csv")
@@ -296,58 +297,99 @@ def main():
     wrb = W.rb
     lens_l = lens.tolist()
     # ---- approach-node attribution: explicit signal/stop/give_way nodes that are NOT junction nodes are
-    # attributed to the junction they approach (walk <= CAP m along the way in the direction of travel;
-    # else nearest junction on the way within CAP m; else standalone) and that (junction, way, dir) is
-    # marked controlled so inference is suppressed there.
-    CAP = 60.0
+    # attributed to the junction they approach. From the sign, walk <= CAP m along the way in the direction
+    # of travel, crossing plain-split continuation nodes (exactly 2 ways of the same class, end vertex of
+    # both) onto the continuing way, to the next junction node. That (junction, way, dir) is marked
+    # controlled so inference is suppressed there. Otherwise the sign is standalone (nothing suppressed).
+    # Unqualified stop/give_way nodes on two-way ways are attributed only toward the nearer junction (and
+    # their event is counted only in that direction); all other signs: every direction they apply to.
+    CAP = a.cap
     jset = set(jnodes.tolist())
-    controlled = set()
+    controlled = {}  # (junction, way, dir) -> source cause of the (first) sign controlling it
     attr = Counter()
+    events = []  # (key or None, cause, unqualified)
+    ev_dir_override = {}  # (node id, way idx) -> directions the event is counted for
     appr_ids = np.array([nid for nid, (c, _, _) in expl.items()
                          if c in ("signal", "stop", "give_way") and nid not in jset], dtype=np.int64)
     amask = np.isin(refs, appr_ids)
+    cont_nodes = unodes[split]
+    cont_map = defaultdict(list)
+    for gi in np.flatnonzero(np.isin(refs, cont_nodes)).tolist():
+        cont_map[int(refs[gi])].append((int(widx[gi]), int(pos[gi])))
     offl = W.off
     lons, lats = W.lons, W.lats
     attr_nodes = set()
+
+    fail = [None]
+
+    def walk(w, q, d):
+        """Walk from vertex q of way w in travel direction d; return (junction, way, dir, crossed, dist) or None."""
+        step = 1 if d == 0 else -1
+        dist, crossed = 0.0, False
+        for _ in range(60):  # bounded number of way hops
+            base_i, nl = offl[w], lens_l[w]
+            hopped = False
+            while 0 <= q + step < nl:
+                a_, b_ = base_i + q, base_i + q + step
+                dist += hav(lons[a_], lats[a_], lons[b_], lats[b_])
+                if dist > CAP:
+                    fail[0] = "cap"
+                    return None
+                q += step
+                node = int(refs[b_])
+                if node not in jset:
+                    continue
+                oc = cont_map.get(node)
+                if oc is not None and (q == 0 or q == nl - 1):
+                    nxt = [o for o in oc if o != (w, q)]
+                    if len(nxt) == 1:
+                        w, q = nxt[0]
+                        step = 1 if q == 0 else -1
+                        crossed = hopped = True
+                        break
+                return node, w, (0 if step == 1 else 1), crossed, dist
+            if not hopped:
+                fail[0] = "end"
+                return None
+        return None
+
     for gi in np.flatnonzero(amask).tolist():
         nid = int(refs[gi])
         w, p = int(widx[gi]), int(pos[gi])
         cause, qk, tg = expl[nid]
-        ds, _ = qual_dir(tg, qk)
+        ds, qkind = qual_dir(tg, qk)
         dirs = set(ds)
         if ow[w] == 1:
             dirs &= {0}
         elif ow[w] == -1:
             dirs &= {1}
         attr_nodes.add(nid)
-        base_i = offl[w]
-        nl = lens_l[w]
-
-        def scan(step, p=p, nl=nl, base_i=base_i):
-            dist, q = 0.0, p
-            while 0 <= q + step < nl:
-                a_, b_ = base_i + q, base_i + q + step
-                dist += hav(lons[a_], lats[a_], lons[b_], lats[b_])
-                if dist > CAP:
-                    return None
-                q += step
-                if int(refs[b_]) in jset:
-                    return int(refs[b_]), dist
-            return None
+        res, failr = {}, {}
         for d in dirs:
-            fwd = scan(1 if d == 0 else -1)
-            if fwd:
-                kind, j = "walk", fwd[0]
+            res[d] = walk(w, p, d)
+            failr[d] = fail[0]
+        if cause in ("stop", "give_way") and qkind is None and len(dirs) == 2:
+            cand = [(r[4], d) for d, r in res.items() if r]
+            if cand:
+                dsel = min(cand)[1]
+                res = {dsel: res[dsel]}
+                dirs = {dsel}
+                if not a.no_attribute:
+                    ev_dir_override[(nid, w)] = dirs
+                attr["unqualified stop/give_way narrowed to one direction"] += 1
+        for d in dirs:
+            r = res.get(d)
+            if r:
+                key = (r[0], r[1], r[2])
+                attr["via continuation" if r[3] else "ahead"] += 1
+                if not a.no_attribute:
+                    controlled.setdefault(key, cause + ("_unq" if qkind is None else ""))
+                events.append((key, cause, qkind is None))
             else:
-                back = scan(-1 if d == 0 else 1)
-                if back:
-                    kind, j = "nearest", back[0]
-                else:
-                    kind, j = "standalone", None
-            attr[kind] += 1
-            if j is not None and not a.no_attribute:
-                controlled.add((j, w, d))
-    suppressed = Counter()
+                attr["standalone"] += 1
+                attr["standalone: walk hit " + ("end of way / no road junction" if failr[d] == "end" else "cap")] += 1
+                events.append((None, cause, qkind is None))
+    hit_keys = {}  # controlled keys that matched a real junction approach in the inference loop
     i, n = 0, len(sel_nodes)
     while i < n:
         j = i
@@ -389,6 +431,7 @@ def main():
                         ok, qkind = True, None
                     else:
                         ds, qkind = qual_dir(e[2], qk)
+                        ds = ev_dir_override.get((nid, w), ds)
                         ok = d in ds
                     if ok:
                         ev[w, d, CI[cause]] += 1
@@ -400,7 +443,7 @@ def main():
                 if not isjunction:
                     continue
                 if (nid, w, d) in controlled:
-                    suppressed["junction approaches suppressed"] += 1
+                    hit_keys[(nid, w, d)] = controlled[(nid, w, d)]
                     continue
                 if wrb[w]:
                     continue  # circulating traffic has priority
@@ -457,13 +500,43 @@ def main():
     P("### Approach-node attribution of explicit signal/stop/give_way nodes\n")
     nj = sum(1 for nid, (c, _, _) in expl.items() if c in ("signal", "stop", "give_way")
              and nid in jset and road_flag.get(nid))
+    n_ev = len(events)
+    n_key = sum(1 for k, _, _ in events if k)
+    n_match = sum(1 for k, _, _ in events if k and k in hit_keys)
+    why = Counter()
+    for k, _, _ in events:
+        if k and k not in hit_keys:
+            jn_, w_, d_ = k
+            if jn_ in expl and ((qual_dir(expl[jn_][2], expl[jn_][1])[0] if expl[jn_][1] else {0, 1}) & {d_}):
+                why["junction node carries its own explicit sign for that direction (two signs, both counted)"] += 1
+            elif (ow[w_] == 1 and d_ == 1) or (ow[w_] == -1 and d_ == 0):
+                why["walk entered a one-way way against its direction"] += 1
+            else:
+                why["other"] += 1
+    n_cont_end = sum(1 for k, _, _ in events if k and k[0] in cont_map)
+    unq = sum(1 for v in hit_keys.values() if v in ("stop_unq", "give_way_unq"))
     P(f"Mode: {'DISABLED (--no-attribute, before-fix behaviour)' if a.no_attribute else 'enabled'}. Explicit "
       f"signal/stop/give_way nodes on road ways: on a junction node {nj}; on an approach (non-junction) node "
-      f"{len(attr_nodes)}. Approach events (node x travel direction): attributed by walking <= {CAP:.0f} m "
-      f"along the way in the direction of travel to the next junction: {attr['walk']}; attributed to the nearest "
-      f"junction within {CAP:.0f} m behind (no junction ahead within the cap): {attr['nearest']}; standalone "
-      f"(no junction within {CAP:.0f} m): {attr['standalone']}. Junction approaches whose inferred yield / "
-      f"equal-class term was suppressed: {suppressed['junction approaches suppressed']}.\n")
+      f"{len(attr_nodes)}. Approach events (node x travel direction it is counted for): {n_ev}.\n")
+    P("| attribution outcome | events |\n|---|---|")
+    P(f"| attributed ahead (walk <= {CAP:.0f} m to the next junction on the same way) | {attr['ahead']} |")
+    P(f"| attributed via continuation (walk crossed >= 1 plain-split node onto the continuing way) | {attr['via continuation']} |")
+    P(f"| standalone (no junction ahead within {CAP:.0f} m; nothing suppressed) | {attr['standalone']} |")
+    P(f"| ... standalone because the walk reached a way end with no junction (dead end, or only non-road ways beyond) | {attr['standalone: walk hit end of way / no road junction']} |")
+    P(f"| ... standalone because the {CAP:.0f} m cap was reached first | {attr['standalone: walk hit cap']} |")
+    P(f"| walk ended on a continuation node (should be 0) | {n_cont_end} |")
+    P("| behind-fallback keys that never match (fallback removed) | 0 |")
+    P(f"| unqualified stop/give_way nodes narrowed to the nearer junction/direction | "
+      f"{attr['unqualified stop/give_way narrowed to one direction']} |")
+    P(f"| distinct (junction, way, dir) keys suppressed (matched a real junction approach) | {len(hit_keys)} |")
+    P(f"| ... of which controlled by unqualified stop/give_way nodes | {unq} |")
+    P(f"| events whose attributed key matched a real approach (actually suppressed) | {n_match} |")
+    P(f"| events with a key that matched no approach (residual double counting) | {n_key - n_match} |")
+    for k_, v_ in why.most_common():
+        P(f"| ... unmatched: {k_} | {v_} |")
+    P(f"\n**Suppressed share** = events whose junction approach is actually suppressed / all approach events = "
+      f"{n_match}/{n_ev} = {100*n_match/max(n_ev,1):.1f}% (standalone events are {100*attr['standalone']/max(n_ev,1):.1f}% "
+      f"of events and unmatched keys {100*(n_key-n_match)/max(n_ev,1):.1f}%).\n")
     P("traffic_calming on road ways (top 8): " + ", ".join(f"{k}={v}" for k, v in calming.most_common(8)))
     P("\nbarrier on road ways (top 8): " + ", ".join(f"{k}={v}" for k, v in barrier.most_common(8)))
 

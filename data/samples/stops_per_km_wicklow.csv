@@ -219,9 +219,9 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 7991818,Richmond Park,residential,0.156,1.5,1.0,9.59,6.39
 7991820,Richmond Grove,residential,0.209,1.0,1.5,4.78,7.18
 7991821,Windsor Park,residential,0.313,1.5,2.0,4.79,6.39
-7991822,Carrickbrennan Lawn,residential,0.327,2.0,2.0,6.11,6.11
+7991822,Carrickbrennan Lawn,residential,0.327,1.0,2.0,3.06,6.11
 7991823,Carrickbrennan Lawn,residential,0.098,0.0,0.0,0.00,0.00
-7991824,Vesey Place,residential,0.253,2.5,1.5,9.89,5.94
+7991824,Vesey Place,residential,0.253,1.5,1.5,5.94,5.94
 7991825,Knapton Road,residential,0.305,1.0,0.5,3.28,1.64
 7991826,Vesey Mews,residential,0.080,0.5,0.5,6.25,6.25
 7991827,Tivoli Road,residential,0.481,5.0,6.0,10.40,12.48
@@ -237,7 +237,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 7991887,Dunedin Terrace,residential,0.076,1.5,1.0,19.66,13.11
 7991888,Saint Patrick's Crescent,residential,0.255,2.0,2.5,7.86,9.82
 7991889,Windsor Drive,residential,0.321,0.5,0.5,1.56,1.56
-7991891,Ashton Park,residential,0.178,2.0,2.0,11.21,11.21
+7991891,Ashton Park,residential,0.178,2.0,1.5,11.21,8.41
 7991892,Ashton Park,residential,0.096,0.0,0.5,0.00,5.19
 7991894,Brook Court,residential,0.233,0.5,1.0,2.14,4.29
 7991896,Rockford Park,residential,0.210,1.0,2.0,4.77,9.53
@@ -296,7 +296,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 8167379,Glandore Park,residential,0.217,1.5,0.5,6.90,2.30
 8168853,Sandycove Road,secondary,0.096,0.5,0.5,5.22,5.22
 8168854,Barnhill Road,secondary,0.242,1.0,2.0,4.14,8.27
-8168860,Hyde Park,tertiary,0.378,1.0,1.0,2.65,2.65
+8168860,Hyde Park,tertiary,0.378,0.0,1.0,0.00,2.65
 8296126,Main Street,tertiary,0.072,1.0,0.5,13.90,6.95
 8402409,Mounttown Park,residential,0.064,0.0,1.0,0.00,15.66
 8402410,Wynberg Park,residential,0.168,1.5,0.5,8.91,2.97
@@ -684,7 +684,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 15028412,Woodlands Drive,residential,0.078,0.5,0.5,6.39,6.39
 15063034,Mount Anville Lawn,residential,0.184,1.0,0.0,5.43,0.00
 15063037,Drummartin Close,residential,0.094,1.0,0.0,10.64,0.00
-15063039,Hollywood Park,residential,0.106,1.5,1.0,14.09,9.39
+15063039,Hollywood Park,residential,0.106,0.5,1.0,4.70,9.39
 15066289,Beaufield Park,residential,0.096,0.5,0.0,5.20,0.00
 15066292,Beaufield Park,residential,0.096,0.5,0.0,5.22,0.00
 15066295,Beaufield Park,residential,0.099,0.0,0.5,0.00,5.07
@@ -731,7 +731,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 16135397,Sandycove Avenue West,secondary,0.137,0.5,1.0,3.65,7.31
 16135400,Sandycove Avenue North,residential,0.110,0.5,,4.54,
 16135402,Sandycove Avenue East,residential,0.235,1.5,,6.38,
-16135404,Link Road,residential,0.092,2.0,2.0,21.84,21.84
+16135404,Link Road,residential,0.092,1.0,2.0,10.92,21.84
 16135406,,unclassified,0.089,0.5,0.0,5.65,0.00
 16135407,,unclassified,0.091,0.0,,0.00,
 16135420,Marine Parade,secondary,0.445,1.0,,2.24,
@@ -932,7 +932,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 19907692,Sweetmount Park,residential,0.182,1.5,1.0,8.25,5.50
 19907694,Laurel Drive,residential,0.256,0.5,0.5,1.95,1.95
 19907695,Laurel Road,residential,0.317,1.5,1.0,4.74,3.16
-19907696,Laurel Avenue,residential,0.128,2.0,1.0,15.57,7.78
+19907696,Laurel Avenue,residential,0.128,1.0,1.0,7.78,7.78
 19907698,Sweetmount Drive,residential,0.242,2.0,2.0,8.28,8.28
 19907703,Beech Lawn,residential,0.269,2.0,2.0,7.42,7.42
 19907704,Beech Lawn,residential,0.052,0.0,0.5,0.00,9.65
@@ -1022,11 +1022,11 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 21161308,Meadow Grove,residential,0.077,1.0,1.0,12.98,12.98
 21161373,Meadow View,residential,0.184,1.0,1.0,5.43,5.43
 21161390,Mountain View Drive,residential,0.380,2.0,2.0,5.26,5.26
-21263215,Rathsallagh Park,residential,0.226,2.5,3.0,11.05,13.25
+21263215,Rathsallagh Park,residential,0.226,2.0,3.0,8.84,13.25
 21263222,Rathsallagh Drive,residential,0.101,0.0,0.5,0.00,4.95
 21263223,Rathsallagh Park,residential,0.127,0.0,0.5,0.00,3.93
 21263229,Rathsallagh Park,residential,0.139,0.0,0.5,0.00,3.60
-21263230,Shanganagh Wood,residential,0.104,1.0,1.5,9.64,14.46
+21263230,Shanganagh Wood,residential,0.104,0.5,1.5,4.82,14.46
 21263233,Aubrey Park,residential,0.179,0.0,1.0,0.00,5.59
 21263234,Corbawn Wood,residential,0.327,0.5,1.0,1.53,3.06
 21263236,Corbawn Glade,residential,0.137,0.0,0.5,0.00,3.66
@@ -1069,7 +1069,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 21655925,Castlebyrne Park,residential,0.056,0.0,0.0,0.00,0.00
 21802665,Shanganagh Grove,residential,0.370,1.0,1.5,2.70,4.06
 21802684,Shanganagh Grove,residential,0.250,1.0,1.0,4.01,4.01
-21802730,Foxes Grove,residential,0.087,1.5,1.0,17.22,11.48
+21802730,Foxes Grove,residential,0.087,0.5,1.0,5.74,11.48
 21802742,Foxes Grove,residential,0.219,0.0,0.5,0.00,2.28
 21802775,Foxes Grove,residential,0.093,0.0,0.5,0.00,5.35
 22278269,Mountain View Drive,residential,0.072,0.0,0.5,0.00,6.92
@@ -1130,7 +1130,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 22725236,Shanganagh Cliffs,residential,0.051,0.0,0.5,0.00,9.85
 22725237,Shanganagh Cliffs,residential,0.158,0.0,0.5,0.00,3.17
 22725238,Shanganagh Cliffs,residential,0.084,0.0,0.0,0.00,0.00
-22725239,Shanganagh Cliffs,residential,0.145,1.0,1.5,6.90,10.35
+22725239,Shanganagh Cliffs,residential,0.145,0.5,1.5,3.45,10.35
 22725240,Shanganagh Cliffs,residential,0.092,0.0,0.5,0.00,5.44
 22725242,Shanganagh Cliffs,residential,0.095,0.5,0.5,5.24,5.24
 22725447,Shrewsbury Road,residential,0.427,1.0,1.0,2.34,2.34
@@ -1233,7 +1233,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 22962757,Beaumont Close,residential,0.067,1.0,0.0,15.01,0.00
 22962758,Orchard Way,residential,0.068,0.0,1.0,0.00,14.71
 22962759,Headford Grove,residential,0.148,0.0,1.0,0.00,6.75
-22962760,Earlscourt,unclassified,0.066,1.0,1.0,15.26,15.26
+22962760,Earlscourt,unclassified,0.066,0.0,1.0,0.00,15.26
 22962761,Nutgrove Avenue,residential,0.082,0.5,1.5,6.13,18.40
 22962762,Nutgrove Avenue,residential,0.088,0.0,0.5,0.00,5.67
 22962763,Nutgrove Avenue,residential,0.070,0.0,1.0,0.00,14.34
@@ -2498,7 +2498,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 29009586,Rory O'Connor Park,residential,0.296,3.0,4.0,10.13,13.51
 29009588,Casement Villas,residential,0.146,0.5,1.5,3.43,10.29
 29009591,Rose Park,residential,0.316,2.0,1.5,6.34,4.75
-29009592,Rose Park,residential,0.307,2.0,2.5,6.52,8.15
+29009592,Rose Park,residential,0.307,2.0,1.5,6.52,4.89
 29009593,Rose Park,residential,0.188,0.5,0.5,2.65,2.65
 29009594,Ash Grove,residential,0.146,1.0,1.0,6.86,6.86
 29009596,Ashgrove,residential,0.142,0.5,0.5,3.52,3.52
@@ -2510,7 +2510,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 29014752,Meadow Vale,residential,0.269,1.0,2.0,3.71,7.43
 29014753,Meadow Vale,residential,0.381,1.0,0.5,2.63,1.31
 29014755,Meadow Vale,residential,0.285,0.5,0.5,1.76,1.76
-29014923,Clonkeen Crescent,residential,0.210,2.0,2.0,9.51,9.51
+29014923,Clonkeen Crescent,residential,0.210,1.0,2.0,4.75,9.51
 29014924,Clonkeen Crescent,residential,0.099,0.5,0.0,5.04,0.00
 29014925,Clonkeen Grove,residential,0.131,0.5,0.0,3.81,0.00
 29015048,Springfield Park,residential,0.287,1.5,1.0,5.22,3.48
@@ -2552,7 +2552,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 29331297,Bentley Park,residential,0.102,0.5,1.0,4.90,9.80
 29331301,Bentley Avenue,residential,0.074,0.0,0.5,0.00,6.74
 29331395,Belmont,residential,0.104,1.5,0.5,14.46,4.82
-29331434,Belmont,residential,0.168,2.0,1.5,11.93,8.95
+29331434,Belmont,residential,0.168,1.0,1.5,5.97,8.95
 29331454,Oak Glen View,residential,0.172,0.5,0.0,2.91,0.00
 29331458,Oak Glen Park,residential,0.109,0.5,0.0,4.58,0.00
 29331543,Swanbrook,residential,0.254,1.0,0.5,3.93,1.97
@@ -2953,7 +2953,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 35667940,South Park,residential,0.093,0.0,0.5,0.00,5.36
 35667941,South Park,residential,0.113,0.0,0.5,0.00,4.42
 35668459,South Park Drive,residential,0.126,0.5,1.0,3.96,7.91
-35668559,Beech Park Grove,residential,0.201,1.0,1.5,4.98,7.47
+35668559,Beech Park Grove,residential,0.201,1.0,0.5,4.98,2.49
 35668628,South Park,residential,0.110,0.0,0.5,0.00,4.53
 35669021,Beech Park Drive,residential,0.215,0.5,1.0,2.32,4.64
 35669053,Beech Park Drive,residential,0.416,1.0,1.0,2.40,2.40
@@ -3685,7 +3685,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 39962453,Haddington Park,residential,0.203,0.5,0.5,2.47,2.47
 39962454,Haddington Park,residential,0.077,0.5,0.5,6.53,6.53
 39962455,Silchester Downs,residential,0.110,0.0,0.5,0.00,4.56
-39962456,Glengara Park,residential,0.125,1.5,1.5,12.04,12.04
+39962456,Glengara Park,residential,0.125,1.0,1.5,8.03,12.04
 39962457,Glengara Park,residential,0.174,0.5,1.0,2.87,5.73
 39962459,The Glen,residential,0.064,0.0,0.5,0.00,7.85
 39962461,Silchester Court,residential,0.061,0.5,1.0,8.25,16.49
@@ -3710,7 +3710,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 39962489,Burdett Avenue,residential,0.178,1.0,,5.61,
 39962490,Ballygihen Avenue,residential,0.154,1.0,1.0,6.50,6.50
 39962491,Marine Avenue,residential,0.176,1.0,,5.68,
-39962492,Wilmont Avenue,residential,0.076,1.0,1.0,13.08,13.08
+39962492,Wilmont Avenue,residential,0.076,0.0,1.0,0.00,13.08
 39962944,Saint Kevin's Villas,living_street,0.072,2.0,1.0,27.83,13.92
 39962945,Sarsfield Street,residential,0.138,0.5,1.0,3.62,7.24
 39962946,Rollins Court,residential,0.068,0.5,0.5,7.31,7.31
@@ -3785,7 +3785,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 39965572,Killiney Grove,residential,0.093,0.0,1.0,0.00,10.75
 39965573,Cluny Park,residential,0.054,0.0,1.0,0.00,18.68
 39965574,Fairlawns,residential,0.118,0.0,0.5,0.00,4.24
-39965575,Saval Park,residential,0.147,1.5,1.0,10.23,6.82
+39965575,Saval Park,residential,0.147,0.5,1.0,3.41,6.82
 39965576,Saval Park Gardens,residential,0.156,1.0,1.0,6.40,6.40
 39965577,Saval Park Gardens,residential,0.136,1.0,1.0,7.33,7.33
 39965578,Saval Park Gardens,residential,0.069,0.5,0.5,7.22,7.22
@@ -3901,7 +3901,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 40023030,Sycamore Grove,residential,0.077,0.0,0.5,0.00,6.47
 40023031,Highland Lawn,residential,0.112,0.0,0.5,0.00,4.47
 40023032,Highland Avenue,residential,0.067,0.5,0.5,7.49,7.49
-40023033,Kerrymount Rise,residential,0.088,1.0,1.5,11.33,16.99
+40023033,Kerrymount Rise,residential,0.088,0.5,1.5,5.66,16.99
 40023034,Kerrymount Rise,residential,0.552,3.0,3.0,5.44,5.44
 40023036,Glen Avenue,residential,0.116,0.0,0.5,0.00,4.29
 40023037,Glen Garth,residential,0.064,0.0,0.5,0.00,7.78
@@ -4135,7 +4135,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 46882910,Meadowlands Court,residential,0.060,1.0,0.5,16.72,8.36
 46883031,O'Rourke Park,residential,0.313,3.0,2.5,9.59,7.99
 46883032,Sallynoggin Park,residential,0.090,1.0,1.5,11.07,16.60
-46990957,Shanganagh Cliffs,residential,0.601,4.0,4.0,6.66,6.66
+46990957,Shanganagh Cliffs,residential,0.601,4.0,3.5,6.66,5.83
 47153492,Grange Grove,residential,0.193,0.5,0.5,2.59,2.59
 47250029,Alma Place,residential,0.061,0.0,0.5,0.00,8.21
 47250030,Longford Terrace,trunk,0.159,2.5,,15.71,
@@ -4215,7 +4215,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 49907737,Simonsridge,unclassified,0.665,1.0,1.0,1.50,1.50
 49908607,Stillorgan Road,trunk,0.424,0.0,,0.00,
 49910958,Ballinteer Avenue,tertiary,0.052,0.0,1.0,0.00,19.40
-49912038,Nutgrove Avenue,secondary,0.226,7.0,7.0,31.01,31.01
+49912038,Nutgrove Avenue,secondary,0.226,7.5,7.0,33.23,31.01
 49912045,Belgard Road,secondary,0.263,2.0,,7.60,
 49912055,Belgard Square West,tertiary,0.066,2.0,1.0,30.46,15.23
 49912368,Belgard Road,secondary,0.055,1.0,,18.09,
@@ -4405,7 +4405,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 54241158,Kelston View,residential,0.103,1.0,0.5,9.67,4.83
 54241159,Willow Park,residential,0.051,0.0,0.5,0.00,9.76
 54242897,Foxrock Manor,residential,0.082,0.5,0.0,6.09,0.00
-54242902,Clonkeen Lawn,residential,0.054,1.0,1.0,18.38,18.38
+54242902,Clonkeen Lawn,residential,0.054,0.0,1.0,0.00,18.38
 54244359,Ardagh Grove,residential,0.179,0.5,0.5,2.80,2.80
 54244360,Foxrock Park,residential,0.133,0.5,0.0,3.75,0.00
 54252237,Pine Avenue,residential,0.127,1.5,1.0,11.83,7.88
@@ -4572,7 +4572,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 65072936,R757,secondary,0.098,0.0,0.5,0.00,5.09
 65072937,L1059,tertiary,3.481,1.0,0.0,0.29,0.00
 69049237,Whitestown Way,tertiary,0.457,3.0,2.0,6.57,4.38
-70265991,,residential,0.263,1.0,1.0,3.80,3.80
+70265991,,residential,0.263,1.0,0.0,3.80,0.00
 70724264,Kilmacud Road Lower,secondary,0.104,0.5,0.0,4.79,0.00
 71054615,Kilmacud Road Lower,secondary,0.256,0.5,0.5,1.96,1.96
 71247437,R759,secondary,2.456,0.5,0.0,0.20,0.00
@@ -4940,7 +4940,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 112797281,Mount Eagle Way,residential,0.132,1.0,0.5,7.58,3.79
 112797282,Mount Eagle Court,residential,0.103,0.5,0.0,4.86,0.00
 112797286,Mount Eagle Rise,residential,0.161,0.5,0.5,3.10,3.10
-112797288,Mount Eagle Park,residential,0.091,1.0,1.5,10.97,16.45
+112797288,Mount Eagle Park,residential,0.091,1.0,0.5,10.97,5.48
 112797290,Mount Eagle Drive,residential,0.278,1.0,1.0,3.60,3.60
 112797295,Mount Eagle Lawn,residential,0.152,0.5,0.0,3.29,0.00
 112804041,Kilmore Avenue,residential,0.288,0.0,0.5,0.00,1.74
@@ -5009,7 +5009,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 117355661,L5014,unclassified,0.297,0.0,0.0,0.00,0.00
 117479860,,unclassified,0.064,0.0,0.5,0.00,7.80
 118484309,Murphystown Way,tertiary,0.079,0.0,0.0,0.00,0.00
-118635426,Claremount,residential,0.298,1.5,1.5,5.04,5.04
+118635426,Claremount,residential,0.298,0.5,1.5,1.68,5.04
 118639026,Glenamuck Road North,secondary,0.096,0.0,0.5,0.00,5.19
 119609529,,unclassified,0.156,0.0,1.0,0.00,6.43
 119609534,,unclassified,0.132,0.0,1.0,0.00,7.59
@@ -5078,7 +5078,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 127498025,Doonanore Park,residential,0.200,0.0,0.5,0.00,2.51
 127498026,Doonsalla Drive,residential,0.208,0.5,1.0,2.40,4.80
 127498027,Doonsalla Park,residential,0.193,0.5,0.0,2.59,0.00
-127498028,Drumkeen Manor,residential,0.136,1.0,1.0,7.36,7.36
+127498028,Drumkeen Manor,residential,0.136,0.0,1.0,0.00,7.36
 127498029,Elm Grove,residential,0.114,1.0,1.0,8.79,8.79
 127498030,Elm Grove,residential,0.106,0.5,0.0,4.74,0.00
 127498031,Glenview,residential,0.098,1.0,0.5,10.24,5.12
@@ -5146,7 +5146,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 127517098,Station Road,secondary,0.147,0.0,0.0,0.00,0.00
 127517100,Strathmore Road,tertiary,0.283,1.0,1.0,3.54,3.54
 127517102,Vico Road,secondary,0.459,1.0,,2.18,
-127529527,Ardbrugh Road,residential,0.467,2.0,2.0,4.28,4.28
+127529527,Ardbrugh Road,residential,0.467,1.0,2.0,2.14,4.28
 127529535,Barnhill Avenue,residential,0.383,2.5,2.0,6.53,5.23
 127529541,Beech Court,residential,0.147,0.5,0.5,3.41,3.41
 127529543,Beech Court,residential,0.107,1.0,0.5,9.36,4.68
@@ -5154,7 +5154,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 127529561,Kilbogget Grove,residential,0.172,0.0,1.0,0.00,5.81
 127529563,Mapas Road,residential,0.396,1.0,1.0,2.52,2.52
 127529567,Rathsallagh Avenue,residential,0.113,0.0,0.5,0.00,4.44
-127529570,Saval Park Crescent,residential,0.144,1.0,1.0,6.95,6.95
+127529570,Saval Park Crescent,residential,0.144,0.0,1.0,0.00,6.95
 127529572,Shanganagh Wood,residential,0.192,3.0,2.5,15.61,13.01
 127529581,The Metals,residential,0.076,0.0,1.0,0.00,13.11
 127543999,Cherrywood Road,secondary,0.187,0.0,1.0,0.00,5.35
@@ -5310,7 +5310,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 129000012,Desmond Avenue,residential,0.092,0.5,0.0,5.44,0.00
 129000016,Dun Leary Hill,secondary,0.155,0.5,0.5,3.24,3.24
 129000027,Maretimo Place,residential,0.052,1.0,0.0,19.31,0.00
-129000028,Maretimo Road,residential,0.076,1.0,1.0,13.13,13.13
+129000028,Maretimo Road,residential,0.076,1.0,0.0,13.13,0.00
 129000030,Newtown Villas,residential,0.078,1.0,0.0,12.83,0.00
 129000031,Windsor Terrace,secondary,0.105,1.0,,9.50,
 129000033,Northcote Avenue,residential,0.165,1.5,,9.10,
@@ -5349,7 +5349,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 129133928,Willbrook Downs,residential,0.118,0.0,0.0,0.00,0.00
 129133929,Willbrook Lawns,residential,0.175,0.0,0.0,0.00,0.00
 129202616,Beeches Park,residential,0.116,0.5,0.0,4.31,0.00
-129202620,Marlborough Road,residential,0.440,1.0,1.5,2.27,3.41
+129202620,Marlborough Road,residential,0.440,1.0,0.5,2.27,1.14
 129202622,St Catherine's Road,residential,0.333,1.0,1.5,3.01,4.51
 129202627,Silchester Wood,residential,0.061,0.0,0.0,0.00,0.00
 129202629,Station Road,residential,0.167,0.0,0.5,0.00,2.99
@@ -5737,7 +5737,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 231218274,Wyattville Park,residential,0.396,1.0,1.0,2.52,2.52
 231225440,The Ramparts,residential,0.108,0.5,0.5,4.64,4.64
 231237017,Churchtown Road Upper,secondary,0.061,1.0,2.0,16.35,32.70
-231240081,Goatstown Close,residential,0.226,2.5,2.0,11.04,8.84
+231240081,Goatstown Close,residential,0.226,2.5,1.0,11.04,4.42
 231515447,Ard Lorcan,residential,0.054,0.5,0.5,9.26,9.26
 231676109,Stradbrook Hill,residential,0.070,0.0,0.5,0.00,7.17
 231866240,Taney Wood,residential,0.068,1.0,1.0,14.69,14.69
@@ -5777,7 +5777,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 237051738,Carrig Park,residential,0.221,1.0,0.0,4.52,0.00
 237051744,Bramble Glade,residential,0.193,1.0,1.0,5.17,5.17
 237051745,Bramble Glade,residential,0.111,1.5,1.0,13.47,8.98
-237051746,Ballinahinch Park,residential,0.207,1.0,1.0,4.83,4.83
+237051746,Ballinahinch Park,residential,0.207,1.0,0.0,4.83,0.00
 237051749,Bramble Glade,residential,0.117,1.0,1.0,8.55,8.55
 237088628,,unclassified,0.420,1.0,0.0,2.38,0.00
 237237097,Ardbrugh Close,residential,0.061,0.0,0.5,0.00,8.17
@@ -5882,7 +5882,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 256056278,The Stables,residential,0.099,0.5,0.0,5.05,0.00
 256080674,Shankill Road,unclassified,0.083,0.0,0.0,0.00,0.00
 256146058,,residential,0.104,1.0,0.0,9.60,0.00
-256147160,L4377,tertiary,1.059,1.0,1.0,0.94,0.94
+256147160,L4377,tertiary,1.059,1.0,0.0,0.94,0.00
 256438933,Station Road,secondary,0.337,0.5,0.5,1.48,1.48
 256446771,Ridge Hall,residential,0.142,0.5,1.5,3.52,10.56
 256453354,St George's Avenue,residential,0.344,1.0,0.0,2.91,0.00
@@ -6786,12 +6786,12 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 533980809,The Avenue,residential,0.105,0.5,0.5,4.76,4.76
 534204558,Old Glenamuck Road,unclassified,0.303,0.0,0.0,0.00,0.00
 534265142,The Avenue,residential,0.062,0.5,1.0,8.01,16.02
-538298074,Roseland Avenue,residential,0.135,2.0,2.5,14.77,18.46
-538298075,Roseland Avenue,residential,0.135,1.0,1.5,7.38,11.07
-538298076,Roseland Avenue,residential,0.234,1.5,1.0,6.41,4.27
+538298074,Roseland Avenue,residential,0.135,2.0,1.0,14.77,7.38
+538298075,Roseland Avenue,residential,0.135,0.5,1.5,3.69,11.07
+538298076,Roseland Avenue,residential,0.234,0.5,1.0,2.14,4.27
 538298078,Cualanor Avenue,residential,0.096,2.0,,20.93,
 538298083,Cooper Way,residential,0.107,0.5,1.0,4.66,9.31
-538298085,Abbot Drive,residential,0.262,3.0,2.0,11.44,7.63
+538298085,Abbot Drive,residential,0.262,2.5,2.0,9.53,7.63
 538318046,Cualanor Avenue,residential,0.096,2.5,,26.02,
 541880143,Giltspur Lane,unclassified,0.330,1.0,0.0,3.03,0.00
 545032812,,residential,0.164,0.0,0.0,0.00,0.00
@@ -6913,7 +6913,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 590787584,Ardilea Crescent,residential,0.143,0.5,1.0,3.49,6.99
 591285701,Churchview Road,residential,0.364,6.5,6.0,17.85,16.48
 591849008,Grange Road,secondary,0.100,0.5,,4.99,
-592172597,Boulders,residential,0.060,1.0,1.0,16.62,16.62
+592172597,Boulders,residential,0.060,0.0,1.0,0.00,16.62
 592547432,Saint Patrick's Park,residential,0.309,3.0,2.0,9.71,6.48
 593186415,Woodbank,residential,0.247,0.5,1.5,2.03,6.08
 594040543,Weston Park,residential,0.220,1.0,1.0,4.55,4.55
@@ -6948,7 +6948,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 638208294,Graydon Road,residential,0.244,2.0,1.0,8.20,4.10
 638280300,Avondale Road,tertiary,0.250,0.5,0.0,2.00,0.00
 638280303,Corrig Road,residential,0.134,1.5,1.0,11.15,7.44
-638280304,Albert Road Lower,residential,0.115,2.0,1.0,17.39,8.70
+638280304,Albert Road Lower,residential,0.115,1.0,1.0,8.70,8.70
 638280307,Sandycove Road,secondary,0.092,0.5,0.0,5.44,0.00
 638320153,Brewery Road,trunk,0.106,2.5,2.0,23.62,18.90
 638479799,Newtownpark Avenue,secondary,0.188,0.0,0.0,0.00,0.00
@@ -7089,8 +7089,8 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 694132987,The Park,residential,0.218,2.0,2.0,9.18,9.18
 695939640,Wyckham Point,residential,0.193,0.5,0.5,2.59,2.59
 696191654,Eustace Drive,residential,0.090,0.0,1.0,0.00,11.17
-696624631,Fairway Drive,residential,0.060,1.0,1.0,16.56,16.56
-696624632,Fairway Drive,residential,0.062,1.0,1.0,16.05,16.05
+696624631,Fairway Drive,residential,0.060,0.0,1.0,0.00,16.56
+696624632,Fairway Drive,residential,0.062,0.0,1.0,0.00,16.05
 696624634,Fairway Drive,residential,0.152,2.0,2.0,13.19,13.19
 697898470,Glen of the Downs Dual Carriageway,trunk,1.278,0.0,,0.00,
 702308251,R755,secondary,1.960,0.0,0.0,0.00,0.00
@@ -7256,7 +7256,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 777267136,Drummartin Link Road,secondary,0.224,0.0,,0.00,
 777267139,Bracken Road,unclassified,0.344,1.0,0.0,2.91,0.00
 778250827,Berryfield Lane,unclassified,0.123,0.0,0.5,0.00,4.07
-779986220,Abbot Drive,residential,0.123,1.5,1.5,12.16,12.16
+779986220,Abbot Drive,residential,0.123,1.0,1.5,8.11,12.16
 782177528,The Nurseries,residential,0.065,0.5,0.5,7.67,7.67
 782177534,The Grove,residential,0.059,0.5,1.5,8.41,25.24
 782177535,The Grove,residential,0.054,1.0,0.5,18.45,9.22
@@ -7426,7 +7426,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 843190510,Blessington Road,primary,0.272,2.0,1.0,7.34,3.67
 843193053,Brownsbarn Orchard,residential,0.100,0.0,0.0,0.00,0.00
 843996809,Belarmine Drive,residential,0.097,1.0,0.5,10.28,5.14
-844036150,Fairway Drive,residential,0.104,1.0,1.0,9.65,9.65
+844036150,Fairway Drive,residential,0.104,0.0,1.0,0.00,9.65
 844668480,Ely Square,residential,0.137,0.5,1.5,3.65,10.95
 845843223,,residential,0.056,0.5,0.0,8.98,0.00
 845861016,Sheehy Skeffington Meadows,residential,0.202,0.5,0.5,2.47,2.47
@@ -7789,9 +7789,9 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1053145458,Carysfort Avenue,secondary,0.069,0.0,0.0,0.00,0.00
 1053305696,Station Road,residential,0.189,1.0,1.0,5.30,5.30
 1053308535,Silchester Park,residential,0.100,1.0,0.5,9.97,4.99
-1053403175,Silchester Wood,residential,0.079,1.0,1.0,12.65,12.65
+1053403175,Silchester Wood,residential,0.079,1.0,0.0,12.65,0.00
 1053453719,Silchester Park,residential,0.112,0.0,0.5,0.00,4.48
-1053624864,Saint Fintan's Park,residential,0.254,1.5,1.5,5.90,5.90
+1053624864,Saint Fintan's Park,residential,0.254,0.5,1.5,1.97,5.90
 1053901251,Monarch Avenue,unclassified,0.343,5.0,5.0,14.60,14.60
 1054717129,Quarry Road,unclassified,0.182,0.0,0.5,0.00,2.74
 1055820092,Clonard Lawn,residential,0.072,0.5,0.5,6.94,6.94
@@ -8021,7 +8021,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1157749162,Ballinclea Heights,residential,0.188,0.5,1.0,2.65,5.31
 1157778872,Dalkey Manor,residential,0.080,0.5,1.5,6.22,18.65
 1157986256,,residential,0.142,1.0,1.0,7.06,7.06
-1160118247,Castle Way,residential,0.477,4.5,5.5,9.43,11.53
+1160118247,Castle Way,residential,0.477,5.0,5.5,10.48,11.53
 1161525632,Greenway View,residential,0.087,0.0,0.5,0.00,5.73
 1161525641,Mountain Gate,residential,0.147,0.0,0.5,0.00,3.40
 1162784351,,unclassified,0.071,1.0,,14.17,
@@ -8034,7 +8034,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1163740422,,residential,0.098,0.5,1.0,5.13,10.25
 1163740423,Domville Park,residential,0.113,0.0,0.5,0.00,4.44
 1163740434,,tertiary,0.371,2.5,,6.73,
-1164921393,Brennanstown Wood,residential,0.218,1.5,1.5,6.88,6.88
+1164921393,Brennanstown Wood,residential,0.218,1.0,1.5,4.59,6.88
 1164921394,Brennanstown Wood,residential,0.093,0.5,1.0,5.38,10.75
 1164953488,,residential,0.053,0.0,0.0,0.00,0.00
 1164958039,,residential,0.051,0.5,1.0,9.76,19.52
@@ -8141,7 +8141,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1208175643,Newtownpark Avenue,secondary,0.138,0.5,0.0,3.62,0.00
 1208175644,Castlebyrne Park,residential,0.085,0.5,1.0,5.87,11.73
 1208175646,Brookfield Court,residential,0.055,0.0,0.5,0.00,9.03
-1208175647,Brookfield Place,residential,0.101,1.5,1.0,14.90,9.94
+1208175647,Brookfield Place,residential,0.101,0.5,1.0,4.97,9.94
 1208184919,Balally Drive,residential,0.328,0.0,0.5,0.00,1.52
 1208184925,Leopardstown Avenue,tertiary,0.216,0.5,0.5,2.32,2.32
 1208184926,Leopardstown Avenue,tertiary,0.311,0.0,0.5,0.00,1.61
@@ -8262,7 +8262,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1269317255,Glendarragh,residential,0.117,1.0,1.0,8.51,8.51
 1269317256,Glendarragh,residential,0.082,0.5,0.5,6.12,6.12
 1269317257,Glendarragh,residential,0.151,0.5,0.5,3.32,3.32
-1269317258,Glendarragh,residential,0.108,2.0,1.5,18.55,13.91
+1269317258,Glendarragh,residential,0.108,2.0,1.0,18.55,9.27
 1269317259,Glendarragh,residential,0.148,1.0,1.0,6.75,6.75
 1269317280,Rockfield Meadow,residential,0.139,1.0,0.0,7.22,0.00
 1269317282,,secondary,0.214,0.5,1.0,2.34,4.68
@@ -8497,7 +8497,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1359165985,Glencarraig,residential,0.107,0.5,1.0,4.67,9.35
 1359593639,,residential,0.108,0.5,0.5,4.62,4.62
 1360558070,Glenamuck Manor,residential,0.328,2.0,3.0,6.10,9.15
-1360558072,Glenamuck Manor,residential,0.112,2.0,1.0,17.85,8.92
+1360558072,Glenamuck Manor,residential,0.112,1.0,1.0,8.92,8.92
 1360558074,,residential,0.137,1.0,2.0,7.31,14.62
 1360659784,The Court,residential,0.094,1.0,0.5,10.65,5.32
 1360659790,The Way,residential,0.077,0.5,1.0,6.47,12.93
@@ -8647,7 +8647,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1447028749,Glenamuck Link Distributor Road,secondary,0.162,1.5,,9.25,
 1447028750,Glenamuck Road South,unclassified,0.100,1.0,1.0,9.96,9.96
 1447028755,L3022,tertiary,0.074,0.0,,0.00,
-1447111172,,residential,0.070,1.0,1.0,14.28,14.28
+1447111172,,residential,0.070,0.0,1.0,0.00,14.28
 1447111188,,secondary,0.607,0.0,0.5,0.00,0.82
 1447111192,,residential,0.129,0.5,1.5,3.88,11.63
 1447111888,Haven Way,residential,0.555,2.5,2.5,4.51,4.51
@@ -8665,7 +8665,7 @@ way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_
 1449634339,,residential,0.091,1.0,2.0,11.04,22.08
 1449634340,,residential,0.054,0.5,0.0,9.28,0.00
 1449902025,,residential,0.097,0.5,1.0,5.16,10.33
-1451755704,Shanganagh Cliffs,residential,0.072,1.0,1.0,13.92,13.92
+1451755704,Shanganagh Cliffs,residential,0.072,0.0,1.0,0.00,13.92
 1452240260,Avoca Avenue,tertiary,0.074,0.0,0.0,0.00,0.00
 1452866456,,residential,0.094,0.0,0.0,0.00,0.00
 1453003086,Harbour Road,tertiary,0.058,0.0,0.5,0.00,8.57
