@@ -9,8 +9,8 @@ elevator/corridor). Also keeps tags of tagged nodes (signals, stop, give_way, cr
 The parsed network is pickled to data/cache/ (gitignored) because the Ireland pass takes minutes.
 """
 import hashlib
-import pickle
 import pathlib
+import pickle
 
 import numpy as np
 import osmium
@@ -33,7 +33,7 @@ class Network:
     def __init__(self, ways, node_xy, node_tag):
         # ways: {way_id: (highway, roundabout, [node ids])}
         self.ways = {w: (hw, rb) for w, (hw, rb, _) in ways.items()}
-        wid, na, nb, ax, ay, bx, by, widx = [], [], [], [], [], [], [], []
+        na, nb, ax, ay, bx, by, widx = [], [], [], [], [], [], []
         self.way_ids = list(ways)
         for k, w in enumerate(self.way_ids):
             ns = ways[w][2]
@@ -138,5 +138,6 @@ def load_network(pbf, boxes=(), points=None, cell=0.02, cache_dir="data/cache"):
     net.node_ll = node_ll
     net.tagged_ll = {}
     cp.parent.mkdir(parents=True, exist_ok=True)
-    pickle.dump(net, open(cp, "wb"), protocol=4)
+    with open(cp, "wb") as f:
+        pickle.dump(net, f, protocol=4)
     return net

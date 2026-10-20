@@ -14,7 +14,13 @@ Usage:
 --dem may be a local GeoTIFF/.hgt or an https URL (read via GDAL /vsicurl/).
 Default --out: data/samples/wicklow_gap_profile_<label>.csv (label defaults to DEM file stem).
 """
-import argparse, csv, math, os, sys
+import argparse
+import csv
+import itertools
+import math
+import os
+import sys
+
 import gpxpy
 import numpy as np
 import rasterio
@@ -42,7 +48,7 @@ def resample(pts, step):
     next_d = 0.0
     total = 0.0
     segs = []
-    for (la1, lo1), (la2, lo2) in zip(pts[:-1], pts[1:]):
+    for (la1, lo1), (la2, lo2) in itertools.pairwise(pts):
         az, _, dist = GEOD.inv(lo1, la1, lo2, la2)
         segs.append((la1, lo1, az, dist))
         total += dist

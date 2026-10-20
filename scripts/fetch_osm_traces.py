@@ -6,9 +6,8 @@ Stops at the first empty page (no <trkpt>). >= 1 s between calls, polite User-Ag
 """
 import argparse
 import pathlib
-import time
-
 import subprocess
+import time
 
 UA = "bike-mapper-research/0.1 (ebowman@boboco.ie)"
 URL = "https://api.openstreetmap.org/api/0.6/trackpoints"
@@ -26,7 +25,7 @@ def main():
         # NB: requests/urllib3 is answered 429 by the OSM CDN (TLS fingerprint); curl is not.
         for attempt in range(6):
             r = subprocess.run(["curl", "-s", "-A", UA, "-w", "\n%{http_code}", f"{URL}?bbox={a.bbox}&page={page}"],
-                               capture_output=True, text=True, timeout=180)
+                               capture_output=True, text=True, timeout=180, check=False)
             body, _, code = r.stdout.rpartition("\n")
             if code not in ("429", "503", "000"):
                 break

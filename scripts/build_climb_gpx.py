@@ -7,7 +7,10 @@ Fetch JSON (Wicklow Gap, R756):
    'data=[out:json];way["ref"="R756"](52.98,-6.45,53.06,-6.25);out geom;' \
    https://overpass-api.de/api/interpreter -o r756.json
 """
-import argparse, json, sys
+import argparse
+import json
+import sys
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -16,7 +19,8 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--name", default="climb")
     a = ap.parse_args()
-    els = {e["id"]: [(p["lat"], p["lon"]) for p in e["geometry"]] for e in json.load(open(a.json))["elements"]}
+    with open(a.json) as jf:
+        els = {e["id"]: [(p["lat"], p["lon"]) for p in e["geometry"]] for e in json.load(jf)["elements"]}
     pts = []
     for tok in a.ways.split(","):
         wid = abs(int(tok))
@@ -33,8 +37,7 @@ def main():
     with open(a.out, "w") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="bike-mapper scripts/build_climb_gpx.py (OSM way geometry, ODbL)" xmlns="http://www.topografix.com/GPX/1/1">\n')
         f.write(f"<trk><name>{a.name}</name><trkseg>\n")
-        for la, lo in pts:
-            f.write(f'<trkpt lat="{la:.7f}" lon="{lo:.7f}"/>\n')
+        f.writelines(f'<trkpt lat="{la:.7f}" lon="{lo:.7f}"/>\n' for la, lo in pts)
         f.write("</trkseg></trk></gpx>\n")
     print(f"{len(pts)} points -> {a.out}")
 

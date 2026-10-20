@@ -7,7 +7,9 @@ Usage: uv run python scripts/climb_spec_dryrun.py data/samples/wicklow_gap_profi
 All constants below are the spec's thresholds.
 """
 import csv
+import itertools
 import sys
+
 import numpy as np
 
 STEP = 25.0       # m, sample spacing
@@ -52,7 +54,7 @@ def zigzag(z):
 def ascents(z, ext):
     """(start_idx, end_idx) for each min->max pair of consecutive extrema."""
     out = []
-    for a, b in zip(ext[:-1], ext[1:]):
+    for a, b in itertools.pairwise(ext):
         if z[b] > z[a]:
             out.append([a, b])
     return out
@@ -61,7 +63,7 @@ def ascents(z, ext):
 def merge(z, asc):
     m = [asc[0][:]]
     for a, b in asc[1:]:
-        pa, pb = m[-1]
+        _, pb = m[-1]
         loss = z[pb] - z[a]
         dlen = (a - pb) * STEP
         if loss <= MERGE_LOSS and dlen <= MERGE_LEN:
@@ -111,7 +113,8 @@ def stats(d, z, s, e, label):
 
 
 def main():
-    rows = list(csv.DictReader(open(sys.argv[1])))
+    with open(sys.argv[1]) as f:
+        rows = list(csv.DictReader(f))
     d = np.array([float(r["distance_m"]) for r in rows]); z0 = np.array([float(r["elevation_m"]) for r in rows])
     z = median3(z0)
     ext = zigzag(z)

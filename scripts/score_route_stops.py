@@ -25,13 +25,13 @@ Method
 """
 import argparse
 import csv
+import itertools
 import math
 import re
 import sys
 from collections import Counter, defaultdict
 
 import gpxpy
-import numpy as np
 import osmium
 from pyproj import Transformer
 from shapely import STRtree
@@ -83,7 +83,7 @@ def ascent(eles, hyst=3.0):
     """Sum of climbs with a 3 m hysteresis (ignores noise smaller than hyst)."""
     if not eles:
         return 0.0
-    tot, ref, lo = 0.0, eles[0], eles[0]
+    tot, ref = 0.0, eles[0]
     for e in eles[1:]:
         if e > ref + hyst:
             tot += e - ref
@@ -94,13 +94,16 @@ def ascent(eles, hyst=3.0):
 
 
 def score(gpx_path, ways, events):
-    g = gpxpy.parse(open(gpx_path))
+    with open(gpx_path) as f:
+        g = gpxpy.parse(f)
     pts = [(p.longitude, p.latitude, p.elevation) for t in g.tracks for s in t.segments for p in s.points]
     xs, ys = TR.transform([p[0] for p in pts], [p[1] for p in pts])
     xy = list(zip(map(float, xs), map(float, ys)))
     dist = sum(math.dist(xy[i], xy[i + 1]) for i in range(len(xy) - 1))
     asc = ascent([p[2] for p in pts if p[2] is not None])
-    m = re.search(r"filtered ascend = (\d+)", open(gpx_path).read(2000))
+    with open(gpx_path) as f:
+        head = f.read(2000)
+    m = re.search(r"filtered ascend = (\d+)", head)
     brouter_asc = int(m.group(1)) if m else None
 
     # vertex STRtree + edge index
@@ -145,7 +148,7 @@ def score(gpx_path, ways, events):
     for (u, v) in edges:
         adj[u].append(v)
     filled, nfill, nfail = [seq[0]] if seq else [], 0, 0
-    for a, b in zip(seq, seq[1:]):
+    for a, b in itertools.pairwise(seq):
         if (a, b) in edges:
             filled.append(b)
             continue
@@ -187,8 +190,7 @@ def score(gpx_path, ways, events):
     seq = filled
     by_cause = Counter()
     gap_m = other_m = road_m = 0.0
-    arrivals = []  # (node, way_id) used for turns
-    for a, b in zip(seq, seq[1:]):
+    for a, b in itertools.pairwise(seq):
         cand = edges.get((a, b))
         L = math.dist(node_xy[a], node_xy[b])
         if not cand:
@@ -206,7 +208,7 @@ def score(gpx_path, ways, events):
     # right turns
     right = left = 0
     cum = [0.0]
-    for a, b in zip(seq, seq[1:]):
+    for a, b in itertools.pairwise(seq):
         cum.append(cum[-1] + math.dist(node_xy[a], node_xy[b]))
     for k in range(1, len(seq) - 1):
         n = seq[k]
@@ -226,8 +228,8 @@ def score(gpx_path, ways, events):
             right += 1
         elif -150 <= ch <= -30:
             left += 1
-    return dict(dist=dist, asc=asc, brouter_asc=brouter_asc, causes=by_cause, right=right, left=left,
-                nodes=len(seq), unsnapped=unsnapped, nfill=nfill, nfail=nfail, gap_m=gap_m, other_m=other_m, road_m=road_m)
+    return {"dist": dist, "asc": asc, "brouter_asc": brouter_asc, "causes": by_cause, "right": right, "left": left,
+            "nodes": len(seq), "unsnapped": unsnapped, "nfill": nfill, "nfail": nfail, "gap_m": gap_m, "other_m": other_m, "road_m": road_m}
 
 
 def main():
@@ -244,7 +246,8 @@ def main():
     # bbox of all routes, +0.02 deg
     allp = []
     for p in a.gpx:
-        g = gpxpy.parse(open(p))
+        with open(p) as f:
+            g = gpxpy.parse(f)
         allp += [(q.longitude, q.latitude) for t in g.tracks for s in t.segments for q in s.points]
     bbox = (min(q[0] for q in allp) - .02, min(q[1] for q in allp) - .02,
             max(q[0] for q in allp) + .02, max(q[1] for q in allp) + .02)

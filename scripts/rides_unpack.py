@@ -115,7 +115,7 @@ def main() -> int:
     indoor = sum(1 for r in index if r.get("reason") == "indoor")
     outdoor = n - indoor
     dl = sum(1 for r in index if r["downloaded"])
-    failed = [r for r in index if not r["downloaded"] and r.get("reason") not in ("indoor", "not_attempted")]
+    failed = [r for r in index if not r["downloaded"] and r.get("reason") != "indoor"]
     print(f"activities: {n}  indoor/virtual (skipped): {indoor}  outdoor: {outdoor}  downloaded: {dl}  failed: {len(failed)}")
     for r in failed:
         print(f"  FAIL {r['activityId']} {r['startTimeGMT']} {r['typeKey']}: {r['reason']}")

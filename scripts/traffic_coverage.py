@@ -12,10 +12,15 @@ scripts/snap.py (EPSG:2157 STRtree) -> table of points per highway class -> frac
 EPSG:2157 (ITM) is also used for the Devon run: distances there are scaled ~0.3-0.5 % off at 3.5W; irrelevant at this precision.
 Limitation: dual carriageways may snap to the wrong carriageway; not corrected.
 """
-import json, sys, pathlib, collections
+import collections
+import json
+import pathlib
+import sys
+
 import numpy as np
 import pandas as pd
 import shapely
+
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from snap import load_network, project
 
@@ -28,10 +33,11 @@ ORDER = ["motorway", "trunk", "primary", "secondary", "tertiary", "unclassified"
 
 def load_points(which):
     if which == "ireland":
-        d = json.load(open(ROOT / "data/traffic/tii/tmu-traffic-counters.geojson"))
-        rows = [dict(site=f["properties"]["field_2"], name=f["properties"]["field_1"],
-                     lon=f["geometry"]["coordinates"][0], lat=f["geometry"]["coordinates"][1],
-                     cat=f["properties"]["field_1"].split()[0][:1]) for f in d["features"]]
+        with open(ROOT / "data/traffic/tii/tmu-traffic-counters.geojson") as fh:
+            d = json.load(fh)
+        rows = [{"site": f["properties"]["field_2"], "name": f["properties"]["field_1"],
+                 "lon": f["geometry"]["coordinates"][0], "lat": f["geometry"]["coordinates"][1],
+                 "cat": f["properties"]["field_1"].split()[0][:1]} for f in d["features"]]
         df = pd.DataFrame(rows)
         bbox = (-10.8, 51.3, -5.3, 55.5)
         pbf = ROOT / "data/osm/ireland.osm.pbf"
@@ -39,7 +45,7 @@ def load_points(which):
         cp = pd.read_csv(ROOT / "data/traffic/dft/count_points.csv", low_memory=False)
         # count_points.csv: one row per point, year = last year with an AADF record -> keep points active in the last 10 y
         cp = cp[(cp.year >= cp.year.max() - 9) & cp.local_authority_name.isin(["Devon", "Plymouth", "Torbay"])]
-        df = pd.DataFrame(dict(site=cp.count_point_id, name=cp.road_name, lon=cp.longitude, lat=cp.latitude, cat=cp.road_category))
+        df = pd.DataFrame({"site": cp.count_point_id, "name": cp.road_name, "lon": cp.longitude, "lat": cp.latitude, "cat": cp.road_category})
         # which of them were physically counted (not estimated) in the last 10 years
         a = pd.read_csv(ROOT / "data/traffic/dft/dft_traffic_counts_aadf.csv", usecols=["count_point_id", "year", "estimation_method"])
         a = a[(a.estimation_method == "Counted") & (a.year >= a.year.max() - 9)]
@@ -65,7 +71,7 @@ def run(which):
     print(f"{which}: {len(df)} count points loaded")
     net = load_network(str(pbf), boxes=[bbox])
     x, y = project(df.lon.values, df.lat.values)
-    seg, t, d = net.snap(x, y, max_m=SNAP_M)
+    seg, _, d = net.snap(x, y, max_m=SNAP_M)
     way_hw = np.array([net.ways[w][0] for w in net.way_ids])
     seg_hw = way_hw[net.way_of_seg]
     df["hw"] = np.where(seg >= 0, seg_hw[np.maximum(seg, 0)], "(no way within 30 m)")

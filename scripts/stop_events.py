@@ -22,10 +22,10 @@ import argparse
 import csv
 import datetime as dt
 import glob
+import itertools
 import json
 import math
 import pathlib
-import statistics
 import sys
 import time
 import xml.etree.ElementTree as ET
@@ -35,7 +35,7 @@ import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-import snap  # noqa: E402
+import snap
 
 R = 6371008.8
 IRELAND = (-10.7, 51.3, -5.3, 55.5)
@@ -75,17 +75,17 @@ def parse_fit(path):
                 sp = fr_.get_value("enhanced_speed", fallback=None)
                 if sp is None:
                     sp = fr_.get_value("speed", fallback=None)
-                T.append(ts.replace(tzinfo=dt.timezone.utc).timestamp()); LA.append(la * SEMI); LO.append(lo * SEMI)
+                T.append(ts.replace(tzinfo=dt.UTC).timestamp()); LA.append(la * SEMI); LO.append(lo * SEMI)
                 SP.append(float(sp) if sp is not None else math.nan)
             elif fr_.name == "event" and fr_.get_value("event", fallback=None) == "timer":
                 et, ts = fr_.get_value("event_type", fallback=None), fr_.get_value("timestamp", fallback=None)
                 if ts is not None and et in ("stop_all", "stop", "start"):
-                    timer.append((ts.replace(tzinfo=dt.timezone.utc).timestamp(), "start" if et == "start" else "stop"))
+                    timer.append((ts.replace(tzinfo=dt.UTC).timestamp(), "start" if et == "start" else "stop"))
     return Stream(T, LA, LO, SP, timer, pathlib.Path(path).stem)
 
 
 def _ts(s):
-    return dt.datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+    return dt.datetime.fromisoformat(s).timestamp()
 
 
 def parse_gpx_segments(source):
@@ -108,7 +108,7 @@ def parse_gpx_segments(source):
 def parse_tcx(path):
     ns = {"t": "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"}
     T, LA, LO, SP = [], [], [], []
-    for tp in ET.parse(path).getroot().iter("{%s}Trackpoint" % ns["t"]):
+    for tp in ET.parse(path).getroot().iter(f"{{{ns['t']}}}Trackpoint"):
         tm, pos = tp.find("t:Time", ns), tp.find("t:Position", ns)
         if tm is None or pos is None:
             continue
@@ -169,8 +169,8 @@ def detect(s, speed_thr=1.0, min_stop_s=3.0, merge_s=10.0, end_margin_m=200.0, g
         while j + 1 < n and slow[j + 1] and s.t[j + 1] - s.t[j] <= run_max_dt:
             j += 1
         if s.t[j] - s.t[i] >= min_stop_s:
-            ev.append(dict(t0=s.t[i], t1=s.t[j], lat=float(np.median(s.lat[i:j + 1])),
-                           lon=float(np.median(s.lon[i:j + 1])), kind="slow"))
+            ev.append({"t0": s.t[i], "t1": s.t[j], "lat": float(np.median(s.lat[i:j + 1])),
+                           "lon": float(np.median(s.lon[i:j + 1])), "kind": "slow"})
         i = j + 1
     # gaps
     stops = [t for t, k in s.timer if k == "stop"]
@@ -182,18 +182,18 @@ def detect(s, speed_thr=1.0, min_stop_s=3.0, merge_s=10.0, end_margin_m=200.0, g
         if disp > gap_max_disp:
             info["datagap_moved"] += 1; continue
         if bracketed:
-            ev.append(dict(t0=a, t1=b, lat=float(s.lat[k]), lon=float(s.lon[k]), kind="pause"))
+            ev.append({"t0": a, "t1": b, "lat": float(s.lat[k]), "lon": float(s.lon[k]), "kind": "pause"})
         elif dts[k] > data_gap_s:
             info["datagap_unbracketed"] += 1
         elif use_gaps:
-            ev.append(dict(t0=a, t1=b, lat=float(s.lat[k]), lon=float(s.lon[k]), kind="gap"))
+            ev.append({"t0": a, "t1": b, "lat": float(s.lat[k]), "lon": float(s.lon[k]), "kind": "gap"})
     # timer stop->start pairs not already covered by a record gap
     tm = sorted(s.timer)
-    for (t1, k1), (t2, k2) in zip(tm, tm[1:]):
+    for (t1, k1), (t2, k2) in itertools.pairwise(tm):
         if k1 == "stop" and k2 == "start" and t2 - t1 > gap_s and not any(e["t0"] - 2 <= t1 <= e["t1"] + 2 for e in ev if e["kind"] == "pause"):
             j = int(np.argmin(np.abs(s.t - t1)))
             if hav(s.lat[j], s.lon[j], s.lat[min(j + 1, n - 1)], s.lon[min(j + 1, n - 1)]) <= gap_max_disp:
-                ev.append(dict(t0=t1, t1=t2, lat=float(s.lat[j]), lon=float(s.lon[j]), kind="pause"))
+                ev.append({"t0": t1, "t1": t2, "lat": float(s.lat[j]), "lon": float(s.lon[j]), "kind": "pause"})
                 info["timer_pair_only"] += 1
     # merge
     ev.sort(key=lambda e: e["t0"])
@@ -249,7 +249,7 @@ def selftest():
     rows += [(t + i, x + 5 * i) for i in range(1, 101)]
     k = 1.0 / (111320 * math.cos(math.radians(lat0)))
     gpx = ('<gpx version="1.1" creator="x" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>'
-           + "".join(f'<trkpt lat="{lat0}" lon="{lon0 + xx * k}"><time>{dt.datetime.fromtimestamp(t0 + tt, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}</time></trkpt>' for tt, xx in rows)
+           + "".join(f'<trkpt lat="{lat0}" lon="{lon0 + xx * k}"><time>{dt.datetime.fromtimestamp(t0 + tt, dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")}</time></trkpt>' for tt, xx in rows)
            + "</trkseg></trk></gpx>")
     with tempfile.TemporaryDirectory() as d:
         p = pathlib.Path(d) / "a.gpx"; p.write_text(gpx)
@@ -257,7 +257,7 @@ def selftest():
         ev, _ = detect(segs[0])
         assert len(ev) == 1 and ev[0]["kind"] == "slow" and 17 <= ev[0]["dur"] <= 22, ev
         tcx = ('<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"><Activities><Activity><Lap><Track>'
-               + "".join(f'<Trackpoint><Time>{dt.datetime.fromtimestamp(t0 + tt, dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}</Time><Position><LatitudeDegrees>{lat0}</LatitudeDegrees><LongitudeDegrees>{lon0 + xx * k}</LongitudeDegrees></Position></Trackpoint>' for tt, xx in rows)
+               + "".join(f'<Trackpoint><Time>{dt.datetime.fromtimestamp(t0 + tt, dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")}</Time><Position><LatitudeDegrees>{lat0}</LatitudeDegrees><LongitudeDegrees>{lon0 + xx * k}</LongitudeDegrees></Position></Trackpoint>' for tt, xx in rows)
                + "</Track></Lap></Activity></Activities></TrainingCenterDatabase>")
         q = pathlib.Path(d) / "a.tcx"; q.write_text(tcx)
         ev2, _ = detect(parse_any(q)[0])
@@ -290,15 +290,16 @@ def country_of(lat, lon):
 
 
 def load_eric(a):
-    idx = {r["activityId"]: r for r in json.load(open(ROOT / "data/rides/index.json"))}
+    with open(ROOT / "data/rides/index.json") as fh:
+        idx = {r["activityId"]: r for r in json.load(fh)}
     cand, dropped = [], []
     for f in sorted(glob.glob(str(ROOT / "data/rides/*.fit"))):
         aid = int(pathlib.Path(f).stem)
         meta = idx.get(aid, {})
         s = parse_fit(f)
-        rec = dict(id=aid, meta=meta, s=s, edge=str(meta.get("manufacturer", "")).upper() == "GARMIN",
-                   start=_ts(meta["startTimeGMT"].replace(" ", "T") + "Z") if meta.get("startTimeGMT") else (s.t[0] if len(s.t) else 0),
-                   dist=float(meta.get("distance_m") or 0))
+        rec = {"id": aid, "meta": meta, "s": s, "edge": str(meta.get("manufacturer", "")).upper() == "GARMIN",
+                   "start": _ts(meta["startTimeGMT"].replace(" ", "T") + "Z") if meta.get("startTimeGMT") else (s.t[0] if len(s.t) else 0),
+                   "dist": float(meta.get("distance_m") or 0)}
         rec["end"] = rec["start"] + (s.t[-1] - s.t[0] if len(s.t) else 0)
         if len(s.t) < 5:
             dropped.append((aid, "no position records (empty / indoor)")); continue
@@ -311,7 +312,7 @@ def load_eric(a):
     for r in sorted(cand, key=lambda r: (not r["edge"], r["start"])):
         # bead rule: start +-60 s and distance +-2 %. Extension: also when the time spans overlap > 50 % of the
         # shorter ride (third-party re-uploads of one ride start minutes apart) and distance is within 10 %.
-        def is_dup(k):
+        def is_dup(k, r=r):
             if abs(k["start"] - r["start"]) <= 60 and abs(k["dist"] - r["dist"]) <= 0.02 * max(k["dist"], 1):
                 return True
             ov = min(k["end"], r["end"]) - max(k["start"], r["start"])
@@ -331,14 +332,15 @@ def load_osm(a):
     total_pts = ts_pts = total_trk = ts_trk = 0
     seen = set()
     for f in sorted(glob.glob(str(ROOT / "data/gps/osm_trackpoints_p*.gpx"))):
-        g = gpxpy.parse(open(f))
+        with open(f) as fh:
+            g = gpxpy.parse(fh)
         for ti, tr in enumerate(g.tracks):
             url = tr.link or tr.name or f"{pathlib.Path(f).stem}#{ti}"
             for si, sg in enumerate(tr.segments):
                 has = [p for p in sg.points if p.time is not None]
                 total_pts += len(sg.points); ts_pts += len(has)
                 total_trk += 1; ts_trk += bool(has)
-                T, LA, LO, SP = traces[(url if tr.link else f"{f}#{ti}", si)]
+                T, LA, LO, _ = traces[(url if tr.link else f"{f}#{ti}", si)]
                 for p in has:
                     k = (url, p.time.timestamp(), round(p.latitude, 6), round(p.longitude, 6))
                     if k in seen:
@@ -346,24 +348,21 @@ def load_osm(a):
                     seen.add(k)
                     T.append(p.time.timestamp()); LA.append(p.latitude); LO.append(p.longitude)
     out = [(k[0], Stream(*v[:3], [math.nan] * len(v[0]), name=str(k[0]))) for k, v in traces.items() if len(v[0]) >= 5]
-    return out, dict(total_pts=total_pts, ts_pts=ts_pts, total_seg=total_trk, ts_seg=ts_trk,
-                     n_traces=len(traces), n_traces_ts=len(out))
+    return out, {"total_pts": total_pts, "ts_pts": ts_pts, "total_seg": total_trk, "ts_seg": ts_trk,
+                     "n_traces": len(traces), "n_traces_ts": len(out)}
 
 
 # ---------------------------------------------------------------- analysis
 def analyze(items, net, a, label):
     """items: list of (id, Stream). Returns node/way stats + counters."""
-    node_pass, node_stop, node_dur = Counter(), Counter(), defaultdict(float)
-    way_km, way_stop, way_pass = Counter(), Counter(), Counter()
-    kinds, info = Counter(), Counter()
-    pts_total = pts_snapped = ev_total = ev_snapped = 0
+    info = Counter()
     per_trace = []
     for tid, s in items:
         ev, inf = detect(s, a.speed_thr, a.min_stop_s, a.merge_s, a.end_margin_m, a.gap_s,
                          a.data_gap_s, a.gap_max_disp, a.run_max_dt, use_gaps=a.source == "eric", max_stop_s=a.max_stop_s)
         info.update(inf)
         x, y = xy_of(s)
-        seg, t, d = net.snap(x, y, a.snap_m)
+        seg, t, _ = net.snap(x, y, a.snap_m)
         node, nd = net.node_of(seg, t, x, y)
         big = np.array([net.hw_of_seg(k) in BIG_HW for k in seg[seg >= 0]]) if (seg >= 0).any() else np.array([])
         per_trace.append((tid, s, ev, seg, t, node, nd, float(big.mean()) if len(big) else 0.0))
@@ -408,7 +407,7 @@ def accumulate(rows, net, a):
                 continue
             ev_total += 1
             ex, ey = snap.project([e["lon"]], [e["lat"]])
-            sgm, tt, dd = net.snap(ex, ey, a.snap_m)
+            sgm, tt, _ = net.snap(ex, ey, a.snap_m)
             if sgm[0] < 0:
                 continue
             ev_snapped += 1
@@ -422,9 +421,9 @@ def accumulate(rows, net, a):
                     capped += 1; continue
                 stopped_here.add(int(nid[0]))
                 node_stop[int(nid[0])] += 1; node_dur[int(nid[0])] += e["dur"]
-    return dict(node_pass=node_pass, node_stop=node_stop, node_dur=node_dur, way_km=way_km, way_stop=way_stop,
-                way_pass=way_pass, kinds=kinds, kind_dur=kind_dur, pts_total=pts_total, pts_snapped=pts_snapped,
-                ev_total=ev_total, ev_snapped=ev_snapped, km=km, capped=capped)
+    return {"node_pass": node_pass, "node_stop": node_stop, "node_dur": node_dur, "way_km": way_km, "way_stop": way_stop,
+                "way_pass": way_pass, "kinds": kinds, "kind_dur": kind_dur, "pts_total": pts_total, "pts_snapped": pts_snapped,
+                "ev_total": ev_total, "ev_snapped": ev_snapped, "km": km, "capped": capped}
 
 
 def what_is_there(net, nid, near_tree):
@@ -520,14 +519,14 @@ def report(label, net, st, a, near, extra_lines):
     nstop5 = [n for n in np5 if st["node_stop"].get(n)]
     L += ["", md_table(["metric", "value"], [
         ["km ridden (haversine)", f"{st['km']:.0f}"],
-        ["trackpoint snap rate (<= %g m)" % a.snap_m, f"{100 * st['pts_snapped'] / max(st['pts_total'], 1):.1f} % of {st['pts_total']}"],
+        [f"trackpoint snap rate (<= {a.snap_m:g} m)", f"{100 * st['pts_snapped'] / max(st['pts_total'], 1):.1f} % of {st['pts_total']}"],
         ["stop-event snap rate (excl. rest)", f"{100 * st['ev_snapped'] / max(st['ev_total'], 1):.1f} % of {st['ev_total']}"],
         ["distinct nodes with >= 1 pass", len(st["node_pass"])],
         ["nodes with >= 5 passes", len(np5)],
         ["... of which with >= 1 stop", len(nstop5)],
         ["nodes with >= 5 passes that are junctions (>= 3 segments) or tagged signals/stop/give_way/crossing", sum(1 for n in np5 if net.node_deg.get(n, 0) >= 3 or net.node_tag.get(n, {}).get("highway") in snap.NODE_HW or "crossing" in net.node_tag.get(n, {}))],
         ["nodes with >= 10 passes", sum(1 for p in st["node_pass"].values() if p >= 10)],
-        ["stop events attached to a node (<= %g m)" % a.node_radius, sum(st["node_stop"].values())],
+        [f"stop events attached to a node (<= {a.node_radius:g} m)", sum(st["node_stop"].values())],
         ["extra same-ride same-node stops dropped by the one-stop-per-ride-per-node cap", st["capped"]],
     ])]
     top = sorted(np5, key=lambda n: (-st["node_stop"].get(n, 0), -st["node_pass"][n]))[:20]
@@ -624,8 +623,8 @@ def main():
             good.append(r)
         pts_all = sum(len(r[1].t) for r in rows); pts_good = sum(len(r[1].t) for r in good)
         km_all = sum(track_km(r[1]) for r in rows)
-        extra += [f"Traces analysed {n0}; excluded: median speed > {a.max_median_speed} m/s: {bad_speed}; > {100 * a.max_bigroad_frac:.0f} % of snapped points on motorway/trunk: {bad_big} "
-                  f"; median speed < {a.min_median_speed} m/s (walking pace, only if flag set): {bad_slow} -> excluded share {100 * (bad_speed + bad_big + bad_slow) / max(n0, 1):.1f} % of traces; trackpoint share {100 * (pts_all - pts_good) / max(pts_all, 1):.1f} %; km before exclusion {km_all:.0f}",
+        extra += [(f"Traces analysed {n0}; excluded: median speed > {a.max_median_speed} m/s: {bad_speed}; > {100 * a.max_bigroad_frac:.0f} % of snapped points on motorway/trunk: {bad_big} "
+                  f"; median speed < {a.min_median_speed} m/s (walking pace, only if flag set): {bad_slow} -> excluded share {100 * (bad_speed + bad_big + bad_slow) / max(n0, 1):.1f} % of traces; trackpoint share {100 * (pts_all - pts_good) / max(pts_all, 1):.1f} %; km before exclusion {km_all:.0f}"),
                   f"Kept traces with median speed < 2.5 m/s (walking pace, not excluded): {bad_walk}"]
         rows = good
         extra += [f"Trace length: median {np.median([len(r[1].t) for r in rows]):.0f} points, median sample interval {np.median([median_dt(r[1]) for r in rows]):.1f} s"]

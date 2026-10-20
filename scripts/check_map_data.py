@@ -1,5 +1,10 @@
 """Smoke test for docs/map: GeoJSON sanity + node --check of the inline script."""
-import json, re, shutil, subprocess, sys, tempfile
+import json
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 MAP = Path(__file__).resolve().parent.parent / "docs" / "map"
@@ -31,7 +36,7 @@ def main():
         print(f"ok {n}: {len(d['features'])} features, {size/1e6:.2f} MB")
     assert total <= 10_000_000
     html = (MAP / "index.html").read_text()
-    blocks = [b for b in re.findall(r"<script>(.*?)</script>", html, re.S) if b.strip()]
+    blocks = [b for b in re.findall(r"<script>(.*?)</script>", html, re.DOTALL) if b.strip()]
     assert blocks, "no inline script"
     if shutil.which("node"):
         with tempfile.TemporaryDirectory() as t:

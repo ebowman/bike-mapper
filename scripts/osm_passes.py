@@ -5,7 +5,9 @@ Usage: uv run python scripts/osm_passes.py data/osm/ireland.osm.pbf data/osm/bal
 Only nodes are counted (the bead scope); ways/relations with these tags are ignored.
 """
 import sys
+
 import osmium
+
 
 def count(path):
     c = {"mountain_pass=yes": [0, 0, 0], "natural=saddle": [0, 0, 0], "natural=peak": [0, 0, 0]}

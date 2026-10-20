@@ -8,8 +8,11 @@ import csv
 import sys
 
 src, ridden = sys.argv[1], sys.argv[2]
-ids = {r["way_id"] for r in csv.DictReader(open(ridden))}
-rows = list(csv.reader(open(src)))
+with open(ridden) as f:
+    ids = {r["way_id"] for r in csv.DictReader(f)}
+with open(src) as f:
+    rows = list(csv.reader(f))
 keep = [rows[0]] + [r for r in rows[1:] if r[0] in ids]
-csv.writer(open(src, "w", newline="")).writerows(keep)
+with open(src, "w", newline="") as f:
+    csv.writer(f).writerows(keep)
 print(f"{src}: {len(rows) - 1} -> {len(keep) - 1} ways")

@@ -14,6 +14,7 @@ Usage:  uv run scripts/rides_inspect.py [--rides-dir data/rides] [--sample N] [-
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import random
 import statistics
@@ -43,10 +44,10 @@ def inspect_fit(path: Path) -> dict:
                 t = frame.get_value("timestamp", fallback=None)
                 if t is not None:
                     ts.append(t)
-                if frame.has_field("speed") or frame.has_field("enhanced_speed"):
-                    if (frame.get_value("speed", fallback=None) is not None
-                            or frame.get_value("enhanced_speed", fallback=None) is not None):
-                        n_speed += 1
+                if (frame.has_field("speed") or frame.has_field("enhanced_speed")) and (
+                        frame.get_value("speed", fallback=None) is not None
+                        or frame.get_value("enhanced_speed", fallback=None) is not None):
+                    n_speed += 1
                 if frame.get_value("position_lat", fallback=None) is not None:
                     n_pos += 1
             elif frame.name == "file_id":
@@ -62,7 +63,7 @@ def inspect_fit(path: Path) -> dict:
             elif frame.name == "sport":
                 sport = (frame.get_value("sport", fallback=None), frame.get_value("sub_sport", fallback=None))
     ts.sort()
-    gaps = [(b - a).total_seconds() for a, b in zip(ts, ts[1:])]
+    gaps = [(b - a).total_seconds() for a, b in itertools.pairwise(ts)]
     gaps = [g for g in gaps if g > 0]
     med = statistics.median(gaps) if gaps else None
     mean = statistics.fmean(gaps) if gaps else None

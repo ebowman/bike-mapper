@@ -5,7 +5,7 @@
 //   1. evaluate_script pageId=<n> sourcePath=scripts/garmin_browser_pull.js
 //        -> installs window.gcPull and returns "installed"
 //   2. evaluate_script function="async () => gcPull.listPages(0, 10)"
-//        filePath=data/rides/_batches/list_000.json  (repeat with start=10,20,.. until done:true)
+//        filePath=data/rides/_batches/list_000.json  (repeat with firstPage=10,20,.. (a page index, 10 pages per call) until done:true)
 //   3. evaluate_script function="async () => gcPull.downloadBatch([id1,id2,...])"
 //        filePath=data/rides/_batches/batch_000.json  (10 ids per call)
 //   4. uv run scripts/rides_unpack.py   -> data/rides/<id>.fit + data/rides/index.json

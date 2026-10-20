@@ -1,7 +1,11 @@
 """Build small GeoJSON files for docs/map/index.html from data/samples/ CSVs/GPX and the OSM PBFs."""
-import csv, json, sys
+import csv
+import json
+import sys
 from pathlib import Path
-import gpxpy, osmium
+
+import gpxpy
+import osmium
 from shapely.geometry import LineString
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,8 +14,8 @@ OUT = ROOT / "docs" / "map" / "data"
 CACHE = ROOT / "data" / "osm"
 MAX_BYTES = 2_000_000
 REGIONS = {
-    "ireland": dict(ways="stops_per_km_wicklow.csv", pbf="ireland.osm.pbf"),
-    "berlin": dict(ways="stops_per_km_berlin.csv", pbf="brandenburg.osm.pbf"),
+    "ireland": {"ways": "stops_per_km_wicklow.csv", "pbf": "ireland.osm.pbf"},
+    "berlin": {"ways": "stops_per_km_berlin.csv", "pbf": "brandenburg.osm.pbf"},
 }
 KEEP_HW = {"tertiary", "unclassified", "secondary", "primary", "residential"}
 
@@ -41,7 +45,7 @@ class Geoms(osmium.SimpleHandler):
         if w.id in self.ids:
             try:
                 self.geoms[w.id] = [(r5(n.lon), r5(n.lat)) for n in w.nodes]
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 - malformed way geometry is skipped on purpose
                 pass
 
 
@@ -58,7 +62,8 @@ def way_geoms(region, ids):
 
 
 def build_ways(region):
-    rows = list(csv.DictReader(open(S / REGIONS[region]["ways"])))
+    with open(S / REGIONS[region]["ways"]) as f:
+        rows = list(csv.DictReader(f))
     rows = [r for r in rows if float(r["length_km"]) >= 0.05]
     geoms = way_geoms(region, {int(r["way_id"]) for r in rows})
 
@@ -87,21 +92,23 @@ def build_ways(region):
 
 def build_stops(region):
     out = []
-    for r in csv.DictReader(open(S / f"stop_units_{region}.csv")):
-        out.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [r5(r["lon"]), r5(r["lat"])]},
-                    "properties": {"passes": int(r["passes"]), "stops": int(r["stops"]), "p": round(float(r["p"]), 3),
-                                   "cls": r["class"], "n_nodes": int(r["n_nodes"]),
-                                   "diam": round(float(r["diameter_m"]), 1)}})
+    with open(S / f"stop_units_{region}.csv") as f:
+        for r in csv.DictReader(f):
+            out.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [r5(r["lon"]), r5(r["lat"])]},
+                        "properties": {"passes": int(r["passes"]), "stops": int(r["stops"]), "p": round(float(r["p"]), 3),
+                                       "cls": r["class"], "n_nodes": int(r["n_nodes"]),
+                                       "diam": round(float(r["diameter_m"]), 1)}})
     return out
 
 
 def build_unexplained(region):
     out = []
-    for r in csv.DictReader(open(S / f"stop_model_unexplained_{region}.csv")):
-        out.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [r5(r["lon"]), r5(r["lat"])]},
-                    "properties": {"cls": r["cls"], "n_nodes": int(r["n_nodes"]), "passes": int(r["passes"]),
-                                   "stops": int(r["stops"]), "mean_stop_s": num(r["mean_stop_s"]),
-                                   "ways": r["nearby_ways"], "label": r["label"], "rationale": r["rationale"]}})
+    with open(S / f"stop_model_unexplained_{region}.csv") as f:
+        for r in csv.DictReader(f):
+            out.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [r5(r["lon"]), r5(r["lat"])]},
+                        "properties": {"cls": r["cls"], "n_nodes": int(r["n_nodes"]), "passes": int(r["passes"]),
+                                       "stops": int(r["stops"]), "mean_stop_s": num(r["mean_stop_s"]),
+                                       "ways": r["nearby_ways"], "label": r["label"], "rationale": r["rationale"]}})
     return out
 
 
@@ -109,7 +116,8 @@ def build_routes():
     out = []
     for pair in ("wicklow", "dublin"):
         for prof in ("baseline", "flow"):
-            g = gpxpy.parse(open(S / f"brouter-{pair}-{prof}.gpx"))
+            with open(S / f"brouter-{pair}-{prof}.gpx") as f:
+                g = gpxpy.parse(f)
             coords = [[r5(p.longitude), r5(p.latitude)] for t in g.tracks for s in t.segments for p in s.points]
             out.append({"type": "Feature", "geometry": {"type": "LineString", "coordinates": coords},
                         "properties": {"pair": pair, "profile": prof,
