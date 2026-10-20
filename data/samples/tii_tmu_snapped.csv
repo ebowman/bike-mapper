@@ -1,0 +1,309 @@
+site,name,lon,lat,cat,hw,snap_m
+1034,"N03 Between Jn02 Blanchardstown and Jn03 Clonsilla, Blanchardstown, Co. Dublin",-6.38519,53.39369,N,trunk,7.718160339024841
+1509,"M50 Between Jn09 N07/M50 Red Cow and Jn10 Ballymount, Ballymount, Co. Dublin",-6.36333,53.31346,M,motorway,9.820730970691086
+1731,"N73 Between Kildorrery and Mallow, South of Ballinamona Cross, Co. Cork",-8.50331,52.22027,N,primary,1.1496087255835579
+1086,"M08 Between Jn12 Mitchelstown (North) and Jn13 Mitchelstown (South), Co. Cork",-8.23993,52.27027,M,motorway,11.941643605304405
+1521,"N52 Between Mullingar and Tyrrellspass, Marlinstown, Co. Westmeath",-7.31134,53.51075,N,primary,0.47871191380743106
+20083,"M08 Between Jn09 Cashel (South) and Jn10 Cahir (North), Cashel, Co. Tipperary",-7.90648,52.47978,M,motorway,6.36201503172288
+20116,"M11 Between Jn22 and Jn23, Gorey, Co. Wexford",-6.25803,52.67383,M,motorway,1.8048415507701596
+1503,"M50 Between Jn07 N04/M50 and Jn09 N07/M50 Red Cow, Palmerstown, Co. Dublin",-6.38715,53.34553,M,motorway,15.412373634265908
+20061,"M06 Between Jn02 Kinnegad (West) and Jn03 Rochfortbridge, Co. Meath",-7.22018,53.4318,M,motorway,3.7536274748753233
+20621,"N62 Between Roscrea and Birr, Sharavogue, Co Offaly",-7.84493,52.9812,N,primary,8.081385278809819
+1221,"N22 Carrigrohane to Cork City, Western Road, Co. Cork",-8.51757,51.894,N,service,7.835645836404157
+1241,"N24 Between Bansha and Tipperary Town, Co. Tipperary",-8.14078,52.46585,N,trunk,5.188527668888189
+1711,"N71 Between Innishshannon and Ballyhassig, Southwest of Ballinhassig, Co Cork",-8.55957,51.80727,N,primary,12.746573101417505
+1508,"M50 Between Jn06 N03/M50 and Jn07 N04/M50, Castleknock, Co. Dublin",-6.37144,53.37482,M,motorway,8.490109676093557
+1602,"N60 Between Ballymoe and Roscommon Town, Co. Roscommon",-8.35652,53.68234,N,primary,0.17250840252163288
+20905,"M09 Between Jn06 Carlow (South) and Jn07 Paulstown, Powerstown, Co. Carlow",-6.96793,52.7647,M,motorway,4.674413425781048
+200722,"M07 Between Jn28 Castletroy and Jn29 M7/N24 Ballysimon, Castletroy, Co. Limerick",-8.51609,52.66726,M,motorway,7.063055497071171
+1531,"N53 Between NI Border and Castleblaney, Drumgoose, Co. Monaghan",-6.69299,54.08873,N,primary,1.4196252925881672
+20221,"N22 Between Tralee and Farranfore, Flemby, Co. Kerry",-9.6004,52.23527,N,trunk,11.117105921777977
+1044,"N04 Between Jn03 Newcastle and Jn04 Lucan, Lucan, Co. Dublin",-6.44254,53.35114,N,cycleway,4.740657094889483
+1506,"M50 Between Jn12 Firhouse and Jn13 Dundrum, Balinteer, Co. Dublin",-6.2823,53.26676,M,motorway,7.698041746526643
+20074,"M07 Between Jn12 Newbridge and Jn M07/M09 , Greatconnell, Co. Kildare",-6.76811,53.16645,M,motorway,7.928708259697269
+3702,M07/M08  to Jn03 Rathdowney,-7.49197,52.89147,M,motorway,5.799418155361517
+20062,"M06 Between Jn04 Tyrrellspass and Jn05 Tullamore, Kilbeggan, Co. Westmeath",-7.44539,53.35916,M,service,5.655677465420241
+20046,"N04 Between Longford and Carrick-on-Shannon, Dromod Bypass, Co. Leitrim",-7.9362,53.8827,N,tertiary,6.198845539639303
+1714,"N71 Between Kenmare and Killarney, Gortamullen, Co. Kerry",-9.60495,51.90655,N,primary,8.196655340657731
+201081,"R108 Between Ballymun and Jn04 M50, Dublin",-6.26565,53.40642,R,cycleway,2.853580783522594
+20051,"N05 Between Tulsk and Frenchpark, Frenchpark, Co. Roscommon",-8.40136,53.86358,N,tertiary,9.279799088311865
+3312,TME 12 M03 Jn10 Northbound On Ramp,-6.8558,53.70779,T,motorway_link,3.203903001643712
+1251,"N25 Between Waterford City and Dungarvan, Kilmacthomas, Co. Waterford",-7.38732,52.21471,N,trunk,7.794593467819285
+20078,"M07 Between Jn15 Ballybrittas and Jn16 Portlaoise (East), Ballydavis, Co. Laois",-7.23607,53.05261,M,motorway_link,11.504033869492117
+20082,"N77 Between Abbeyleix and Durrow, Kilamuck, Co. Laois",-7.36429,52.88282,N,primary,2.574967190372672
+1801,"N80 Between Carlow Town and Strabally, Coolhenry, Co. Carlow",-6.99106,52.8644,N,primary,7.331584450722351
+1014,M01 Between Jn01 M50/M01 and Jn02 Dublin Airport,-6.22294,53.4178,M,motorway_link,11.56512321302238
+20204,"N20 Between Blarney and Mallow, Lissavoura, Co. Cork",-8.6079,52.03357,N,trunk,1.031531113784814
+1171,"N17 Between Tuam and Claremorris, Kilcloony, Co. Galway",-8.86696,53.59072,N,trunk,6.2078918981221785
+1222,"N22 Between Killarney and N22/R569 Jn, Islandmore, Co. Kerry",-9.34443,52.00281,N,trunk,7.618903145122187
+20022,"M02 Between Jn02 St. Margrets and Jn03 Ashbourne (South), Ashbourne, Co. Meath",-6.37795,53.48403,M,motorway_link,4.373934893934743
+1131,"N13 Between Bridgend and Burnfoot, Co. Donegal",-7.3897,55.04278,N,trunk,11.658123798450484
+200721,"M07 Between Jn27 Birdhill and J28 Castletroy, Birdhill, Co. Tipperary",-8.41886,52.75285,M,motorway,7.668266433010611
+20073,"M07 Between Jn10 Naas South and Jn11 M7/M9, Lewistown, Co. Kildare",-6.7355,53.18341,M,motorway,5.931644349246561
+3704,M07 Jn17 Portlaoise to Jn18 Portlaoise West,-7.3333,53.01996,M,motorway,8.178252477086978
+1051,"N05 Between Westport and Castlebar, Doon, Co. Mayo",-9.44985,53.80634,N,secondary,8.368989682045848
+20181,"M18 Ennis North, Co. Clare",-8.94053,52.86959,M,motorway,10.954953442584944
+200715,"M07 Between Jn23 Moneygall and Jn24 Toomevara, Co. Offaly",-7.97528,52.88343,M,motorway,15.322988867188384
+202104,"N21 Castleisland Bypass, Dooneen, Co. Kerry",-9.45752,52.26234,N,trunk,0.11983506686551733
+20907,"M09 Between Jn08 Kilkenny and Jn09 Kilkenny (South), Co. Kilkenny",-7.15348,52.62807,M,motorway,16.13974525371949
+1722,"N72 Between Killarney and Rathmore, Co. Kerry",-9.36513,52.05729,N,primary,8.832660644483056
+20067,"R446 (Old N06) Between Loughrea and Ballinasloe, Cappataggle, Go. Galway",-8.3994,53.27069,R,secondary,11.892707219504986
+20224,"N22 Between Killarney and Macroom, Ballyvourney Co. Cork",-9.19034,51.95679,N,secondary,11.044230678760082
+20721,"N72 Between Fermoy and Ballyhooley, Castlehyde, Co. Cork",-8.3342,52.14292,N,primary,5.441146113278974
+1113,"M11 Between M50/M11 and Bray North Jn, Bray, Co. Dublin",-6.12913,53.22208,M,motorway,12.835772074831025
+20075,"M07 Between Jn12 Newbridge and Jn13 Kildare, The Curragh, Co. Kildare",-6.85208,53.1588,M,motorway,10.860576734640034
+1551,"N55 Between Ballymahon and Edgeworthstown, Cartronfin, Co. Longford",-7.71694,53.59461,N,primary,6.309356502317866
+15012,"M50 Between Jn16 Cherrywood and Jn17 M50/M11, Shankill, Co. Dublin",-6.13921,53.23572,M,motorway,8.493310759005816
+3311,TME 11 M03 Jn09 to Jn10,-6.74992,53.64821,T,unclassified,6.692807396140047
+1832,"N83 Between N17/N83 Jn and Ballyhaunis, Southeast of N17/N83 Jn, Co. Mayo",-8.79018,53.88194,N,primary,4.422416465355379
+3306,TME 05 M03 Jn07 North-side Ramps,-6.61579,53.59938,T,motorway_link,8.552301762310245
+20184,"N18 Between Limerick and Cratloe, Cratloe, Co. Clare",-8.73878,52.68842,N,trunk,3.256246165815757
+3103,M1-3 M01 Northbound Jn07 to Jn08,-6.3404,53.66669,M,motorway,5.786274879642342
+1151,"N15 Lifford to Castlefinn, Inchenagh, Co. Donegal",-7.52054,54.81215,N,trunk,6.8616981300948545
+1012,M50 Between Jn02 Santry and Jn03 M50/M1,-6.2335,53.40305,M,motorway,12.890441148836715
+20071,"N07 Between Jn07 Kill and Jn08 Johnstown, Kill, Co. Kildare",-6.5991,53.24717,N,service,6.785651313421704
+3802,M08 Watergrasshill Jn17 to Jn18 Southbound,-8.34312,52.00521,M,motorway_link,1.2029566039734265
+15010,"M50 Between Jn14 Dun Laoghaire and Jn15 Carrickmines, Cabinteely, Co. Dublin",-6.19356,53.26272,M,service,7.8731958340262596
+20223,"N22 South of Carrigohane, Poulavone, Co. Cork",-8.56911,51.88714,N,trunk,6.710441672240965
+1511,"N51 Between Athboy and Navan, Rathmore, Co. Meath",-6.87564,53.64438,N,primary,4.814350536686044
+20812,"N81 Between Tullow and N81/N80 Jn, Co. Carlow",-6.74603,52.73812,N,primary,8.985543389069997
+20242,"N24 North of Cahir, Kilemly, Co. Tipperary",-7.90783,52.39473,N,trunk,3.4186762793984955
+20023,"N02 Between Collon and Ardee, Hunterstown, Co. Louth",-6.5328,53.82612,N,trunk,5.3264183510336
+20203,"M20 Between Jn03 Ballycummin and Jn04 Patrickswell, Rootiagh , Co. Limerick",-8.66921,52.6086,M,motorway,3.386381789746167
+1037,"R147 (Old N03) Between Dunshaughlin and Dunboyne, Black Bull, Co. Meath",-6.47488,53.4486,R,service,3.757953782951779
+20031,"R147 Between Dunshaughlin and Navan, Tara, Co. Meath",-6.58737,53.57967,R,secondary,8.97436656592422
+32501,N25 Between R680 and R710 Junctions (Kilmeaden Bypass),-7.24209,52.24051,N,(no way within 30 m),inf
+1201,"N20 Between Buttevant and Charleville, Co. Cork",-8.6792,52.28539,N,trunk,8.03880286932312
+1052,"N05 Between Turlough and Castlebar, Gortnafolla, Co. Mayo",-9.27769,53.86279,N,secondary,2.4946233076874367
+1173,"N17 Between Tobercurry and Charlestown, Co. Sligo",-8.77674,53.99517,N,trunk,6.466068835776301
+3104,M1-4 M01 Northbound On Slip Jn09,-6.38608,53.70334,M,motorway_link,7.20355351485717
+3313,TME 13 M03 Jn10 Southbound On Ramp,-6.85468,53.70809,T,motorway_link,11.23481326182771
+20094,"M09 Between Jn10 Knocktopher and Jn11 Mullinavat, Co. Kilkenny",-7.17208,52.38173,M,motorway,9.443529821762787
+1871,"N87 Between Ballyconnel and NI Border, North of Swanlinbar, Co. Cavan",-7.70498,54.19971,N,primary,0.08424893322778507
+1312,"N31 Brewery Road, Leopardstown, Co. Dublin",-6.19821,53.27846,N,cycleway,0.4684712996740013
+1101,"N10 Between Kilkenny City and M09 Jn09 Kilkenny (South), Grevine, Co. Kilkenny",-7.24455,52.61042,N,trunk,6.6380715727676245
+202103,"N21 Castleisland Bypass, Mullaghmarky, Co. Kerry",-9.48204,52.24753,N,trunk,11.720153486019107
+20186,"M18 Cusheen, Co. Clare",-8.91552,52.92631,M,motorway,7.2130764609316635
+1681,"N68 Between Ennis and Kilrush, Ballyduneen, Co. Clare",-9.2641,52.70957,N,primary,0.4802157356174067
+20114,"N11 North of Arklow Bypass, Arklow, Co. Wicklow",-6.14266,52.82218,N,motorway,0.5995707745464375
+20011,"M01 Between Jn02 Dublin Airport and Jn03 Swords, Swords, Co. Dublin",-6.2103,53.43663,M,motorway,10.01680551713
+1102,"R712 Between Kilkenny and Paulstown, Brickana, Co. Kilkenny",-7.0998,52.64823,R,secondary,7.796590285336212
+202301,"N23 Castleisland Bypass, Kealgorm, Co. Kerry",-9.47804,52.22455,N,trunk,4.502686504203078
+20906,"M09 Between Jn07 and Jn08, Jordanstown, Co. Kilkenny",-7.0462,52.6758,M,motorway,7.720360608278418
+1715,"N71 Between Bantry and Glengarriff, North of Bantry, Co. Cork",-9.44237,51.70235,N,primary,1.6287621771836553
+1024,"N02 Between Castleblaney and Monaghan Town, Clontibert, Co. Monaghan",-6.84583,54.20615,N,trunk,2.949100749923866
+20153,"N15 Between Bundoran and Sligo, Tullaghan, Co. Leitrim",-8.36523,54.4622,N,trunk,1.6292290178150728
+1253,"N40 Between Kinsale Road and Douglas Interchange, South Ring Road, Togher, Co. Cork",-8.44783,51.87488,N,trunk,14.687320437164745
+1023,"N02 Between Ashbourne and Slane, Crickstown Co. Meath",-6.42853,53.54228,N,trunk,6.522713684951167
+3105,M1-5 M01 Southbound Jn07 to Jn08,-6.35109,53.6732,M,motorway,2.7334948260107628
+1691,"N69 Between Listowel and Tralee, Knockbrack, Co. Kerry",-9.62181,52.33982,N,primary,0.4361543157483846
+1255,"N40 Between Ballinora and Curraheen, South Ring Road, Bishopstown, Co. Cork",-8.56072,51.87636,N,trunk,11.58708553345594
+20255,"N25 Northeast of Dungarvan, Skehanard, Co. Waterford",-7.60386,52.10524,N,trunk,2.6357755436824393
+1741,"N74 Between Golden and Tipperary Town, West of Golden, Co. Tipperary",-8.00709,52.49496,N,primary,3.7272978376182064
+20252,"N25 Between NewRoss and Wexford Town, Carrickbyrne, Co. Wexford",-6.78815,52.36016,N,trunk,9.800139746252853
+3703,M07 Jn19 to M07 Jn21 Borris in Ossory,-7.49401,52.91507,M,motorway,9.51029240762566
+1692,"N69 Between Askeaton and Foynes, Clondrinagh, Co. Limerick",-9.00779,52.60541,N,primary,1.0978402261551774
+1112,"N11 Between Ferrycarrig and Oilgate, Co. Wexford",-6.5198,52.3956,N,trunk,8.581865384923367
+1223,"N22 Killarney Northern Ring Road, Killarney, Co. Kerry",-9.49473,52.06633,N,service,14.55484778105249
+1045,"R148 East of Kinnegad, Ardnamullen, Co. Meath",-7.06698,53.44971,R,secondary,6.052595639846251
+3106,M1-6 M01 Castlebellingham Jn15 to Jn16,-6.41682,53.91175,M,motorway,9.965293874114666
+3305,TME 05 M03 Jn06 to Jn07,-6.56167,53.51602,T,motorway,7.088048664989935
+1242,"N24 Between Carrick-on-Suir and Clonmel, Killaloan, Co. Tipperary",-7.62675,52.3649,N,trunk,4.518990993052336
+20018,"M01 Between Jn18 Carlingford and Jn19 Ravensdale, Ballymascanlan Co. Louth",-6.37605,54.0392,M,trunk_link,5.902103157528254
+1524,N52 Between N52/Belvedere and N52/L1122 Ballinagore Junctions,-7.37307,53.43972,N,primary,5.995703627227942
+1321,"N32 Between M50 and Clarehall, Clonshaugh, Co. Dublin",-6.21042,53.40928,N,footway,2.7687266019768697
+1243,"N24 Between Carrick-on-Suir and Waterford, Piltown, Co. Kilkenny",-7.33316,52.34572,N,trunk,14.174629284039918
+1841,"N84 Between Galway City and Headford, Curraghline, Co. Galway",-9.02055,53.3312,N,primary,0.18745719856954932
+1055,N5 Ballaghaderreen Bypass,-8.549,53.90929,N,trunk,16.694880115817554
+20044,"M04 Between Jn16 Delvin and Jn17 Castlepollard, Mullingar Bypass, Co. Westmeath",-7.3196,53.54357,M,trunk,9.373673544063823
+1132,"N14 Between Letterkenny and Lifford, Rossbracken, Co. Donegal",-7.64555,54.94666,N,trunk,16.449542902092446
+1172,"N17 Between Charlestown and Knock, Ballinacostelo, Co. Mayo",-8.87827,53.82623,N,trunk,4.887616525820754
+20601,"N60 Between Balla and Claremorris, Ballynastangfod, Co. Mayo",-9.04588,53.76328,N,primary,3.1989879484332997
+20562,"N56 Between Dungloe and R252 Jn, Co. Donegal",-8.32332,54.93434,N,primary,1.249082345047847
+3102,M1-2 M01 Southbound Off Slip Jn09,-6.38613,53.70422,M,motorway_link,10.149989618962573
+20064,"M06 Between Jn07 Moate (West) and Jn08 Ferbane, Athlone East, Co. Westmeath",-7.88602,53.41239,M,motorway,8.755642122570816
+1671,"N67 Between Kilrush Ferry and Kilrush, Moyne Court, Co. Clare",-9.46661,52.62353,N,primary,6.566542306242195
+20524,"N52 Southwest of Tullamore, Co. Offaly",-7.57212,53.2432,N,primary,6.559509267543193
+20091,"M09 Between Jn02 Kilcullen and Jn03 Athy, Crookstown, Co. Kildare",-6.81739,53.02617,M,motorway,3.744699389560034
+200812,"M08 Between Jn17 Watergrasshill and Jn18 Glanmire, Watergrasshill, Co. Cork",-8.36293,51.98734,M,motorway,0.6260875260941873
+200720,"M07 Between Jn26 Nenagh (West) and Jn27 Birdhill, Birdhill, Co. Tipperary",-8.39795,52.76195,M,motorway,12.368210232775997
+200718,"M07 Between Jn24 Nenagh and Jn25 Thurles, Nenagh, Co. Tipperary",-8.13971,52.85476,M,motorway,16.036791171807106
+1252,"N25 Between Castlemartyer and Midelton, Co. Cork",-8.10629,51.9151,N,trunk,2.801925544030366
+20526,"N52 North of Dundalk, Co. Louth",-6.39227,54.01086,N,footway,0.10525883435789059
+1651,"N65 Between Portumna and Borrisokane, Ballycasey, Co. Tipperary",-8.12535,53.01833,N,primary,1.781617909119683
+20088,"M08 Between Jn05 Twomileborris and Jn06 Thurles, Thurles, Co. Tipperary",-7.72258,52.6611,M,motorway,5.419450131105515
+1723,"N72 Between Dungarvan and Cappoquin, west of R671 Jn, Co. Waterford",-7.78874,52.1276,N,primary,1.3235280619123406
+3803,M08 Between Jn16 and Jn17,-8.30794,52.05035,M,motorway_link,9.877591629997207
+20241,"N24 Between Clonmel and Cahir, Woodroffe, Co. Tipperary",-7.79017,52.37409,N,trunk,5.7510521511078
+1031,"N03 Between Belleek  and Ballyshannon, Templenew, Co. Donegal",-8.12508,54.4844,N,trunk,9.241269176145193
+1271,"N27 Between Cork Airport and Cork, Ballycurreen, Co. Cork",-8.47908,51.86242,N,cycleway,5.0145604916923725
+1552,"N55 Between Cavan and Granard, Pottlebane, Co. Cavan",-7.44885,53.82027,N,primary,0.5366413437467172
+1121,"N12 Armagh Road, Between N02 and R213",-6.92463,54.26738,N,trunk,15.797412654286845
+20115,"M11 Between Jn21 and Jn22, Arklow, Co. Wicklow",-6.18398,52.77216,M,motorway,0.7377729986006395
+20301,"N30 Between New Ross and Enniscorthy, Scarke, Co. Wexford",-6.89601,52.41814,N,secondary,14.581940045534584
+20113,"N11 Jack Whites, North of Arklow, Co. Wicklow",-6.10092,52.89786,N,secondary,4.012216140015513
+20171,"N17 Between Tuam and Claregalway, North of N63 Jn, Co. Galway",-8.91069,53.40764,N,primary,1.3613971048051905
+3302,TME 02 M03 Jn05 North-side Ramps,-6.46878,53.43897,T,motorway_link,7.982242511200894
+3801,M08 Watergrasshill Jn18 to Jn17 Northbound,-8.34384,52.00536,M,motorway_link,7.1216308979291245
+1851,"N85 Between Ennistimon and Inagh, North of Drumcullaun, Co. Clare",-9.26992,52.92787,N,primary,12.384797044942626
+20561,"N56 Between Letterkenny and Ellistrin, Mountaintop, Co. Donegal",-7.72934,54.99359,N,cycleway,3.7756859922107626
+1624,"N62 Between Athlone and Ferbane, Ballynahown, Co. Westmeath",-7.84297,53.3472,N,primary,5.521914582003716
+1622,"N62 Between Thurles and Templemore, Whitefield, Co. Tipperary",-7.84399,52.76747,N,primary,13.05306390461264
+1261,"N26 Between Foxford and Ballina, Drumrevagh, Co. Mayo",-9.1522,54.0614,N,trunk,10.172119331339848
+20611,"N61 Between Athlone and Roscommom, Newtown, Co. Roscommon",-8.13158,53.60974,N,primary,2.02433260420346
+20201,"N20 Between Blarney and Cork, Blackpool, Co. Cork",-8.53211,51.93303,N,trunk,6.945205114543827
+1015,"M01 Between Jn04 Donabate and Jn05 Balbriggan (South), Donabate",-6.19982,53.50218,M,motorway,11.32929921806209
+200719,"M07 Between Jn25 Nenagh (Central) and Jn26 Nenagh (West), Nenagh, Co. Tipperary",-8.16953,52.84832,M,track,4.726047681090572
+20182,"M18 Ennis South, Co. Clare",-8.93139,52.80833,M,motorway,7.404092422009486
+1258,"N25 West of Mahon Interchange, between Mahon and Bloomfield Interchange",-8.4076,51.88229,N,trunk,10.604969021301502
+201082,"R108 North of M50 Jn04 Ballymun, Co. Dublin",-6.26542,53.41255,R,secondary,3.68753937006648
+20086,"M08 Between Jn13 Mitchelstown (South) Jn14 Fermoy(North), Mitchelstown, Co. Cork",-8.28182,52.21668,M,motorway,8.717271431240217
+200714,"R445 Between Castletroy and Annacotty Roundabouts, Annacotty, Co. Limerick",-8.54296,52.66814,R,secondary,9.455553333330073
+20016,"N01 North of Jn20 Jonesborough, Ravensdale, Co. Louth",-6.36497,54.11027,N,trunk,3.64320554987657
+3101,M1-1 M01 Dundalk Bypass Jn16 to Jn17,-6.43367,53.98545,M,motorway,22.594837476818952
+1591,"N59 Between Oughterard and Moycullen, Knockaunranny, Co. Galway",-9.23635,53.37186,N,primary,1.7275342620467902
+3701,M08 Jn03 Rathdowney to Jn04 Urlingford,-7.50118,52.83988,M,motorway,6.115885429755833
+1035,"N03 Between R188 Jn and Dublin Road Roundabout, Cavan Bypass, Co. Cavan",-7.34263,54.00773,N,trunk,8.094332900394388
+1811,"N81 Between Blessington and Tallaght, South of R114 Jn, Co. Wicklow",-6.46505,53.22588,N,primary,3.3516469576091557
+1041,"N04 Between the N59/N4 roundabout (Belladrihid) and Carrowroe Exit, Co. Sligo",-8.49203,54.23255,N,trunk,10.41883753712144
+1032,"N03 Between Virginia and Kells, Co. Cavan",-7.00942,53.78017,N,trunk,10.176843036898887
+1111,"N11 Between N11/N80 Jn and Enniscorthy, Clavass, Co. Wexford",-6.55295,52.53752,N,secondary,8.359454028271758
+20045,"N04 Between Dublin Road and Granard Road Roundabouts, Longford Bypass, Co. Longford",-7.76268,53.72244,N,trunk,6.9292268598510764
+20151,"N15 Between Ballybofey and Donegal Town, North of Baresmore, Co. Donegal",-7.89482,54.757,N,trunk,5.946460241619132
+20801,"N80 South N80/N52 Jn, Tullamore, Co. Offaly",-7.47739,53.25241,N,primary,6.137774642805125
+1592,"N59 Between Crossmolina and Bangor-Erris, Moylaw, Co. Mayo",-9.37759,54.09502,N,primary,1.0766789195719495
+20087,"M08 Between Jn06 Thurles and Jn07 Cashel (North), Cashel, Co. Tipperary",-7.85157,52.55771,M,motorway,7.950576203701962
+20089,"M08 Between Jn03 Rathdowney and Jn04 Urlingford, Glashare, Co. Kilkenny",-7.52357,52.78875,M,motorway,6.1682662864351645
+20253,"N25 Between New Ross and Waterford City, Glenmore, Co. Waterford",-7.05566,52.32547,N,trunk,7.089568760220581
+20079,"M07 Between Jn16 Portlaoise (East) and Jn17 Portlaoise (Centre), Co. Laois",-7.29836,53.01308,M,motorway_link,9.064571420370354
+1011,M01 Airport Link Road Between R132 Swords Road and Jn2 Dublin Airport,-6.22453,53.42808,M,motorway_link,8.045567726461991
+1712,"N71 Between Halfway and Inishannon, Co. Cork",-8.61756,51.78615,N,primary,2.648953707555111
+1611,"N61 Between Roscommon Town and Tulsk, Greehill, Co. Roscommon",-8.19746,53.67624,N,primary,0.9205488658731947
+3308,TME 08 M03 Jn08 North-side Ramps,-6.68559,53.61787,T,service,9.36893444616256
+1081,"N08 Between Dunkettle Interchange and Cork City, Tivoli, Co. Cork",-8.41296,51.90461,N,footway,3.4770960823514727
+1053,"N05 Between Swinford and Charlestown, Cloonaghboy, Co. Mayo",-8.8926,53.9486,N,trunk,5.40421761613541
+1072,"N07 Between Jn01a Newlands Cross and Jn02 Kingswood, Co. Dublin",-6.41113,53.30487,N,trunk,9.938866534648191
+3307,TME 07 M03 Jn07 to Jn08,-6.6384,53.60249,T,motorway,18.5431881624033
+20172,"N17 Between Claregalway and N63 Jn, Laghtgeorge, Co. Galway",-8.9328,53.355,N,primary,4.753743689945553
+200811,"N08 Between Glanmire Roundabound and Jn19 N08/N25 Dunkettle, Cork",-8.39022,51.90523,N,trunk,7.69644392869233
+1803,"R420 Between Clara and Tullamore, Loughaun, Co. Offaly",-7.55465,53.31254,R,secondary,0.7807785260410353
+20036,"N03 Between Belturbet and George Mitchell Bridge at NI Border, Belturbet, Co. Cavan",-7.48169,54.12109,N,trunk,9.359786075207825
+1542,"N54 Between Butlers Bridge and Clones, Clonoony, Co. Monaghan",-7.32455,54.14135,N,primary,0.77367472412945
+1761,"N76 Between Callan and Kilbride, South of Callan, Co. Kilkenny",-7.40324,52.53327,N,primary,4.33707245312465
+20251,"N25 Southwest of Rosslare Harbour, Kilraine Co. Wexford",-6.34888,52.24288,N,trunk,7.239310726084516
+1581,"N58 Between Ballylahan and Foxford, Co. Mayo",-9.10458,53.94213,N,primary,2.19347120014572
+1022,"N02 Between Ardee and Carrickmacross, Drumgeeny, Co. Monaghan",-6.64804,53.92964,N,trunk,8.855220009655397
+20063,"M06 Between Jn05 Tullamore and Jn06 Moate (East), Horseleap, Co. Westmeath",-7.58138,53.38363,M,motorway,26.13447928197059
+1721,"N72 Between Killarney and Kilorglin, East of Beaufort, Co. Kerry",-9.62142,52.07486,N,primary,1.6612401235229781
+1507,"M50 Between Jn13 Dundrum and Jn14 Dun Laoghaire, Sandyford, Co. Dublin",-6.23799,53.27188,M,motorway,6.504496330398814
+1771,"N77 North of Ring Road Roundabout, Kilkenny City, Co. Kilkenny",-7.25369,52.67886,N,primary,0.5133599453707655
+1043,"N04 Between Edgeworthstown and Mullingar, Loughlanstown, Co. Longford",-7.53782,53.66783,N,trunk,8.171783768566394
+20117,"M11 Between Jn23 and Jn24, Gorey, Co. Wexford",-6.30403,52.65503,M,motorway,7.632763145380586
+20802,"N80 Between Ballon and Kildavin , Ballyhealy, Co, Wexford",-6.7079,52.70786,N,primary,2.894769241436398
+1631,"N63 Between Roscommon and Claregalway, Derreen, Co. Roscommon",-8.71274,53.44681,N,primary,15.00362593881595
+3807,M08 Corrin Jnc15 Southbound Off-Slip,-8.27178,52.11692,M,motorway_link,7.148217675105222
+1256,"N40 Between Jack Lynch Tunnel and Mahon Jn, South Ring Road, Mahon, Co. Cork",-8.39061,51.88825,N,trunk,12.419048572232844
+10113,"M11 Jack Whites, North of Arklow, Co. Wicklow",-6.10118,52.89783,M,motorway,4.252644831312518
+1042,"N04 Between Castlebaldwin and Boyle, Dromdoney, Co. Sligo",-8.36554,54.07138,N,trunk,17.014813772251337
+1601,"N60 Between Claremorris and Ballyhaunis, Holywell, Co. Mayo",-8.81516,53.74323,N,primary,1.9734772646068357
+1812,"N81 Between Tallaght Village and M50, Tallaght, Co. Dublin",-6.3454,53.28737,N,primary,2.2999741875143354
+1021,"N02 Between Carrickmacross and Castleblaney, Donaghmoyne, Co. Monaghan",-6.71235,54.0103,N,trunk,7.257581551032443
+200717,"M07 Between Jn21 Bossis-in-Ossory and Jn22 Roscrea, Co. Laois",-7.65301,52.9231,M,motorway,4.662488812431554
+20035,"N03 Between R188 LHS on slip and RHS on slip Junctions, Cavan Bypass, Co. Cavan",-7.34162,54.01177,N,trunk,7.55011013232518
+200723,"N07 Westbound Between Jn05 Athgoe and Jn06 Castlewarden, Kilteel, Co. Kildare",-6.5458,53.25975,N,trunk,10.434368823934994
+208001,"N80 Carlow Town Bypass, Co. Carlow",-6.93084,52.84659,N,primary,8.685538485908623
+1504,"M50 Between Jn10 - Ballymount and Jn11 - Tymon, Co. Dublin",-6.33826,53.30004,M,path,6.782012652719775
+1541,"N54 Between Smithborough and Clones, Stranagarvey, Co. Monaghan",-7.1336,54.21571,N,primary,2.028514184152073
+1831,"N83 Between Tuam and Dunmore, Joycegrove, Co. Galway",-8.79326,53.56447,N,primary,4.020606402840353
+20205,"M20 Between Jn02 Loughmore and Jn03 Ballycummin, Co. Limerick",-8.6457,52.61863,M,motorway,6.696757892286351
+20511,"N51 Between Navan and Slane, Carrickdexter, Co. Meath",-6.57712,53.70527,N,primary,7.309132218547693
+1781,"N78 Between Athy and Castlecomer, Southwest of N78/N80 Jn, Co. Laois",-7.06349,52.92147,N,primary,3.272712400858229
+1505,"M50 Between Jn11 Tallaght and Jn12 Firhouse, Co. Dublin",-6.32733,53.28384,M,motorway,6.531652650478732
+1281,"N28 Between Cork City and Carrigaline, Carrs Hill, Co. Cork",-8.41577,51.85085,N,service,4.057984466630692
+20024,"N02 Between NI Border and Emyvale, Mullinderg, Co. Monaghan",-6.97313,54.39058,N,trunk,6.034139731260611
+20033,"R147 (Old N03) Between Blackbull and Dunshaughlin, Co. Meath",-6.52254,53.49123,R,secondary,0.5316383491332177
+20085,"M08 Between Jn18 Glanmire and Jn19 N8/N25 Dunkettle, Glanmire, Co. Cork",-8.38155,51.9161,M,motorway,3.4651455667149054
+20034,"N03 Between Virginia and Cavan, Poles, Co. Cavan.",-7.28958,53.99095,N,residential,4.1936324143595325
+1632,"N63 Between Lanesborough and Roscommon Town, Cloontimullan, Co. Roscommon",-8.09816,53.65583,N,primary,0.7659125180159113
+20222,"N22 Between Ballincollig and Ovens, Ballincollig, Co. Cork",-8.64464,51.87858,N,trunk,7.045000546933829
+1013,"N01 South of M50 Jn02 Santry, Whitehall",-6.24237,53.38807,N,motorway,1.1991021210377246
+20112,"N11 Between Kilmacanogue and Delgany Jn, Co. Wicklow",-6.12795,53.15905,N,unclassified,3.4321859846923446
+1141,"N14 Between Lifford and Letterkenny, Drumbuoy, Co. Donegal",-7.49488,54.8402,N,trunk,8.583775215941646
+20183,"N18 Between Shannon and Limerick, Hurlers Cross, Co. Clare",-8.84375,52.71729,N,tertiary,6.515739873452063
+200711,"R445 Between Borris-in-Ossory and Mountrath, Pike of Rushall, Co. Laois",-7.55977,52.95053,R,secondary,18.410776135193032
+1211,"N21 Between Tralee and Castleisland, Co. Kerry",-9.5002,52.23983,N,trunk,9.761566552108123
+1593,"N59 Between Sligo and Ballina, Corbally, Co. Mayo",-9.06317,54.1694,N,primary,7.306707126306557
+20093,"M09 Between Jn11 Mullinavat and Jn12 M9/N24/N25 Grannagh, Mullinavat, Co. Kilkenny",-7.1653,52.36673,M,motorway,6.520006333175859
+1502,"M50 Between Jn06 N03/M50 and Jn05 N02/M50, Finglas, Co. Dublin",-6.33667,53.39524,M,motorway,8.734020827816485
+3301,TME 01 M03 Jn04 to Jn05,-6.4644,53.42933,T,motorway,9.920442746264403
+3309,TME 09 M03 Jn08 to Jn09,-6.71424,53.62388,T,motorway,11.305650662933278
+3806,M08 Corrin Jnc15 Northbound On-Slip,-8.27226,52.11744,M,motorway_link,4.87641156901926
+1033,"N03 Between Jn03 Clonsilla and Jn04 Clonee , Clonee, Co. Dublin",-6.42042,53.40748,N,trunk_link,14.750704615387548
+200716,"M07 Between Jn22 Roscrea and Jn23 Moneygall, Co. Offaly",-7.90311,52.90036,M,motorway,2.6889290740859715
+20092,"M09 Castledermot, Co. Kildare",-6.8652,52.91377,M,motorway,6.64326341604769
+200713,"M07 Between Jn29 M07/N24 Ballysimon and Jn30 M07/M18/20 Rossbrien, Rossbrien, Co. Limerick",-8.58542,52.63952,M,motorway,6.518803436965429
+3303,TME 03 M03 Jcn05 to Jcn06,-6.47054,53.4423,T,motorway_link,7.236224315445717
+20908,"M09 Between Jn09 Kilkenny (South) and Jn10 Knocktopher, Danesfort, Co. Kilkenny",-7.23645,52.568,M,motorway,5.090243930338858
+20081,"N77 Between Portlaoise and Abbeyleix, South of M7 Jn17 Portlaoise (Central), Portlaoise, Co. Laois",-7.3046,53.00523,N,service,7.5758429074312215
+1311,"N31 Between Stillorgan Road and Rock Road, Blackrock, Co. Dublin",-6.19153,53.30009,N,path,5.299441110096984
+20047,"N04 Between Jn01 N4/M50 and Jn02 Liffey Valley, Liffey Valley, Co. Dublin",-6.39533,53.3555,N,trunk,6.499949514036281
+20525,"N52 Between Dundalk and M1, Dundalk (Southlink), Co. Louth",-6.41903,53.97095,N,primary,2.665628420933653
+202639,"R639 Between Exit 15 of M08 and Rathcormac, Co. Cork",-8.27791,52.08494,R,secondary,5.150285766669684
+20521,"N52 Between Delvin and Mullingar, Delvin, Co. Westmeath",-7.10352,53.60284,N,primary,10.331597288964915
+20256,"N25 Carrigtohill Bypass, Carrigtohill, Co. Cork",-8.27244,51.90645,N,trunk,11.690756949442166
+1782,"N78 Between Athy and M09 Jn03 Athy, Ballycullane, Co. Kildare",-6.92644,52.98721,N,primary,18.274594738424337
+20202,"N20 Between Croom and M20, Croom North, Co.Limerick",-8.72005,52.57027,N,service,3.922059347327323
+1713,"N71 Between Clonakilty and Jones Bridge, Clonakility, Co. Cork",-8.87287,51.63637,N,cycleway,7.863076982044737
+1623,"N62 Between Roscrea and Templemore, Lismakin, Co. Tipperary",-7.79785,52.9003,N,primary,4.944497301461247
+20065,"N06 Between Jn11 Athlone (Centre) and Jn12 Roscommon,  Athlone Bypass, Co. Westmeath",-7.94832,53.43438,N,trunk,11.652503889521185
+20076,"M07 Between Jn13 Kildare and Jn14 Monasterevin, Kildare Town, Co. Kildare",-6.95265,53.15473,M,motorway,9.57085876018195
+20811,"N81 Between Hollywood and Baltinglass, Donard, Co. Wicklow",-6.63954,53.02845,N,primary,3.318110851121694
+20012,"M01 Between Jn04 Donabate and Jn05 Balbriggan South, Co. Dublin",-6.21491,53.55996,M,motorway,5.810070045404292
+1661,"N66 Between Loughrea and Gort, Gortaloman, Co. Galway",-8.75103,53.1116,N,secondary,0.5293154388579715
+1071,"N07 Between Jn02 Kingswood and Jn03 Citywest, Kingswood, Co. Dublin",-6.42507,53.29789,N,trunk,9.029898263737815
+15011,"M50 Betweenn Jn15 Carrickmines and Jn16 Cherrywood ,Cabintely, Co. Dublin",-6.16456,53.2469,M,motorway,13.904280397297631
+20041,"M04 Between Jn06 Celbridge and Jn07 Maynooth, Maynooth, Co. Kildare",-6.56185,53.36438,M,motorway,6.622968023628434
+20066,"R446 (Old N06) Between Athlone and Ballinasloe, Ballydangan, Co. Roscommon",-8.06759,53.3616,R,secondary,11.044823452905527
+1701,"N70 Between Sneem and Kenmare, Templenoe, Co. Kerry",-9.6781,51.86732,N,primary,4.901541395002519
+1501,"M50 Between Jn05 N02/M50 and Jn04 Ballymun, Finglas, Co. Dublin",-6.28956,53.40816,M,motorway,7.718966346197161
+20084,"M08 Between Jn04 Urlingford and Jn05 Twomileborris, Twomileborris, Co. Tipperary",-7.695,52.6702,M,motorway,7.003299688884265
+20563,"N56 North of Donegal, Drumrooske, Co. Donegal",-8.10466,54.66156,N,footway,4.299326748394225
+1182,"N18 Between Kilcolgan and Clarinbridge, Co. Galway",-8.87202,53.21652,N,primary,4.825903566750905
+20152,"N15 Between Ballyshannon and Donegal Town, Donegal Town Bypass, Co. Donegal",-8.08635,54.64502,N,trunk,6.12295880197422
+20258,"N25 At the Interchange Between N25 and N28, Littleisland, Co. Cork",-8.35638,51.90728,N,trunk_link,8.801401080866526
+200171,"N01 Between Jn19 Ravensdale and Jn20 Jonesborough (Northbound), Ravensdale, Co. Louth",-6.36099,54.09455,N,trunk_link,4.795483591390913
+1621,"N62 Between Thurles and M08 Jn06 Thurles, Knockroe Co. Tipperary",-7.78434,52.63959,N,primary,3.8716509599199216
+20032,"R147 (Old N03) Between Kells and Navan, Martry, Co. Meath",-6.78932,53.69842,R,secondary,16.057416900198998
+3310,TME 10 M03 Jn09 North-side Ramps,-6.7428,53.64191,T,track,4.933801525385081
+20077,"M07 Between Jn14 Monasterevin and Jn15 Ballybrittas, New Inn, Co. Laois",-7.16771,53.09198,M,motorway,5.606590810129736
+1523,"N52 Between Birr and Kilcormac, Kilcormac, Co. Offaly",-7.74721,53.17023,N,primary,4.375787610861077
+20212,"N21 Between Adare and M20 Jn, Nouborough, Co. Limerick",-8.75221,52.57864,N,trunk,3.38160569387797
+20591,"N59 Between Mullranny and Newport, Newfield, Co. Mayo",-9.67708,53.9058,N,service,7.538657082277578
+20701,"N70 Between Caherciveen and Glenbeigh, Gortaforia, Co. Kerry",-10.08797,52.0309,N,primary,6.606186549496011
+3304,TME 04 M03 Jnc06 North-side Ramps,-6.56182,53.51162,T,motorway_link,8.710021665617706
+20243,"N24 Between Ballysimon and R513 Jn, Killonan, Co. Limerick",-8.53691,52.63854,N,residential,2.5600792585478698
+1751,"N75 Between Thurles and Twomileborris, Co. Tipperary",-7.74535,52.67212,N,primary,8.080209593236193
+1161,"N16 Between Enniskillen and Sligo, McNean Court, Co. Sligo",-7.91383,54.28701,N,trunk,2.807647360958032
+3804,"M08 Corrin Bridge, Jnc15 to Jnc16",-8.27496,52.10814,M,motorway,7.028034925092591
+20021,"M02 Between Jn01 M50/N02 and Jn02, Coldwinters, Co Dublin",-6.31592,53.41283,M,trunk_link,6.2453919212549485
+20072,"M07 Between Jn09 Naas North and Jn10 Nass South, Naas Bypass, Co. Kildare",-6.66288,53.24144,M,motorway,11.331162476040909
+20522,"N52 North of Tyrrellspass, Co. Westmeath",-7.37061,53.3937,N,primary,2.753757833898497
+20118,"M11 Between Jn16 and Jn17, Rathnew, Co. Wicklow",-6.09087,53.00297,M,motorway,4.763698124555787
+20257,"N25 Between Littleisland and Carigtohill, Tullegreinne, Co. Cork",-8.28723,51.90628,N,trunk_link,8.600252689482097
+20185,"M18 Gort, Co. Galway",-8.89035,52.95824,M,motorway,7.784308792653538
+1842,"N84 Between Ballinrobe and Partry, Cloonkerry, Co. Mayo",-9.25784,53.64954,N,primary,2.6672048805757225
+20861,"N86 Between Dingle and Annascaul, Emlagh, Co. Kerry",-10.1926,52.14043,N,primary,8.571396139796922
+1056,N5 Ballaghaderreen Bypass,-8.56383,53.91459,N,trunk,10.621445374031548
+1133,"N13 Between Stranorlar and Letterkenny, Treantaboy, Co. Donegal",-7.74265,54.87773,N,trunk,3.6438175546457003
+3314,TME 14 M03 Jn10 to Jn11,-6.86808,53.71339,T,motorway,12.65619020681936
+201321,"R132 South of Julianstown, Whitecross, Co. Meath",-6.27883,53.66797,R,secondary,1.4085500630076035
+1522,"N52 Between Kells and Ardee, Glebe, Co. Meath",-6.66862,53.80577,N,primary,2.052773004953322
+1693,"N69 Between Listowel and Tarbert, Kylebwee, Co. Kerry",-9.42912,52.4662,N,primary,1.05032595215914
+20523,"N52 Between Tullamore and Kilbeggan, Co. Westmeath",-7.49666,53.35323,N,primary,13.280030694949343
+1054,"N05 Between Strokestown and Longford,Termonbarry, Co. Roscommon",-7.93814,53.74647,N,trunk,9.723855303043054
+3805,M08 Corrin Jn15 South Side On/Off-Slips,-8.27305,52.11238,M,motorway_link,6.494836187686614
+20211,"N21 Between Abbeyfeale and R551 Jn, Templeglantine, Co. Limerick",-9.22114,52.38221,N,trunk,1.7245209629378473
+20671,"N67 Between Ennistimon and Lisdoonvarna, Co. Clare",-9.28551,52.95414,N,primary,2.0185440022426957
+1331,"N33 Between Ardee and M01, Richardstown, Co. Louth",-6.46027,53.85822,N,trunk,10.807052075901076
+20042,"M04, Maynooth,West Co. Kildare",-6.62558,53.37465,M,motorway,6.570705622665883
+20111,"M11 Between Bray North and Fassaroe Jn, Co. Wicklow",-6.1296,53.20248,M,motorway,5.499846267706897
