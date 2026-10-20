@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>bike-mapper: stops, expected stops/km, routes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html, body, #map { height: 100%; margin: 0; }
+.panel { background: #fff; padding: 6px 8px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.4); font: 12px/1.4 sans-serif; }
+.legend i { display: inline-block; width: 18px; height: 8px; margin-right: 6px; }
+.panel select { font-size: 13px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var REGIONS = {
+  ireland: { label: 'Dublin / Wicklow', stops: 'data/stops_ireland.geojson', ways: 'data/ways_ireland.geojson',
+             unexplained: 'data/unexplained_ireland.geojson', pairs: ['dublin', 'wicklow'] },
+  berlin:  { label: 'Berlin', stops: 'data/stops_berlin.geojson', ways: 'data/ways_berlin.geojson',
+             unexplained: 'data/unexplained_berlin.geojson', pairs: [] }
+};
+var PAIR_COLOUR = { dublin: '#1f77b4', wicklow: '#9467bd' };
+var SCALE = [[0.2, '#1a9850'], [0.5, '#91cf60'], [1.0, '#fee08b'], [3.0, '#fc8d59'], [Infinity, '#d73027']];
+var SCALE_LABELS = ['0 - 0.2', '0.2 - 0.5', '0.5 - 1', '1 - 3', '> 3'];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function spkColour(v) {
+  for (var i = 0; i < SCALE.length; i++) { if (v <= SCALE[i][0]) { return SCALE[i][1]; } }
+  return SCALE[SCALE.length - 1][1];
+}
+function pColour(p) {
+  // grey (0) -> red (1)
+  var a = [150, 150, 150], b = [215, 25, 28];
+  var c = a.map(function (x, i) { return Math.round(x + (b[i] - x) * p); });
+  return 'rgb(' + c.join(',') + ')';
+}
+
+var map = L.map('map');
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var control = L.control.layers(null, null, { collapsed: false }).addTo(map);
+var current = null; // {name: layer}
+var cache = {};
+
+function getJSON(url) {
+  if (!cache[url]) {
+    cache[url] = fetch(url).then(function (r) {
+      if (!r.ok) { throw new Error(url + ': HTTP ' + r.status); }
+      return r.json();
+    });
+  }
+  return cache[url];
+}
+
+function waysLayer(gj) {
+  return L.geoJSON(gj, {
+    style: function (f) { return { color: spkColour(f.properties.spk), weight: 3, opacity: 0.85 }; },
+    onEachFeature: function (f, l) {
+      var p = f.properties;
+      l.bindPopup('<b>' + esc(p.name || '(unnamed)') + '</b><br>' + esc(p.highway) + ', ' + esc(p.km) +
+                  ' km<br>expected stops/km: ' + esc(p.spk));
+    }
+  });
+}
+function stopsLayer(gj) {
+  return L.geoJSON(gj, {
+    pointToLayer: function (f, ll) {
+      var p = f.properties, faint = p.passes < 5;
+      return L.circleMarker(ll, {
+        radius: 3 + 2.5 * Math.log(p.passes + 1),
+        color: '#333', weight: faint ? 0.5 : 1,
+        fillColor: pColour(p.p), fillOpacity: faint ? 0.25 : 0.8, opacity: faint ? 0.3 : 0.9
+      });
+    },
+    onEachFeature: function (f, l) {
+      var p = f.properties;
+      l.bindPopup('<b>Stop unit: ' + esc(p.cls) + '</b><br>passes: ' + esc(p.passes) + '<br>stops: ' + esc(p.stops) +
+                  '<br>p: ' + esc(p.p) + '<br>OSM nodes in unit: ' + esc(p.n_nodes) + '<br>diameter: ' + esc(p.diam) + ' m');
+    }
+  });
+}
+function routesLayer(gj, pairs) {
+  return L.geoJSON(gj, {
+    filter: function (f) { return pairs.indexOf(f.properties.pair) >= 0; },
+    style: function (f) {
+      var base = f.properties.profile === 'baseline';
+      return { color: PAIR_COLOUR[f.properties.pair] || '#000', weight: base ? 4 : 4, opacity: 0.9,
+               dashArray: base ? '8 8' : null };
+    },
+    onEachFeature: function (f, l) {
+      var p = f.properties;
+      l.bindPopup('<b>' + esc(p.pair) + ' ' + esc(p.profile) + '</b><br>' + esc(p.km) + ' km');
+    }
+  });
+}
+function unexplainedLayer(gj) {
+  return L.geoJSON(gj, {
+    pointToLayer: function (f, ll) {
+      return L.marker(ll, { icon: L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9],
+        html: '<div style="width:14px;height:14px;background:#7b1fa2;border:2px solid #fff;transform:rotate(45deg);box-shadow:0 0 3px #000"></div>' }) });
+    },
+    onEachFeature: function (f, l) {
+      var p = f.properties;
+      l.bindPopup('<b>Unexplained: ' + esc(p.label) + '</b><br>' + esc(p.rationale) +
+                  '<br>class: ' + esc(p.cls) + ', passes: ' + esc(p.passes) + ', stops: ' + esc(p.stops) +
+                  ', mean stop: ' + esc(p.mean_stop_s) + ' s, nodes: ' + esc(p.n_nodes) +
+                  '<br>nearby: ' + esc(p.ways));
+    }
+  });
+}
+
+function clearCurrent() {
+  if (!current) { return; }
+  Object.keys(current).forEach(function (k) {
+    map.removeLayer(current[k]);
+    control.removeLayer(current[k]);
+  });
+  current = null;
+}
+
+function showRegion(key) {
+  var R = REGIONS[key];
+  clearCurrent();
+  Promise.all([getJSON(R.ways), getJSON(R.stops), getJSON('data/routes.geojson'), getJSON(R.unexplained)])
+    .then(function (d) {
+      var layers = {};
+      layers['Ways by expected stops/km'] = waysLayer(d[0]);
+      layers['Observed stop units (size ~ log passes, colour = p)'] = stopsLayer(d[1]);
+      layers['Routes (dashed baseline, solid flow)'] = routesLayer(d[2], R.pairs);
+      layers['Unexplained units'] = unexplainedLayer(d[3]);
+      current = layers;
+      Object.keys(layers).forEach(function (k) { layers[k].addTo(map); control.addOverlay(layers[k], k); });
+      var b = layers['Observed stop units (size ~ log passes, colour = p)'].getBounds();
+      if (b.isValid()) { map.fitBounds(b); }
+      layers['Routes (dashed baseline, solid flow)'].bringToFront();
+    })
+    .catch(function (e) { console.error(e); alert('Failed to load map data: ' + e.message); });
+}
+
+var SwitchCtl = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd: function () {
+    var div = L.DomUtil.create('div', 'panel');
+    var sel = L.DomUtil.create('select', '', div);
+    Object.keys(REGIONS).forEach(function (k) {
+      var o = document.createElement('option'); o.value = k; o.textContent = REGIONS[k].label; sel.appendChild(o);
+    });
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.on(sel, 'change', function () { showRegion(sel.value); });
+    return div;
+  }
+});
+new SwitchCtl().addTo(map);
+
+var Legend = L.Control.extend({
+  options: { position: 'bottomright' },
+  onAdd: function () {
+    var div = L.DomUtil.create('div', 'panel legend');
+    var h = '<b>Expected stops/km</b><br>';
+    SCALE.forEach(function (s, i) { h += '<i style="background:' + s[1] + '"></i>' + SCALE_LABELS[i] + '<br>'; });
+    h += '<br><b>Stop units</b>: grey p=0 to red p=1,<br>faint = fewer than 5 passes<br>' +
+         '<b>Routes</b>: dashed baseline, solid flow<br><b>Purple diamond</b>: unexplained unit';
+    div.innerHTML = h;
+    return div;
+  }
+});
+new Legend().addTo(map);
+
+showRegion('ireland');
+</script>
+</body>
+</html>
