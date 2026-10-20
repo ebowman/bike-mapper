@@ -1,0 +1,18 @@
+[project]
+name = "bike-mapper"
+version = "0.1.0"
+description = "Open-data feasibility research for a custom road-cycling route planner"
+requires-python = ">=3.11"
+dependencies = [
+    "osmium",
+    "rasterio",
+    "shapely",
+    "pyproj",
+    "requests",
+    "geopandas",
+    "gpxpy",
+    "fitdecode",
+]
+
+[tool.uv]
+package = false
