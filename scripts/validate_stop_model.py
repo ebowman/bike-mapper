@@ -328,7 +328,8 @@ def unit_export(units, path):
     d = units
     out = pd.DataFrame({"unit_id": d.unit_id, "lat": d.lat.round(6), "lon": d.lon.round(6), "passes": d.passes,
                         "stops": d.stops, "p": (d.stops / d.passes).round(4), "class": d.cls, "n_nodes": d.n_nodes,
-                        "diameter_m": d.diameter_m.round(1), "member_node_ids": d.members})
+                        "diameter_m": d.diameter_m.round(1), "mean_stop_s": d.mean_stop_s.round(1),
+                        "member_node_ids": d.members})
     out.to_csv(path, index=False)
     if path.stat().st_size > 1_000_000:  # keep each file < 1 MB: drop single-pass units
         out = out[d.passes.values >= 2]

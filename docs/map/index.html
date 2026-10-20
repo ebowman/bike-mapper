@@ -5,6 +5,7 @@
 <title>bike-mapper: stops, expected stops/km, routes</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Ccircle cx=%278%27 cy=%278%27 r=%277%27 fill=%27%23d73027%27/%3E%3C/svg%3E">
 <style>
 html, body, #map { height: 100%; margin: 0; }
 .panel { background: #fff; padding: 6px 8px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.4); font: 12px/1.4 sans-serif; }
@@ -72,22 +73,46 @@ function waysLayer(gj) {
     }
   });
 }
+var LOW_PASSES = 3, LOW_MIN_ZOOM = 12;
+var zoomHandlers = [];
 function stopsLayer(gj) {
-  return L.geoJSON(gj, {
-    pointToLayer: function (f, ll) {
-      var p = f.properties, faint = p.passes < 5;
-      return L.circleMarker(ll, {
-        radius: 3 + 2.5 * Math.log(p.passes + 1),
-        color: '#333', weight: faint ? 0.5 : 1,
-        fillColor: pColour(p.p), fillOpacity: faint ? 0.25 : 0.8, opacity: faint ? 0.3 : 0.9
-      });
-    },
-    onEachFeature: function (f, l) {
-      var p = f.properties;
-      l.bindPopup('<b>Stop unit: ' + esc(p.cls) + '</b><br>passes: ' + esc(p.passes) + '<br>stops: ' + esc(p.stops) +
-                  '<br>p: ' + esc(p.p) + '<br>OSM nodes in unit: ' + esc(p.n_nodes) + '<br>diameter: ' + esc(p.diam) + ' m');
-    }
-  });
+  function mk(filter) {
+    return L.geoJSON(gj, {
+      filter: filter,
+      pointToLayer: function (f, ll) {
+        var p = f.properties, faint = p.passes < 5;
+        return L.circleMarker(ll, {
+          radius: 3 + 2.5 * Math.log(p.passes + 1),
+          color: '#333', weight: faint ? 0.5 : 1,
+          fillColor: pColour(p.p), fillOpacity: faint ? 0.25 : 0.8, opacity: faint ? 0.3 : 0.9
+        });
+      },
+      onEachFeature: function (f, l) {
+        var p = f.properties;
+        l.bindPopup('<b>Stop unit: ' + esc(p.cls) + '</b><br>passes: ' + esc(p.passes) + '<br>stops: ' + esc(p.stops) +
+                    '<br>p: ' + esc(p.p) + '<br>mean stop: ' + (p.mean_s == null ? 'n/a' : esc(p.mean_s) + ' s') +
+                    '<br>OSM nodes in unit: ' + esc(p.n_nodes) + '<br>diameter: ' + esc(p.diam) + ' m');
+      }
+    });
+  }
+  var high = mk(function (f) { return f.properties.passes >= LOW_PASSES; });
+  var low = mk(function (f) { return f.properties.passes < LOW_PASSES; });
+  var group = L.layerGroup([high]);
+  function sync() {
+    var z = map._loaded ? map.getZoom() : 0; // view not set yet on first load
+    if (z >= LOW_MIN_ZOOM) { group.addLayer(low); } else { group.removeLayer(low); }
+  }
+  map.on('zoomend', sync);
+  zoomHandlers.push(sync);
+  sync();
+  group.unitBounds = function () {
+    var b = L.latLngBounds([]);
+    gj.features.forEach(function (f) {
+      if (f.properties.passes >= 5) { b.extend([f.geometry.coordinates[1], f.geometry.coordinates[0]]); }
+    });
+    return b.isValid() ? b : high.getBounds();
+  };
+  return group;
 }
 function routesLayer(gj, pairs) {
   return L.geoJSON(gj, {
@@ -126,13 +151,18 @@ function clearCurrent() {
     control.removeLayer(current[k]);
   });
   current = null;
+  zoomHandlers.forEach(function (h) { map.off('zoomend', h); });
+  zoomHandlers = [];
 }
 
+var loadToken = 0;
 function showRegion(key) {
   var R = REGIONS[key];
+  var token = ++loadToken;
   clearCurrent();
   Promise.all([getJSON(R.ways), getJSON(R.stops), getJSON('data/routes.geojson'), getJSON(R.unexplained)])
     .then(function (d) {
+      if (token !== loadToken) { return; } // stale load: a newer switch superseded this one
       var layers = {};
       layers['Ways by expected stops/km'] = waysLayer(d[0]);
       layers['Observed stop units (size ~ log passes, colour = p)'] = stopsLayer(d[1]);
@@ -140,11 +170,14 @@ function showRegion(key) {
       layers['Unexplained units'] = unexplainedLayer(d[3]);
       current = layers;
       Object.keys(layers).forEach(function (k) { layers[k].addTo(map); control.addOverlay(layers[k], k); });
-      var b = layers['Observed stop units (size ~ log passes, colour = p)'].getBounds();
+      var b = layers['Observed stop units (size ~ log passes, colour = p)'].unitBounds();
       if (b.isValid()) { map.fitBounds(b); }
+      zoomHandlers.forEach(function (h) { h(); });
       layers['Routes (dashed baseline, solid flow)'].bringToFront();
     })
-    .catch(function (e) { console.error(e); alert('Failed to load map data: ' + e.message); });
+    .catch(function (e) {
+      if (token !== loadToken) { return; }
+      console.error(e); alert('Failed to load map data: ' + e.message); });
 }
 
 var SwitchCtl = L.Control.extend({

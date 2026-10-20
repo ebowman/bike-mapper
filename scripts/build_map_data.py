@@ -97,7 +97,8 @@ def build_stops(region):
             out.append({"type": "Feature", "geometry": {"type": "Point", "coordinates": [r5(r["lon"]), r5(r["lat"])]},
                         "properties": {"passes": int(r["passes"]), "stops": int(r["stops"]), "p": round(float(r["p"]), 3),
                                        "cls": r["class"], "n_nodes": int(r["n_nodes"]),
-                                       "diam": round(float(r["diameter_m"]), 1)}})
+                                       "diam": round(float(r["diameter_m"]), 1),
+                                   "mean_s": num(r.get("mean_stop_s"))}})
     return out
 
 
