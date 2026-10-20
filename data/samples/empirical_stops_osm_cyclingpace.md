@@ -5,7 +5,7 @@ Traces analysed 231; excluded: median speed > 12.0 m/s: 54; > 50 % of snapped po
 Kept traces with median speed < 2.5 m/s (walking pace, not excluded): 0
 Trace length: median 130 points, median sample interval 2.0 s
 Traces/rides in node statistics: 56; data-gap counters: datagap_moved=1154, datagap_unbracketed=2326, discarded_end_margin=566
-CSV observed_stops_osm_cyclingpace.csv: 9367 of 9367 nodes written (min passes 1); size 380823 bytes
+CSV observed_stops_osm_cyclingpace.csv: 9367 of 9367 nodes written (min passes 1); size 380822 bytes
 
 | stop kind | events | total stopped time (h) | mean (s) |
 |---|---|---|---|
@@ -25,7 +25,8 @@ CSV observed_stops_osm_cyclingpace.csv: 9367 of 9367 nodes written (min passes 1
 | ... of which with >= 1 stop | 0 |
 | nodes with >= 5 passes that are junctions (>= 3 segments) or tagged signals/stop/give_way/crossing | 12 |
 | nodes with >= 10 passes | 0 |
-| stop events attached to a node (<= 30 m) | 170 |
+| stop events attached to a node (<= 30 m) | 149 |
+| extra same-ride same-node stops dropped by the one-stop-per-ride-per-node cap | 21 |
 
 Top 20 nodes by stop count (>= 5 passes):
 

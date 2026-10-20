@@ -100,7 +100,7 @@ def load_network(pbf, boxes=(), points=None, cell=0.02, cache_dir="data/cache"):
             for di in (-1, 0, 1):
                 for dj in (-1, 0, 1):
                     cells.add((lo + di, la + dj))
-    key = hashlib.md5((str(pathlib.Path(pbf).stat().st_mtime) + repr(sorted(boxes)) + repr(sorted(cells))).encode()).hexdigest()[:10]
+    key = hashlib.md5((str(pathlib.Path(pbf).resolve()) + str(pathlib.Path(pbf).stat().st_mtime) + repr(sorted(boxes)) + repr(sorted(cells))).encode()).hexdigest()[:10]
     cp = pathlib.Path(cache_dir) / f"network_{key}.pkl"
     if cp.exists():
         return pickle.load(open(cp, "rb"))
@@ -134,7 +134,7 @@ def load_network(pbf, boxes=(), points=None, cell=0.02, cache_dir="data/cache"):
     xs, ys = project([ll[i][0] for i in ids], [ll[i][1] for i in ids])
     node_xy = {i: (float(x), float(y)) for i, x, y in zip(ids, xs, ys)}
     node_ll = ll
-    net = Network(ways, node_xy, {k: v for k, v in tags.items() if k in node_xy or True})
+    net = Network(ways, node_xy, tags)
     net.node_ll = node_ll
     net.tagged_ll = {}
     cp.parent.mkdir(parents=True, exist_ok=True)

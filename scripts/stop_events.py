@@ -276,6 +276,19 @@ def selftest():
 
 
 # ---------------------------------------------------------------- source loading
+COUNTRIES = [("Ireland", (-10.7, 51.3, -5.3, 55.5)), ("Slovenia", (13.3, 45.4, 16.6, 46.9)),
+             ("Greece", (19.0, 34.8, 30.0, 41.8)), ("Netherlands", (3.3, 50.7, 7.3, 53.6)),
+             ("France", (-5.2, 42.3, 8.3, 51.1)), ("Germany", (5.9, 47.2, 15.1, 55.1)),
+             ("UK (GB)", (-8.0, 49.8, 2.0, 60.9))]
+
+
+def country_of(lat, lon):
+    for n, b in COUNTRIES:
+        if b[0] <= lon <= b[2] and b[1] <= lat <= b[3]:
+            return n
+    return "other"
+
+
 def load_eric(a):
     idx = {r["activityId"]: r for r in json.load(open(ROOT / "data/rides/index.json"))}
     cand, dropped = [], []
@@ -291,7 +304,7 @@ def load_eric(a):
             dropped.append((aid, "no position records (empty / indoor)")); continue
         if median_dt(s) > 2.0:
             dropped.append((aid, f"smart recording (median dt {median_dt(s):.1f}s)")); continue
-        if not (IRELAND[0] <= s.lon[0] <= IRELAND[2] and IRELAND[1] <= s.lat[0] <= IRELAND[3]):
+        if not (a.inbox[0] <= s.lon[0] <= a.inbox[2] and a.inbox[1] <= s.lat[0] <= a.inbox[3]):
             rec["outside"] = True
         cand.append(rec)
     keep = []
@@ -324,7 +337,6 @@ def load_osm(a):
             for si, sg in enumerate(tr.segments):
                 has = [p for p in sg.points if p.time is not None]
                 total_pts += len(sg.points); ts_pts += len(has)
-                key = (url, si, f if tr.link is None else None)
                 total_trk += 1; ts_trk += bool(has)
                 T, LA, LO, SP = traces[(url if tr.link else f"{f}#{ti}", si)]
                 for p in has:
@@ -362,6 +374,7 @@ def accumulate(rows, net, a):
     node_pass, node_stop, node_dur = Counter(), Counter(), defaultdict(float)
     way_km, way_stop, way_pass = Counter(), Counter(), Counter()
     kinds = Counter(); kind_dur = defaultdict(float)
+    capped = 0
     pts_total = pts_snapped = ev_total = ev_snapped = 0
     km = 0.0
     for tid, s, ev, seg, t, node, nd, bigfrac in rows:
@@ -388,6 +401,7 @@ def accumulate(rows, net, a):
             if key not in seen:
                 seen.add(key); way_pass[key] += 1
         # events
+        stopped_here = set()  # one stop per ride per node (probability <= 1)
         for e in ev:
             kinds[e["kind"]] += 1; kind_dur[e["kind"]] += e["dur"]
             if e["kind"] == "rest":
@@ -404,10 +418,13 @@ def accumulate(rows, net, a):
             f = ((x[hi_] - x[lo_]) * (net.bx[sgm[0]] - net.ax[sgm[0]]) + (y[hi_] - y[lo_]) * (net.by[sgm[0]] - net.ay[sgm[0]])) >= 0
             way_stop[(net.way_ids[net.way_of_seg[sgm[0]]], 0 if f else 1)] += 1
             if ndist[0] <= a.node_radius:
+                if int(nid[0]) in stopped_here:
+                    capped += 1; continue
+                stopped_here.add(int(nid[0]))
                 node_stop[int(nid[0])] += 1; node_dur[int(nid[0])] += e["dur"]
     return dict(node_pass=node_pass, node_stop=node_stop, node_dur=node_dur, way_km=way_km, way_stop=way_stop,
                 way_pass=way_pass, kinds=kinds, kind_dur=kind_dur, pts_total=pts_total, pts_snapped=pts_snapped,
-                ev_total=ev_total, ev_snapped=ev_snapped, km=km)
+                ev_total=ev_total, ev_snapped=ev_snapped, km=km, capped=capped)
 
 
 def what_is_there(net, nid, near_tree):
@@ -511,6 +528,7 @@ def report(label, net, st, a, near, extra_lines):
         ["nodes with >= 5 passes that are junctions (>= 3 segments) or tagged signals/stop/give_way/crossing", sum(1 for n in np5 if net.node_deg.get(n, 0) >= 3 or net.node_tag.get(n, {}).get("highway") in snap.NODE_HW or "crossing" in net.node_tag.get(n, {}))],
         ["nodes with >= 10 passes", sum(1 for p in st["node_pass"].values() if p >= 10)],
         ["stop events attached to a node (<= %g m)" % a.node_radius, sum(st["node_stop"].values())],
+        ["extra same-ride same-node stops dropped by the one-stop-per-ride-per-node cap", st["capped"]],
     ])]
     top = sorted(np5, key=lambda n: (-st["node_stop"].get(n, 0), -st["node_pass"][n]))[:20]
     rows = []
@@ -543,7 +561,10 @@ def main():
     ap.add_argument("--min-median-speed", type=float, default=0.0, help="OSM: also exclude traces slower than this (walkers); default off")
     ap.add_argument("--tag", default="", help="suffix for output file names")
     ap.add_argument("--max-bigroad-frac", type=float, default=0.5, help="exclude OSM traces with more than this share of snapped points on motorway/trunk")
-    ap.add_argument("--pbf", default=str(ROOT / "data/osm/ireland.osm.pbf"))
+    ap.add_argument("--extract", "--pbf", dest="pbf", default=str(ROOT / "data/osm/ireland.osm.pbf"),
+                    help="OSM extract (default Ireland); the network cache is keyed by its path")
+    ap.add_argument("--region", default="", help="tag used in output file names, e.g. berlin (default: none = Ireland)")
+    ap.add_argument("--extract-bbox", default=None, help="lon0,lat0,lon1,lat1 of rides counted as inside the extract (default: Ireland, or Brandenburg for --region berlin)")
     a = ap.parse_args()
     if a.selftest:
         return selftest()
@@ -552,14 +573,24 @@ def main():
     if a.run_max_dt is None:
         a.run_max_dt = 5.0 if a.source == "eric" else 20.0
     t_start = time.time()
+    if a.extract_bbox:
+        a.inbox = tuple(float(v) for v in a.extract_bbox.split(","))
+    else:
+        a.inbox = (11.2, 51.3, 14.8, 53.6) if a.region == "berlin" else IRELAND
+    if a.region:
+        a.tag = f"{a.tag}_{a.region}"
     extra = []
     if a.source == "eric":
         keep, dropped = load_eric(a)
         ire = [r for r in keep if not r.get("outside")]
         outs = [r for r in keep if r.get("outside")]
-        extra += [f"Files {len(keep) + len(dropped)}; used {len(ire)} in Ireland; dropped {len(dropped)}: "
+        extra += [f"Files {len(keep) + len(dropped)}; used {len(ire)} inside the extract bbox; dropped {len(dropped)}: "
                   + "; ".join(f"{i} ({r})" for i, r in dropped)]
-        extra += [f"Outside the Ireland extract (stop events counted, not snapped): {len(outs)} rides, {sum(track_km(r['s']) for r in outs):.0f} km"]
+        extra += [f"Outside the extract (stop events counted, not snapped): {len(outs)} rides, {sum(track_km(r['s']) for r in outs):.0f} km"]
+        bc = defaultdict(lambda: [0, 0.0])
+        for r in outs:
+            c = country_of(r["s"].lat[0], r["s"].lon[0]); bc[c][0] += 1; bc[c][1] += track_km(r["s"])
+        extra += ["Unsnapped (outside extract) by country: " + "; ".join(f"{c}: {n} rides, {k:.0f} km" for c, (n, k) in sorted(bc.items()))]
         items = [(r["id"], r["s"]) for r in ire]
         allitems = [(r["id"], r["s"]) for r in keep]
     else:
@@ -606,12 +637,12 @@ def main():
         for _, s in [x for x in allitems if x not in items]:
             ev, _ = detect(s, a.speed_thr, a.min_stop_s, a.merge_s, a.end_margin_m, a.gap_s, a.data_gap_s, a.gap_max_disp, a.run_max_dt, max_stop_s=a.max_stop_s)
             o.update(e["kind"] for e in ev)
-        extra += ["Stop events on outside-Ireland rides: " + (", ".join(f"{k}={v}" for k, v in sorted(o.items())) or "none")]
+        extra += ["Stop events on rides outside the extract: " + (", ".join(f"{k}={v}" for k, v in sorted(o.items())) or "none")]
     out = ROOT / "data/samples" / f"observed_stops_{a.source}{a.tag}.csv"
     thr, nall, nsel = write_nodes(out, net, st, a)
     extra += [f"CSV {out.name}: {nsel} of {nall} nodes written (min passes {thr}); size {out.stat().st_size} bytes"]
     if a.source == "eric":
-        write_ways(ROOT / "data/samples/observed_ways_eric.csv", net, st)
+        write_ways(ROOT / "data/samples" / f"observed_ways_eric{a.tag}.csv", net, st)
     text = report(f"Source {'A (Eric)' if a.source == 'eric' else 'B (OSM public traces)'}", net, st, a, near, extra)
     (ROOT / "data/samples" / f"empirical_stops_{a.source}{a.tag}.md").write_text(text + "\n")
     print(text)

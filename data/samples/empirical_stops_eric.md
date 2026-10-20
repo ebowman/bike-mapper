@@ -1,10 +1,11 @@
 ### Source A (Eric)
 
-Files 86; used 31 in Ireland; dropped 5: 20030508907 (no position records (empty / indoor)); 20070525554 (no position records (empty / indoor)); 20271114668 (smart recording (median dt 3.0s)); 24428644818 (no position records (empty / indoor)); 20271116194 (duplicate of 20030354929)
-Outside the Ireland extract (stop events counted, not snapped): 50 rides, 2402 km
+Files 86; used 31 inside the extract bbox; dropped 5: 20030508907 (no position records (empty / indoor)); 20070525554 (no position records (empty / indoor)); 20271114668 (smart recording (median dt 3.0s)); 24428644818 (no position records (empty / indoor)); 20271116194 (duplicate of 20030354929)
+Outside the extract (stop events counted, not snapped): 50 rides, 2402 km
+Unsnapped (outside extract) by country: France: 4 rides, 387 km; Germany: 32 rides, 1490 km; Greece: 6 rides, 208 km; Netherlands: 2 rides, 10 km; Slovenia: 4 rides, 237 km; UK (GB): 2 rides, 70 km
 Traces/rides in node statistics: 31; data-gap counters: datagap_moved=1, discarded_end_margin=69
-Stop events on outside-Ireland rides: gap=46, pause=889, rest=71, slow=187
-CSV observed_stops_eric.csv: 15176 of 15176 nodes written (min passes 1); size 619963 bytes
+Stop events on rides outside the extract: gap=46, pause=889, rest=71, slow=187
+CSV observed_stops_eric.csv: 15176 of 15176 nodes written (min passes 1); size 619964 bytes
 
 | stop kind | events | total stopped time (h) | mean (s) |
 |---|---|---|---|
@@ -24,7 +25,8 @@ CSV observed_stops_eric.csv: 15176 of 15176 nodes written (min passes 1); size 6
 | ... of which with >= 1 stop | 90 |
 | nodes with >= 5 passes that are junctions (>= 3 segments) or tagged signals/stop/give_way/crossing | 973 |
 | nodes with >= 10 passes | 914 |
-| stop events attached to a node (<= 30 m) | 311 |
+| stop events attached to a node (<= 30 m) | 308 |
+| extra same-ride same-node stops dropped by the one-stop-per-ride-per-node cap | 3 |
 
 Top 20 nodes by stop count (>= 5 passes):
 
@@ -44,9 +46,9 @@ Top 20 nodes by stop count (>= 5 passes):
 | 11514001162 | 53.36080,-6.18224 | 8 | 2 | 0.25 | 21 | crossing 5 m away |
 | 255329546 | 53.41725,-6.14238 | 6 | 2 | 0.33 | 16 | traffic_signals 13 m away |
 | 3642841659 | 53.38948,-6.11053 | 6 | 2 | 0.33 | 41 | crossing 7 m away |
-| 4090999428 | 53.45404,-6.17112 | 5 | 2 | 0.40 | 16 | nothing tagged (mid-way / bend) |
-| 659995687 | 53.45430,-6.17059 | 5 | 2 | 0.40 | 68 | junction footway x tertiary |
 | 12382074333 | 53.45212,-6.15379 | 5 | 2 | 0.40 | 10 | tagged node: highway=crossing, crossing=traffic_signals |
 | 253242243 | 53.37835,-6.06212 | 5 | 2 | 0.40 | 16 | junction of residential ways |
 | 6650776261 | 53.38931,-6.11010 | 5 | 2 | 0.40 | 98 | crossing 7 m away |
 | 219156898 | 53.37229,-6.08841 | 23 | 1 | 0.04 | 58 | junction secondary x tertiary |
+| 5636559527 | 53.38914,-6.10948 | 21 | 1 | 0.05 | 8 | junction secondary x service |
+| 658732 | 53.37165,-6.08746 | 20 | 1 | 0.05 | 63 | nothing tagged (mid-way / bend) |
