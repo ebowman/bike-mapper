@@ -2,8 +2,11 @@
 
 Every note in this directory follows [TEMPLATE.md](TEMPLATE.md).
 
-Planned notes:
+Start here: [feasibility-summary.md](feasibility-summary.md) - go/no-go synthesis (flow answer, layer verdicts, licence matrix, recommended stack, next epic, open questions).
 
+Notes:
+
+- feasibility-summary.md - go/no-go synthesis: layer verdicts, licence matrix, recommended stack
 - osm-road-network.md - OSM tag coverage (surface, smoothness, maxspeed, cycleway...) for the Ireland extract
 - osm-stop-features.md - OSM stop-cause features (signals, stop, give-way, roundabouts) and expected stops/km
 - empirical-stops.md - empirical stop detection from real ride GPS and public traces
@@ -12,7 +15,6 @@ Planned notes:
 - climbs.md - open climb datasets and a derivation spec from OSM + DEM
 - motor-traffic-flow.md - open AADT sources (TII, DfT) and coverage of minor roads
 - routing-engines.md - routing engines compared on node-level stop and turn costs, BRouter 'flow' profile
-- feasibility-summary.md - go/no-go synthesis: layer verdicts, licence matrix, recommended stack
 - ride-data-acquisition.md - acquiring Eric's ride history (FIT/GPX) from Garmin Connect / Strava (bead dhy.12)
 
 ## Environment
