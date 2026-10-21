@@ -15,6 +15,7 @@ Notes:
 - climbs.md - open climb datasets and a derivation spec from OSM + DEM
 - motor-traffic-flow.md - open AADT sources (TII, DfT) and coverage of minor roads
 - routing-engines.md - routing engines compared on node-level stop and turn costs, BRouter 'flow' profile
+- stop-priors-open-data.md - open non-ride sources (See.Sense, SCATS, GTFS-R, Strava Metro) and literature for per-class stop priors; structural prior table vs empirical
 - ride-data-acquisition.md - acquiring Eric's ride history (FIT/GPX) from Garmin Connect / Strava (bead dhy.12)
 
 ## Environment
