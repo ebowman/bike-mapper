@@ -39,6 +39,8 @@ class Candidate:
     duplicate_of: str | None = None
     # per-BRouter-message-row dicts (see parse_messages); [] when the response had no messages
     segments: list = field(default_factory=list)
+    # parallel to geometry: metres, or None when the coordinate had no third element
+    elevations: list = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -157,13 +159,15 @@ def parse_geojson(data: dict, variant: str = "", profile: str = "", alt: int = 0
                   params: dict | None = None) -> Candidate:
     feat = data["features"][0]
     props = feat["properties"]
-    geom = [(float(c[0]), float(c[1])) for c in feat["geometry"]["coordinates"]]
+    coords = feat["geometry"]["coordinates"]
+    geom = [(float(c[0]), float(c[1])) for c in coords]
+    elevs = [float(c[2]) if len(c) > 2 and c[2] is not None else None for c in coords]
     return Candidate(variant=variant or profile, profile=profile, alt=alt, geometry=geom,
                      length_m=float(props["track-length"]),
                      ascent_m=float(props.get("filtered ascend", 0) or 0),
                      time_s=float(props.get("total-time", 0) or 0),
                      cost=float(props.get("cost", 0) or 0), params=dict(params or {}),
-                     segments=parse_messages(props.get("messages")))
+                     segments=parse_messages(props.get("messages")), elevations=elevs)
 
 
 class BRouterClient:
