@@ -10,6 +10,13 @@ DEFAULT_URL = "http://localhost:17777"
 HEALTH_PAIR = [(-6.2825, 53.2990), (-6.2150, 53.2210)]
 MAX_FLOW_SCALE = 10.0
 MAX_COST = 1000.0
+MIN_LANE_BONUS, MAX_LANE_BONUS = 0.5, 1.0
+
+# Same value sets and precedence as scripts/build_cycle_overlay.py classify() (duplicated: that module imports
+# osmium at top level, which the server does not need). Keep in sync.
+CYCLEWAY_KEYS = ("cycleway", "cycleway:left", "cycleway:right", "cycleway:both")
+LANE_VALUES = {"lane", "shared_lane", "share_busway", "opposite_lane"}
+TRACK_VALUES = {"track", "opposite_track", "separate"}
 
 
 class BRouterUnavailable(RuntimeError):
@@ -28,6 +35,8 @@ class Candidate:
     cost: float
     params: dict = field(default_factory=dict)
     duplicate_of: str | None = None
+    # per-BRouter-message-row dicts (see parse_messages); [] when the response had no messages
+    segments: list = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -46,6 +55,14 @@ def validate_params(params: dict | None) -> dict:
                 raise ValueError(f"flow_scale must be numeric, got {v!r}") from None
             if not math.isfinite(f) or f <= 0 or f > MAX_FLOW_SCALE:
                 raise ValueError(f"flow_scale must be finite, > 0 and <= {MAX_FLOW_SCALE}, got {v!r}")
+        elif k == "lane_bonus":
+            try:
+                f = float(v)
+            except (TypeError, ValueError):
+                raise ValueError(f"lane_bonus must be numeric, got {v!r}") from None
+            if not math.isfinite(f) or not MIN_LANE_BONUS <= f <= MAX_LANE_BONUS:
+                raise ValueError(f"lane_bonus must be finite and within "
+                                 f"{MIN_LANE_BONUS}..{MAX_LANE_BONUS}, got {v!r}")
         elif str(k).startswith("cost_"):
             try:
                 f = float(v)
@@ -57,6 +74,75 @@ def validate_params(params: dict | None) -> dict:
     return out
 
 
+def _num(row, idx, scale=1.0):
+    try:
+        return float(row[idx]) / scale
+    except (TypeError, ValueError, IndexError):
+        return 0.0
+
+
+def parse_messages(messages) -> list:
+    """BRouter geojson `messages` (row 0 = header, then one row per routed node; all cells strings)
+    -> [{lon, lat, dist_m, way_tags, node_cost, initial_cost, turn_cost, cost_per_km, time_s}].
+    Columns are looked up by header name, so missing/reordered columns are tolerated. Lon/lat are
+    microdegrees in the raw rows. Each row describes the segment ENDING at its node, with the way
+    tags of that segment. Time is cumulative in BRouter; time_s here is the per-segment delta."""
+    if not messages or not isinstance(messages, list) or len(messages) < 2:
+        return []
+    col = {str(n): i for i, n in enumerate(messages[0])}
+
+    def get(row, name, scale=1.0):
+        i = col.get(name)
+        return 0.0 if i is None else _num(row, i, scale)
+
+    out, prev_t = [], 0.0
+    for row in messages[1:]:
+        if not isinstance(row, list):
+            continue
+        tags = {}
+        i = col.get("WayTags")
+        if i is not None and i < len(row) and isinstance(row[i], str):
+            for tok in row[i].split():
+                k, _, v = tok.partition("=")
+                if k:
+                    tags[k] = v
+        t = get(row, "Time")
+        out.append({"lon": get(row, "Longitude", 1e6), "lat": get(row, "Latitude", 1e6),
+                    "dist_m": get(row, "Distance"), "way_tags": tags,
+                    "node_cost": get(row, "NodeCost"), "initial_cost": get(row, "InitialCost"),
+                    "turn_cost": get(row, "TurnCost"), "cost_per_km": get(row, "CostPerKm"),
+                    "time_s": max(0.0, t - prev_t)})
+        prev_t = t
+    return out
+
+
+def classify_tags(tags: dict) -> str | None:
+    """'path' (highway=cycleway), 'track', 'lane' or None. Path wins; track beats lane."""
+    if tags.get("highway") == "cycleway":
+        return "path"
+    kinds = set()
+    for key in CYCLEWAY_KEYS:
+        v = tags.get(key)
+        if v in TRACK_VALUES:
+            kinds.add("track")
+        elif v in LANE_VALUES:
+            kinds.add("lane")
+    return "track" if "track" in kinds else "lane" if kinds else None
+
+
+def cycle_km(segments) -> dict:
+    """Kilometres of a route on cycle infrastructure: {path, lane, track, total_km}."""
+    km = {"path": 0.0, "lane": 0.0, "track": 0.0}
+    total = 0.0
+    for sg in segments or []:
+        d = float(sg.get("dist_m", 0) or 0)
+        total += d
+        kind = classify_tags(sg.get("way_tags") or {})
+        if kind:
+            km[kind] += d
+    return {**{k: v / 1000 for k, v in km.items()}, "total_km": total / 1000}
+
+
 def parse_geojson(data: dict, variant: str = "", profile: str = "", alt: int = 0,
                   params: dict | None = None) -> Candidate:
     feat = data["features"][0]
@@ -66,7 +152,8 @@ def parse_geojson(data: dict, variant: str = "", profile: str = "", alt: int = 0
                      length_m=float(props["track-length"]),
                      ascent_m=float(props.get("filtered ascend", 0) or 0),
                      time_s=float(props.get("total-time", 0) or 0),
-                     cost=float(props.get("cost", 0) or 0), params=dict(params or {}))
+                     cost=float(props.get("cost", 0) or 0), params=dict(params or {}),
+                     segments=parse_messages(props.get("messages")))
 
 
 class BRouterClient:

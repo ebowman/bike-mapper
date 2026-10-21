@@ -21,9 +21,10 @@ from flowplan.brouter import (
     DEFAULT_URL,
     BRouterClient,
     BRouterUnavailable,
+    cycle_km,
     validate_params,
 )
-from flowplan.candidates import DEFAULT_VARIANTS, Variant, generate
+from flowplan.candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
 from flowplan.ranking import ScoredCandidate, rank
 from flowplan.scoring import FlowIndex, score
 
@@ -158,7 +159,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
     def route(request: Request, from_: str = Query(alias="from"), to: str = Query(), n: int = 4,
               weights: str | None = None, blend_with: str | None = None,
               blend: str | None = None, guard: str | None = None, scales: str | None = None,
-              refresh: str | None = None, router: str = "base"):
+              refresh: str | None = None, router: str = "base",
+              lane_bonus: str | None = None, lanes_variant_: str | None = Query(None, alias="lanes_variant")):
         t0 = time.perf_counter()
         start = parse_latlon(from_, "from", bbox)
         end = parse_latlon(to, "to", bbox)
@@ -193,21 +195,32 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
             raise HTTPException(400, f"'guard' must be within 0..{MAX_GUARD} (got {guard!r})")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         refresh_b = refresh not in (None, "", "0", "false")
+        lane_v = 1.0 if lane_bonus is None else parse_float(lane_bonus, "lane_bonus")
+        try:
+            validate_params({"lane_bonus": lane_v})
+        except ValueError as e:
+            raise HTTPException(400, f"'lane_bonus': {e}") from None
+        lanes_b = lanes_variant_ not in (None, "", "0", "false")
         costs = (base_model if router == "base" else m).brouter_costs()
+        profile_params = dict(costs)
+        if lane_v < 1.0:  # 1.0 = off: leave the request identical to pre-emq.23 ones
+            profile_params["lane_bonus"] = lane_v
         for ck, cv in costs.items():
             if not math.isfinite(cv) or not 0 <= cv <= 1000:
                 raise HTTPException(400, f"derived {ck}={cv} is outside 0..1000")
         key = (round(start[1], 5), round(start[0], 5), round(end[1], 5), round(end[0], 5),
-               scales_t, tuple(sorted(costs.items())))
+               scales_t, tuple(sorted(costs.items())), lane_v, lanes_b)
         hit = None if refresh_b else cache.get(key)
         if hit is not None:
             kept, dropped, skipped, brouter_ms = hit
             brouter_ms = 0
         else:
             try:
-                kept, dropped, skipped = generate(client, start, end,
-                                                  variants=variants_for(scales_t), region=region,
-                                                  profile_params=costs)
+                variants = variants_for(scales_t)
+                if lanes_b:
+                    variants = (*variants, lanes_variant(lane_v))
+                kept, dropped, skipped = generate(client, start, end, variants=variants,
+                                                  region=region, profile_params=profile_params)
             except BRouterUnavailable as e:
                 raise HTTPException(503, str(e)) from None
             brouter_ms = round((time.perf_counter() - t0) * 1000)
@@ -235,7 +248,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "stats": {"distance_km": c.length_m / 1000, "ascent_m": c.ascent_m,
                           "brouter_time_s": c.time_s, "expected_stops": sc.expected_stops,
                           "stops_per_km": sc.stops_per_km, "expected_stop_s": sc.expected_stop_s,
-                          "by_class": sc.by_class},
+                          "by_class": sc.by_class,
+                          "cycle_km": cycle_km(c.segments)},
                 "delta_vs_fastest": s.delta_vs_fastest,
                 "hits": [{"lat": h["lat"], "lon": h["lon"], "cause": h["cause"], "p": h["p"]}
                          for h in sc.hits],
@@ -246,7 +260,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "settings": {"weights": weights or model.weight_set, "blend_with": blend_with,
                              "blend": blend_alpha, "overrides": overrides, "guard": guard_v,
                              "scales": list(scales_t), "n": n, "router": router,
-                             "brouter_costs": costs},
+                             "brouter_costs": costs, "lane_bonus": lane_v,
+                             "lanes_variant": lanes_b},
                 "model": {c: m.p(c) for c in m.classes}, "cached": hit is not None,
                 "candidates_total": len(kept) + len(dropped),
                 "candidates_deduped": len(kept), "skipped": skipped,

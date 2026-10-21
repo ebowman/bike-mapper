@@ -210,3 +210,60 @@ def test_model_endpoint_uses_app_model_path(index, tmp_path):
     p.write_text(json.dumps(d))
     app = flow_server.create_app(client=FakeClient(), index=index, model_path=p)
     assert TestClient(app).get("/api/model").json()["midway_background_p"] == 0.123
+
+
+def test_lane_bonus_echoed_and_keyed(index):
+    fc = Counting()
+    c = app_client(index, fc)
+    base = fc.calls
+    j1 = c.get(f"/api/route?{Q}").json()
+    assert j1["settings"]["lane_bonus"] == 1.0 and j1["settings"]["lanes_variant"] is False
+    assert fc.calls == base + 16
+    assert all("cycle_km" in r["stats"] for r in j1["routes"])
+    j2 = c.get(f"/api/route?{Q}&lane_bonus=0.8").json()
+    assert j2["cached"] is False and fc.calls == base + 32
+    assert j2["settings"]["lane_bonus"] == 0.8
+    assert c.get(f"/api/route?{Q}&lane_bonus=0.8&guard=2").json()["cached"] is True
+
+
+def test_lane_bonus_applied_to_flow_variants_only(index):
+    seen = []
+
+    class Rec(FakeClient):
+        def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+            seen.append((profile, dict(params or {})))
+            return super().route(points, profile, alternativeidx, params)
+
+    app_client(index, Rec()).get(f"/api/route?{Q}&lane_bonus=0.7")
+    assert all(p.get("lane_bonus") == 0.7 for prof, p in seen if prof == "flow")
+    assert all("lane_bonus" not in p for prof, p in seen if prof == "fastbike")
+
+
+def test_lanes_variant_added_when_requested(index):
+    seen = []
+
+    class Rec(FakeClient):
+        def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+            seen.append((profile, dict(params or {})))
+            return super().route(points, profile, alternativeidx, params)
+
+    c = app_client(index, Rec())
+    seen.clear()  # startup health check
+    j0 = c.get(f"/api/route?{Q}&refresh=1").json()
+    assert j0["candidates_total"] == 16 and len(seen) == 16
+    seen.clear()
+    j = c.get(f"/api/route?{Q}&lanes_variant=1&refresh=1").json()
+    assert j["candidates_total"] == 20 and j["settings"]["lanes_variant"] is True
+    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.8]
+    seen.clear()
+    c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.9&refresh=1")
+    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.8, 0.9}  # 0.9 base, lanes variant 0.8
+    seen.clear()
+    c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.7&refresh=1")
+    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.7}
+
+
+@pytest.mark.parametrize("v", ["0.4", "1.1", "abc", "nan", "inf"])
+def test_bad_lane_bonus_400(index, v):
+    r = app_client(index, FakeClient()).get(f"/api/route?{Q}&lane_bonus={v}")
+    assert r.status_code == 400 and "lane_bonus" in r.json()["detail"]

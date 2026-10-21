@@ -107,6 +107,13 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       </div>
       <div class="srow"><label><input id="routerTable" type="checkbox"> Router follows sliders (re-routes on every change, 5-8 s)</label></div>
       <div class="note" id="routerNote"></div>
+      <div class="srow">
+        <div class="lab"><span>Prefer cycle infrastructure</span><span id="laneVal">Off</span></div>
+        <input id="lane" type="range" min="0" max="30" step="5" value="0" style="width:100%" aria-label="Prefer cycle infrastructure (0 = off, 30 = strong)">
+        <div class="lab"><span>Off</span><span>Strong</span></div>
+      </div>
+      <div class="srow"><label><input id="lanesVariant" type="checkbox"> Add a lanes-favouring route</label></div>
+      <div class="note">Cycle-infrastructure preference makes cycle paths and roads with tagged lanes/tracks cheaper per metre (Strong = x0.7). Changing it or the lanes route re-routes through BRouter (5-8 s). Only ~8% of Irish lanes are tagged in OSM, so the effect is a lower bound.</div>
       <div class="note">Changing flow scales re-routes through BRouter (5-8 s). Guard and route count only re-rank cached candidates (instant).</div>
       <div class="note" id="costs">router costs: ...</div>
     </details>
@@ -125,7 +132,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
 (function () {
   'use strict';
   var PALETTE = ['#0072B2', '#D55E00', '#009E73', '#CC79A7', '#E69F00', '#56B4E9'];
-  var LABELS = { fastbike: 'Fastest', flow_lo: 'Flow-light', flow: 'Flow', flow_hi: 'Flow-heavy' };
+  var LABELS = { fastbike: 'Fastest', flow_lo: 'Flow-light', flow: 'Flow', flow_hi: 'Flow-heavy', flow_lanes: 'Flow+lanes' };
   var $ = function (id) { return document.getElementById(id); };
 
   var map = L.map('map').setView([53.35, -6.26], 10);
@@ -162,7 +169,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     ['ireland', 'My Irish rides', 'Stop rates measured on your own Irish rides (some classes have few passes).'],
     ['combined', 'Pooled (Ireland+Berlin)', 'Irish and Berlin rides pooled: more data, less local.']
   ];
-  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4, router: 'base' };
+  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4, router: 'base', lane: 1, lanesVariant: false };
   var LS_KEY = 'flowplan.settings';
   var S = JSON.parse(JSON.stringify(DEF));   // guard 0 means off
   var MODEL = null;                          // /api/model response
@@ -189,6 +196,9 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (ss.length && ss.every(function (v) { return v !== null && v > 0 && v <= 10; })) r.scales = dedupe(ss);
     }
     if (o.r === 'table' || o.router === 'table') r.router = 'table';
+    var lb = num(o.lb !== undefined ? o.lb : o.lane);
+    if (lb !== null) r.lane = Math.round(clamp(lb, 0.7, 1) * 20) / 20;
+    if (o.lv === '1' || o.lv === 1 || o.lv === true || o.lanesVariant === true) r.lanesVariant = true;
     var n = parseInt(o.n, 10);
     if (n >= 3 && n <= 6) r.n = n;
     return r;
@@ -201,6 +211,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     CAUSES.forEach(function (c) { if (S.p[c[0]] != null) o['p_' + c[0]] = String(+S.p[c[0]].toFixed(4)); });
     if (S.guard !== DEF.guard) o.g = String(S.guard);
     if (S.router === 'table') o.r = 'table';
+    if (S.lane !== DEF.lane) o.lb = String(S.lane);
+    if (S.lanesVariant) o.lv = '1';
     if (!sameScales(S.scales, DEF.scales)) o.s = S.scales.join(',');
     return o;
   }
@@ -209,12 +221,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     writeHash();
   }
   function loadSettings(h) {
-    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|r|p_.*)$/.test(k); });
+    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|r|lb|lv|p_.*)$/.test(k); });
     var stored = null;
     try { stored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { stored = null; }
     if (hasHash) S = settingsFromObj(h);        // hash wins, whole-settings
     else if (stored && typeof stored === 'object') {
-      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(','), r: stored.router };
+      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(','), r: stored.router, lb: stored.lane, lv: stored.lanesVariant ? '1' : '' };
       if (stored.blend > 0) { o.bw = 'ireland'; o.b = stored.blend; }
       Object.keys(stored.p || {}).forEach(function (k) { o['p_' + k] = stored.p[k]; });
       S = settingsFromObj(o);
@@ -365,6 +377,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (isSel) ln.bringToFront();
     });
   }
+  function routesToFront() {   // overlays added later sit above the route polylines; keep routes on top
+    lines.forEach(function (ln, i) { if (i !== selected) ln.bringToFront(); });
+    if (lines[selected]) lines[selected].bringToFront();
+    stopLayer.eachLayer(function (l) { if (l.bringToFront) l.bringToFront(); });
+  }
   function select(i) {
     selected = i;
     styleLines(-1);
@@ -414,6 +431,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       t.appendChild(g); card.appendChild(t);
       card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
       card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
+      var ck = s.cycle_km;
+      if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
+        card.appendChild(el('div', 'd', ck.path.toFixed(1) + ' km on cycle paths, ' + (ck.lane + ck.track).toFixed(1) + ' km on roads with lanes/tracks'));
+      }
       var irish = irishStops(r);
       if (irish !== null) card.appendChild(el('div', 'irish', 'under your Irish rides: ' + irish.toFixed(1) + ' stops'));
       if (r.delta_vs_fastest) {
@@ -426,6 +447,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     });
     if (routes.length) {
       select(0);
+      routesToFront();
       if (!keepView) map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
     }
     setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' +
@@ -466,6 +488,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (S.w !== 'ireland' && S.blend > 0) q += '&blend_with=ireland&blend=' + S.blend;
     CAUSES.forEach(function (c) { if (S.p[c[0]] != null) q += '&p_' + c[0] + '=' + S.p[c[0]]; });
     if (S.router === 'table') q += '&router=table';
+    if (S.lane < 1) q += '&lane_bonus=' + S.lane;
+    if (S.lanesVariant) q += '&lanes_variant=1';
     q += '&guard=' + S.guard + '&scales=' + S.scales.join(',');
     return q;
   }
@@ -510,6 +534,9 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (S.guard !== 0) $('guard').value = String(g);
     $('guardVal').textContent = S.guard === 0 ? 'off' : g.toFixed(2);
     $('routerTable').checked = S.router === 'table';
+    $('lane').value = String(Math.round((1 - S.lane) * 100));
+    $('laneVal').textContent = S.lane >= 1 ? 'Off' : 'x' + S.lane.toFixed(2);
+    $('lanesVariant').checked = S.lanesVariant;
     $('routerNote').textContent = S.router === 'table'
       ? 'Every probability change re-routes through BRouter (5-8 s); the router uses the costs derived from the sliders.'
       : "Sliders re-rank the cached candidates instantly; the router searches with the base set's costs.";
@@ -561,12 +588,14 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       sliderEls[c[0]] = { input: inp, val: val, ov: ov, reset: reset };
     });
     $('resetAll').onclick = function () {
-      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); lastModelP = null;
+      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); S.lane = DEF.lane; S.lanesVariant = DEF.lanesVariant; lastModelP = null;
       $('scaleErr').textContent = '';
       Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) { i.className = ''; });
       changed();
     };
     $('routerTable').onchange = function () { S.router = $('routerTable').checked ? 'table' : 'base'; changed(); };
+    $('lane').oninput = function () { S.lane = Math.round((1 - parseInt($('lane').value, 10) / 100) * 20) / 20; changed(); };
+    $('lanesVariant').onchange = function () { S.lanesVariant = $('lanesVariant').checked; changed(); };
     $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(); };
     $('guardOff').onchange = function () { S.guard = $('guardOff').checked ? 0 : (num($('guard').value) || DEF.guard); changed(); };
     Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) {
@@ -650,12 +679,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       var on = e.type === 'overlayadd';
       if (e.layer === pathLayer) want.path = on; else if (e.layer === roadLayer) want.road = on; else return;
       save();
-      if (on) ensureLoaded(function () {});
+      if (on) ensureLoaded(routesToFront);
     });
     // Layer groups are empty until the data arrives; adding them to the map first lets the control show the checkbox state.
     if (want.path) pathLayer.addTo(map);
     if (want.road) roadLayer.addTo(map);
-    if (want.path || want.road) ensureLoaded(function () {});
+    if (want.path || want.road) ensureLoaded(routesToFront);
   })();
 })();
 </script>

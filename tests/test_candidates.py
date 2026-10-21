@@ -140,3 +140,56 @@ def test_generate_profile_params_passthrough():
     assert [p for pr, p in seen if pr == "fastbike"] == [{}] * 4
     with pytest.raises(ValueError):
         generate(Rec(), A, B, profile_params={"cost_stop": 5000})
+
+
+@pytest.mark.parametrize("v", [0.5, 0.7, 1.0, "0.8"])
+def test_lane_bonus_valid(v):
+    assert brouter.validate_params({"lane_bonus": v})["lane_bonus"] == v
+
+
+@pytest.mark.parametrize("v", [0.49, 1.01, 0, -1, float("nan"), float("inf"), "x", None])
+def test_lane_bonus_invalid(v):
+    with pytest.raises(ValueError):
+        brouter.validate_params({"lane_bonus": v})
+
+
+def test_parse_geojson_messages_segments():
+    data = json.loads((FIX / "brouter_dublin_flow_alt0.json").read_text())
+    c = parse_geojson(data, profile="flow")
+    assert len(c.segments) == len(data["features"][0]["properties"]["messages"]) - 1 > 10
+    s = c.segments[2]
+    assert set(s) == {"lon", "lat", "dist_m", "way_tags", "node_cost", "initial_cost",
+                      "turn_cost", "cost_per_km", "time_s"}
+    assert -7 < s["lon"] < -6 and 53 < s["lat"] < 54
+    assert "highway" in s["way_tags"] or s["way_tags"] == {} or s["way_tags"]
+    assert sum(x["dist_m"] for x in c.segments) == pytest.approx(c.length_m, rel=0.02)
+    assert sum(x["time_s"] for x in c.segments) == pytest.approx(c.time_s, rel=0.05)
+
+
+def test_parse_messages_tolerates_missing_columns():
+    msgs = [["Longitude", "Latitude", "Distance", "WayTags"],
+            ["-6283760", "53298290", "10", "highway=cycleway surface=asphalt"],
+            ["-6283000", "53298000", "x"]]
+    segs = brouter.parse_messages(msgs)
+    assert segs[0]["way_tags"] == {"highway": "cycleway", "surface": "asphalt"}
+    assert segs[0]["dist_m"] == 10 and segs[0]["node_cost"] == 0 and segs[0]["lon"] == -6.28376
+    assert segs[1]["dist_m"] == 0 and segs[1]["way_tags"] == {}
+    assert brouter.parse_messages(None) == [] and brouter.parse_messages([["Longitude"]]) == []
+
+
+def test_cycle_km_synthetic():
+    def seg(d, **t):
+        return {"dist_m": d, "way_tags": t}
+    segs = [seg(1000, highway="cycleway"), seg(500, highway="residential", cycleway="lane"),
+            seg(250, highway="primary", **{"cycleway:left": "track", "cycleway:right": "lane"}),
+            seg(2000, highway="residential"), seg(100, highway="tertiary", cycleway="no"),
+            seg(150, highway="residential", **{"cycleway:both": "shared_lane"})]
+    k = brouter.cycle_km(segs)
+    assert k == pytest.approx({"path": 1.0, "lane": 0.65, "track": 0.25, "total_km": 4.0})
+    assert brouter.cycle_km([]) == {"path": 0.0, "lane": 0.0, "track": 0.0, "total_km": 0.0}
+
+
+def test_lanes_variant_helper():
+    assert candidates.lanes_variant(1.0).params == {"flow_scale": 1.0, "lane_bonus": 0.8}
+    assert candidates.lanes_variant(0.7).params["lane_bonus"] == 0.7
+    assert candidates.lanes_variant(0.9).name == "flow_lanes"

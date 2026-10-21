@@ -10,7 +10,8 @@ from pyproj import Transformer
 from .brouter import BRouterClient, Candidate, validate_params
 from .scoring import REGION_CRS
 
-__all__ = ["DEFAULT_VARIANTS", "DEFAULT_WORKERS", "Candidate", "Variant", "dedupe", "generate"]
+__all__ = ["DEFAULT_VARIANTS", "DEFAULT_WORKERS", "Candidate", "Variant", "dedupe", "generate",
+           "lanes_variant"]
 
 # Client concurrency; keep <= BRouter server threads (THREADS in scripts/run_brouter.sh).
 DEFAULT_WORKERS = 4
@@ -29,6 +30,15 @@ DEFAULT_VARIANTS = (
     Variant("flow", "flow", {"flow_scale": 1.0}),
     Variant("flow_hi", "flow", {"flow_scale": 2.0}),
 )
+
+# Optional fifth variant (flow_server lanes_variant=1): flow at default stop weights with a cycle-infrastructure bonus.
+DEFAULT_LANES_BONUS = 0.8
+
+
+def lanes_variant(lane_bonus: float = 1.0) -> Variant:
+    """flow_lanes: lane_bonus 0.8, or the requested lane_bonus when that is already lower."""
+    return Variant("flow_lanes", "flow", {"flow_scale": 1.0,
+                                          "lane_bonus": min(DEFAULT_LANES_BONUS, float(lane_bonus))})
 
 
 def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20.0,
@@ -63,13 +73,13 @@ def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=
              profile_params: dict | None = None):
     """Return (kept, dropped, skipped). skipped = [{variant, alt, error}] for failed
     requests; BRouterUnavailable propagates. profile_params (e.g. cost_* from
-    StopModel.brouter_costs) are merged into every non-fastbike variant's params. start == end yields no candidates."""
+    StopModel.brouter_costs) are merged into every non-fastbike variant's params (a variant's own params win). start == end yields no candidates."""
     start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
     if start == end:
         return [], [], []
     if profile_params:
         variants = tuple(v if v.profile == "fastbike" else
-                         Variant(v.name, v.profile, {**v.params, **profile_params})
+                         Variant(v.name, v.profile, {**profile_params, **v.params})
                          for v in variants)
     for v in variants:
         validate_params(v.params)

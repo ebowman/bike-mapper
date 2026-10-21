@@ -34,6 +34,13 @@ assign cost_stop             = 60    # %cost_stop% | stop sign node cost | numbe
 assign cost_mini_rb          = 80    # %cost_mini_rb% | mini_roundabout node cost | number
 assign cost_rb_entry         = 150   # %cost_rb_entry% | roundabout entry cost (way context, not scaled by flow_scale) | number
 
+# FLOW (emq.23): multiplier on the BASE per-metre costfactor of cycle infrastructure (highway=cycleway and roads with a
+# cycleway lane/track tag); 1.0 = off (byte-identical routing), 0.8 = 20% cheaper per metre, recommended band 0.7-1.0.
+# Per-request override: &profile:lane_bonus=<x>. Cost is PER METRE: 0.8 over 10 km saves ~2000 cost units (~7 signals at 300).
+# BRouter does NOT clamp or reject costfactor < 1 (verified live with a constant 0.5: CostPerKm 500 honoured), so the bonus
+# is applied directly; only the base is scaled, additive penalties (oneway, traffic, ...) are not.
+assign lane_bonus            = 1.0   # %lane_bonus% | costfactor multiplier for cycle paths and roads with bike lanes/tracks | number
+
 # Use the following switches to change behaviour
 assign allow_steps           = true   # %allow_steps% | Set to false to disallow steps | boolean
 assign allow_ferries         = true   # %allow_ferries% | set to false to disallow ferries | boolean
@@ -170,6 +177,16 @@ assign badoneway =
 assign hascycleway = not
   and ( or cycleway= cycleway=no|none ) and ( or cycleway:left= cycleway:left=no ) and ( or cycleway:right= cycleway:right=no ) ( or cycleway:both= cycleway:both=no )
 
+# FLOW (emq.23): stricter than hascycleway: an actual lane/track tag on this way (or an opposite-direction lane/track)
+# (cycleway:both has no opposite_* lookup values in lookups.dat; the parser rejects unknown values)
+assign hasbikelane =
+  or cycleway=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+  or cycleway:left=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+  or cycleway:right=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+     cycleway:both=lane|track|shared_lane|share_busway
+
+assign lane_factor = if or highway=cycleway hasbikelane then lane_bonus else 1.0
+
 assign onewaypenalty =
        if ( badoneway ) then
        (
@@ -264,7 +281,7 @@ assign costfactor
   add no_river_penalty
   add noise_penalty
 
-
+  multiply lane_factor (
   switch or highway=motorway highway=motorway_link    switch allow_motorways 1.5 10000
   switch or highway=trunk highway=trunk_link          switch allow_motorways 1.5 10
   switch or highway=primary highway=primary_link      1.2
@@ -287,6 +304,7 @@ assign costfactor
    switch or bicycle=designated bicycle_road=yes switch isunpaved 3 1.2
    switch ispaved 2.0 switch isunpaved 15.0 5.0
   10.0
+  )
 
 # way priorities used for voice hint generation
 
