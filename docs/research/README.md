@@ -25,3 +25,5 @@ Python tooling is managed with [uv](https://docs.astral.sh/uv/). Install with `b
 ## Map viewer
 
 `docs/map/index.html` is a single-file Leaflet map over the study's sample outputs, for Dublin/Wicklow and Berlin (region switcher, top left). Layers: ways coloured by expected stops/km (5-step scale), dhy.11 stop units (circle size ~ log passes, grey-to-red by observed stop probability, faint under 5 passes), BRouter baseline (dashed) vs flow (solid) routes, and the manually labelled unexplained units. Build the data with `make map` (writes `docs/map/data/*.geojson` from `data/samples/` and the OSM PBFs; Ireland ways are filtered to primary/secondary/tertiary/unclassified/residential and at least 0.1 km to stay under 2 MB), then serve with `uv run python -m http.server 8080 --directory docs/map` and open http://localhost:8080. `uv run python scripts/check_map_data.py` is the smoke test. Way geometries are simplified with a Douglas-Peucker tolerance of 1.5e-5 degrees (roughly 1-2 m) before export.
+
+The route planner built on these findings is documented in [../planner.md](../planner.md).

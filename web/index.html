@@ -82,6 +82,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   }).addTo(map);
 
   var state = { from: null, to: null, mode: 'from', n: 4, loading: false };
+  var reqSeq = 0;   // bumped by every new request and by clear/swap; stale responses are ignored
   var markers = { from: null, to: null };
   var routeLayer = L.layerGroup().addTo(map);
   var stopLayer = L.layerGroup().addTo(map);
@@ -122,14 +123,16 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
 
   function updateGo() { $('go').disabled = state.loading || !(state.from && state.to); }
 
+  function supersede() { if (state.loading) setStatus(''); reqSeq++; state.loading = false; }
   function setPoint(which, ll, label) {
+    supersede();
     state[which] = ll;
     if (markers[which]) { markers[which].setLatLng(ll); }
     else {
       var m = L.marker(ll, { draggable: true, title: which === 'from' ? 'Start' : 'End' }).addTo(map);
       m.bindTooltip(which === 'from' ? 'Start' : 'End', { permanent: true, direction: 'top', offset: [-15, -8] });
       m.on('dragend', function () {
-        var p = m.getLatLng(); state[which] = [p.lat, p.lng];
+        supersede(); var p = m.getLatLng(); state[which] = [p.lat, p.lng];
         $(which === 'from' ? 'qStart' : 'qEnd').value = fmtLL(state[which]);
         writeHash(); updateGo();
       });
@@ -156,9 +159,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     clearPoint('from'); clearPoint('to');
     if (b) setPoint('from', b, lb);
     if (a) setPoint('to', a, la);
-    clearResults(); writeHash(); updateGo();
+    reqSeq++; state.loading = false; clearResults(); setStatus(''); writeHash(); updateGo();
   };
   $('clear').onclick = function () {
+    reqSeq++; state.loading = false;
     clearPoint('from'); clearPoint('to'); clearResults(); setStatus('');
     setMode('from'); writeHash(); updateGo();
   };
@@ -245,8 +249,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     });
   }
 
+  function xmlEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
   function gpxFor(r, idx) {
-    var name = 'flow rank ' + r.rank + ' ' + r.variant;
+    var name = xmlEsc('flow rank ' + r.rank + ' ' + (LABELS[r.variant] || r.variant));
     var pts = r.geometry.coordinates.map(function (c) {
       return '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"/>';
     }).join('');
@@ -298,18 +305,20 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   function findRoutes() {
     if (!(state.from && state.to) || state.loading) return;
     state.loading = true; updateGo(); clearResults();
-    setStatus('Asking BRouter for 16 candidates, about 5 s');
+    var seq = ++reqSeq;
+    setStatus('Asking BRouter for candidates, about 5-8 s');
     var url = '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + state.n;
     fetch(url).then(function (r) {
       return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
     }).then(function (res) {
+      if (seq !== reqSeq) return;
       if (res.ok && res.body && res.body.routes) { render(res.body); return; }
       var d = res.body && res.body.detail;
       if ((res.status === 400 || res.status === 404 || res.status === 503) && typeof d === 'string') setStatus(d, true);
       else setStatus('Something went wrong (HTTP ' + res.status + ').', true);
     }).catch(function () {
-      setStatus('Could not reach the planner server.', true);
-    }).then(function () { state.loading = false; updateGo(); });
+      if (seq === reqSeq) setStatus('Could not reach the planner server.', true);
+    }).then(function () { if (seq === reqSeq) { state.loading = false; updateGo(); } });
   }
   $('go').onclick = findRoutes;
 
@@ -326,7 +335,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   fetch('/api/health').then(function (r) { return r.json(); }).then(function (j) {
     var b = j.bbox;
     if (b && !(f && t)) map.fitBounds([[b.lat_min, b.lon_min], [b.lat_max, b.lon_max]]);
-    $('foot').textContent = 'Routing: BRouter ' + (j.brouter ? 'up' : 'DOWN (start scripts/run_brouter.sh serve)') + '. Stop weights: ' + j.weight_set + '.';
+    $('foot').textContent = 'Routing: BRouter ' + (j.brouter ? 'up' : 'DOWN (start it with make brouter)') + '. Stop weights: ' + j.weight_set + '.';
   }).catch(function () {
     $('foot').textContent = 'Planner API unreachable.';
   });

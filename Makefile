@@ -21,3 +21,22 @@ ui-check:
 	@echo "ui-check ok"
 
 .PHONY: ui-check
+
+# Flow route planner: see docs/planner.md. BRouter and the planner run in two terminals.
+planner-setup:
+	scripts/run_brouter.sh setup
+	$(MAKE) flow-index
+
+brouter:
+	scripts/run_brouter.sh serve
+
+planner:
+	@echo "Planner: http://localhost:8081"
+	uv run scripts/flow_server.py --port 8081
+
+planner-check:
+	uv run pytest -q
+	uvx ruff check scripts/ tests/
+	$(MAKE) ui-check
+
+.PHONY: planner-setup brouter planner planner-check
