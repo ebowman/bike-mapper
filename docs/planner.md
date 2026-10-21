@@ -187,3 +187,28 @@ Ranking formula: `score = expected_stops + turn_weight * turns` (lower is better
 ## GPX export
 
 `scripts/flowplan/gpx.py` (`gpx_string`, `write_gpx`) writes GPX 1.1: an XML declaration, a `<metadata>` block (name, optional desc, UTC time) and one `<trk>/<trkseg>` of `<trkpt>` with `<ele>` (metres, 1 decimal; omitted where unknown). Coordinates have 6 decimals, all text is XML-escaped, and fewer than 2 or more than 100,000 points raises `ValueError`. Optional course points are written as a `<rte>` of `<rtept>` and are off by default. Elevations come from `Candidate.elevations`, which `parse_geojson` keeps parallel to `geometry`. To use a file on a Garmin: in Garmin Connect go to Training & Planning > Courses > Import, upload the `.gpx`, then send the course to the device.
+
+### Loops and out-and-back (41w.3)
+
+`scripts/flowplan/plan.py: plan_candidates(client, mode, start, end=None, length_km=(min, max), ...)` generates
+loop, out-and-back and one-way candidates aimed at a length range.
+
+- **Loop**: for each of `bearings` headings theta, vias at theta, theta+120, theta+240 on a ring of radius r
+  around the start (projected CRS, so placement is metric); route start -> v1 -> v2 -> v3 -> start. If that
+  fails to route (e.g. a via in the sea), a 2-via loop (theta, theta+180) is tried.
+- **Out-and-back**: a turnaround at distance d along theta, or the explicit `end`. `return_mode='same'`
+  reverses the out leg (one call, palindromic GPX, length and ascent doubled/mirrored); `'free'` routes a second
+  leg back with `alternativeidx=1` and falls back to `'same'` when it overlaps the out leg by more than 70%.
+- **Radius iteration**: r0 = target/(2*pi) * 1.15 (circle radius for the mid-range target times a 1.15 road
+  detour factor); d0 = target/2 * 1.15. After each route r (or d) is scaled by target/measured (clamped 0.5-2),
+  at most 3 routes per heading, stopping once the length is inside the range. Only the `flow` variant is used
+  for this; the other variants are then routed through the same via-points and kept if their length is also in range.
+- **Budget**: `max_calls` (default 48) is a hard cap on BRouter requests (every call counts, including
+  fallbacks and the variants stage); when it bites, results are partial and `notes` says so. Calls within a
+  round run on 4 threads. 8 headings x ~2 iterations + variants typically uses 30-40 calls (~10-40 s).
+- **Dedupe**: the 20 m / 90% rule on the full geometry; loops whose out and back halves overlap > 60% are
+  dropped as disguised out-and-backs. Each candidate has a `plan` dict (mode, heading_deg, via_points,
+  radius_m or turnaround/distance_m, iterations, length_km).
+- **One-way** delegates to `candidates.generate`; the length range is only noted, not enforced.
+- **Limits**: 3 iterations may miss a narrow range (reported in `skipped`); vias in water or off-network
+  (BRouter "island" errors) lose that heading; headings are crow-flies, not terrain-aware (see 41w.4).

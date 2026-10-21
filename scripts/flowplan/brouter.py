@@ -41,6 +41,8 @@ class Candidate:
     segments: list = field(default_factory=list)
     # parallel to geometry: metres, or None when the coordinate had no third element
     elevations: list = field(default_factory=list)
+    # set by flowplan.plan: mode, heading_deg, via_points, radius_m/turnaround, iterations, length_km
+    plan: dict | None = None
 
     @property
     def key(self) -> str:
