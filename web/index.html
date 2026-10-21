@@ -31,6 +31,30 @@ button.on { background: #cde; font-weight: 600; }
 .card .t { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
 .card .d { font-size: 12px; color: #444; }
 .card .delta { font-size: 12px; color: #005; }
+details#settings { border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; background: #fafafa; }
+details#settings summary { cursor: pointer; font-weight: 600; }
+#setBadge { font-weight: 400; font-size: 12px; background: #e6eefc; border-radius: 8px; padding: 1px 7px; margin-left: 6px; }
+#setBadge.custom { background: #fde9c9; }
+#settings h3 { font-size: 13px; margin: 10px 0 4px; }
+#settings .desc { font-size: 11px; color: #555; margin-left: 20px; }
+#settings .opt { margin: 2px 0; }
+.srow { margin: 6px 0; }
+.srow .lab { display: flex; justify-content: space-between; font-size: 12px; align-items: baseline; }
+.srow .lab .ov { color: #a05a00; font-weight: 600; }
+.srow a { font-size: 11px; cursor: pointer; color: #36c; margin-left: 6px; text-decoration: underline; }
+.srow a.hid { visibility: hidden; }
+.track { position: relative; padding-top: 8px; }
+.track input[type=range] { width: 100%; margin: 0; }
+.tick { position: absolute; top: 0; width: 3px; height: 9px; margin-left: -1px; cursor: help; }
+.tick.prior { background: #7b3294; } .tick.ireland { background: #008837; } .tick.combined { background: #e66101; }
+.legend { font-size: 11px; color: #555; }
+.legend b.prior { color: #7b3294; } .legend b.ireland { color: #008837; } .legend b.combined { color: #e66101; }
+.hint { font-size: 11px; color: #8a4b00; }
+.note { font-size: 11px; color: #555; margin-top: 6px; }
+#scales input { width: 60px; }
+#scales input.bad { border: 2px solid #b00020; }
+#scaleErr { color: #b00020; font-size: 11px; }
+.card .irish { font-size: 12px; color: #555; }
 footer { font-size: 11px; color: #555; margin-top: auto; }
 @media (max-width: 899px) {
   html, body { height: auto; }
@@ -59,6 +83,31 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       <select id="nSel"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
       <button id="go" disabled>Find routes</button>
     </div>
+    <details id="settings">
+      <summary>Settings <span id="setBadge">...</span></summary>
+      <h3>Stop weights</h3>
+      <div id="wsets"></div>
+      <div id="blendRow" class="srow">
+        <div class="lab"><span>Blend with my Irish rides</span><span id="blendVal">0%</span></div>
+        <input id="blend" type="range" min="0" max="100" step="1" value="0" style="width:100%">
+      </div>
+      <h3>Stop probability per class <a id="resetAll" style="font-size:11px;cursor:pointer;color:#36c;text-decoration:underline">Reset all</a></h3>
+      <div class="legend">Ticks: <b class="prior">prior</b> <b class="ireland">Irish rides</b> <b class="combined">pooled</b> (hover for details)</div>
+      <div id="sliders"></div>
+      <div id="sigHint" class="hint" hidden>Signals at 0: stops at signals are no longer counted, but the router keeps its signal cost at the anchor (300), so it still avoids them.</div>
+      <h3>Routing</h3>
+      <div class="srow">
+        <div class="lab"><span>Distance guard (max x fastest)</span><span><span id="guardVal">1.30</span> <label><input id="guardOff" type="checkbox"> off</label></span></div>
+        <input id="guard" type="range" min="1" max="2" step="0.05" value="1.3" style="width:100%">
+      </div>
+      <div class="srow" id="scales">
+        <div class="lab"><span>Flow-scale variants</span></div>
+        <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 1"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 2"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 3">
+        <div id="scaleErr"></div>
+      </div>
+      <div class="note">Changing probabilities or flow scales re-routes through BRouter (5-8 s). Guard and route count only re-rank cached candidates (instant).</div>
+      <div class="note" id="costs">router costs: ...</div>
+    </details>
     <div id="status" role="status"></div>
     <div id="results"></div>
     <footer>
@@ -99,12 +148,85 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   function signed(v, dp) { var t = Math.abs(v).toFixed(dp); return (v < 0 ? '−' : '+') + t; }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
+  // ---------- settings model ----------
+  var CAUSES = [
+    ['signal', 'Traffic signals'], ['xing_signal', 'Signalled crossing'], ['stop', 'Stop sign'],
+    ['give_way', 'Give way'], ['yield_infer', 'Minor-road yield (inferred)'],
+    ['yield_equal', 'Equal-priority junction'], ['rb_entry', 'Roundabout entry']
+  ];
+  var WSETS = [
+    ['prior', 'Prior (literature)', 'Literature-based starting values.'],
+    ['ireland', 'My Irish rides', 'Stop rates measured on your own Irish rides (some classes have few passes).'],
+    ['combined', 'Pooled (Ireland+Berlin)', 'Irish and Berlin rides pooled: more data, less local.']
+  ];
+  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4 };
+  var LS_KEY = 'flowplan.settings';
+  var S = JSON.parse(JSON.stringify(DEF));   // guard 0 means off
+  var MODEL = null;                          // /api/model response
+  var lastModelP = null;                     // model echoed by the last /api/route response
+  var sliderEls = {};
+
+  function sameScales(a, b) { return a.length === b.length && a.every(function (v, i) { return v === b[i]; }); }
+  function num(v) { var f = parseFloat(v); return isFinite(f) ? f : null; }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function settingsFromObj(o) {   // validate a loosely-typed {w,bw,b,p_*,g,s,n} (hash keys or stored)
+    var r = JSON.parse(JSON.stringify(DEF));
+    if (WSETS.some(function (x) { return x[0] === o.w; })) r.w = o.w;
+    var b = num(o.b);
+    if (b !== null && o.bw === 'ireland') r.blend = clamp(b, 0, 1);
+    CAUSES.forEach(function (c) {
+      var v = num(o['p_' + c[0]]);
+      if (v !== null) r.p[c[0]] = clamp(v, 0, 1);
+    });
+    var g = num(o.g);
+    if (g !== null) r.guard = g === 0 ? 0 : clamp(g, 1, 2);
+    if (o.s) {
+      var ss = String(o.s).split(',').map(num);
+      if (ss.length && ss.every(function (v) { return v !== null && v > 0 && v <= 10; })) r.scales = dedupe(ss);
+    }
+    var n = parseInt(o.n, 10);
+    if (n >= 3 && n <= 6) r.n = n;
+    return r;
+  }
+  function dedupe(a) { return a.filter(function (v, i) { return a.indexOf(v) === i; }); }
+  function settingsToObj() {      // only non-default values, short keys
+    var o = {};
+    if (S.w !== DEF.w) o.w = S.w;
+    if (S.blend > 0) { o.bw = 'ireland'; o.b = String(+S.blend.toFixed(3)); }
+    CAUSES.forEach(function (c) { if (S.p[c[0]] != null) o['p_' + c[0]] = String(+S.p[c[0]].toFixed(4)); });
+    if (S.guard !== DEF.guard) o.g = String(S.guard);
+    if (!sameScales(S.scales, DEF.scales)) o.s = S.scales.join(',');
+    return o;
+  }
+  function saveSettings() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ }
+    writeHash();
+  }
+  function loadSettings(h) {
+    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|p_.*)$/.test(k); });
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { stored = null; }
+    if (hasHash) S = settingsFromObj(h);        // hash wins, whole-settings
+    else if (stored && typeof stored === 'object') {
+      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(',') };
+      if (stored.blend > 0) { o.bw = 'ireland'; o.b = stored.blend; }
+      Object.keys(stored.p || {}).forEach(function (k) { o['p_' + k] = stored.p[k]; });
+      S = settingsFromObj(o);
+    }
+    var nh = parseInt(h.n, 10);
+    if (nh >= 3 && nh <= 6) S.n = nh;
+    state.n = S.n;
+  }
+
   // ---------- state <-> hash ----------
   function writeHash() {
     var parts = [];
     if (state.from) parts.push('from=' + fmtLL(state.from));
     if (state.to) parts.push('to=' + fmtLL(state.to));
-    if (parts.length) parts.push('n=' + state.n);
+    var so = settingsToObj();
+    Object.keys(so).forEach(function (k) { parts.push(k + '=' + encodeURIComponent(so[k]).replace(/%2C/g, ',')); });
+    if (state.from || state.to || parts.length || S.n !== DEF.n) parts.push('n=' + S.n);
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
   }
   function readHash() {
@@ -166,7 +288,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     clearPoint('from'); clearPoint('to'); clearResults(); setStatus('');
     setMode('from'); writeHash(); updateGo();
   };
-  $('nSel').onchange = function () { state.n = parseInt($('nSel').value, 10); writeHash(); };
+  $('nSel').onchange = function () { state.n = S.n = parseInt($('nSel').value, 10); saveSettings(); scheduleRoute(); };
 
   // ---------- Nominatim search: 600 ms debounce + hard 1 req/s throttle ----------
   var NOM_GAP_MS = 1000;
@@ -268,7 +390,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
-  function render(data) {
+  function render(data, keepView) {
     clearResults();
     routes = data.routes;
     var box = $('results');
@@ -287,6 +409,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       t.appendChild(g); card.appendChild(t);
       card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
       card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
+      var irish = irishStops(r);
+      if (irish !== null) card.appendChild(el('div', 'irish', 'under your Irish rides: ' + irish.toFixed(1) + ' stops'));
       if (r.delta_vs_fastest) {
         card.appendChild(el('div', 'delta', 'vs fastest: ' + signed(r.delta_vs_fastest.stops, 1) + ' stops, ' + signed(r.delta_vs_fastest.km, 1) + ' km'));
       }
@@ -297,22 +421,26 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     });
     if (routes.length) {
       select(0);
-      map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
+      if (!keepView) map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
     }
-    setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' + (data.timings_ms.total / 1000).toFixed(1) + ' s)');
+    setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' +
+      (data.cached ? 'cached' : 're-routed') + ', ' + (data.timings_ms.total / 1000).toFixed(1) + ' s)');
+    afterResponse(data);
   }
 
-  function findRoutes() {
-    if (!(state.from && state.to) || state.loading) return;
-    state.loading = true; updateGo(); clearResults();
+  function findRoutes(fromSettings) {
+    if (!(state.from && state.to)) return;
+    if (state.loading && fromSettings !== true) return;
+    state.loading = true; updateGo();
+    if (fromSettings !== true || !routes.length) clearResults();
     var seq = ++reqSeq;
-    setStatus('Asking BRouter for candidates, about 5-8 s');
-    var url = '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + state.n;
+    setStatus(fromSettings === true ? 'Updating (cached candidates are instant; new probabilities re-route, 5-8 s)' : 'Asking BRouter for candidates, about 5-8 s');
+    var url = '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + S.n + settingsQuery();
     fetch(url).then(function (r) {
       return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
     }).then(function (res) {
       if (seq !== reqSeq) return;
-      if (res.ok && res.body && res.body.routes) { render(res.body); return; }
+      if (res.ok && res.body && res.body.routes) { render(res.body, fromSettings === true); return; }
       var d = res.body && res.body.detail;
       if ((res.status === 400 || res.status === 404 || res.status === 503) && typeof d === 'string') setStatus(d, true);
       else setStatus('Something went wrong (HTTP ' + res.status + ').', true);
@@ -320,17 +448,144 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (seq === reqSeq) setStatus('Could not reach the planner server.', true);
     }).then(function () { if (seq === reqSeq) { state.loading = false; updateGo(); } });
   }
-  $('go').onclick = findRoutes;
+  $('go').onclick = function () { findRoutes(); };
+
+  // ---------- settings panel ----------
+  var routeTimer = null;
+  function scheduleRoute() {
+    clearTimeout(routeTimer);
+    routeTimer = setTimeout(function () { findRoutes(true); }, 250);
+  }
+  function settingsQuery() {
+    var q = '&weights=' + encodeURIComponent(S.w);
+    if (S.w !== 'ireland' && S.blend > 0) q += '&blend_with=ireland&blend=' + S.blend;
+    CAUSES.forEach(function (c) { if (S.p[c[0]] != null) q += '&p_' + c[0] + '=' + S.p[c[0]]; });
+    q += '&guard=' + S.guard + '&scales=' + S.scales.join(',');
+    return q;
+  }
+  function setP(name, cause) { return MODEL && MODEL.weight_sets[name] && MODEL.weight_sets[name][cause] ? MODEL.weight_sets[name][cause].p : 0; }
+  function baseP(cause) {   // client-side effective p before overrides
+    var p = setP(S.w, cause);
+    if (S.w !== 'ireland' && S.blend > 0) p = (1 - S.blend) * p + S.blend * setP('ireland', cause);
+    return p;
+  }
+  function irishStops(r) {
+    if (S.w === 'ireland' || !MODEL || !MODEL.weight_sets.ireland) return null;
+    var tot = 0;
+    r.hits.forEach(function (h) { tot += setP('ireland', h.cause); });
+    return tot;
+  }
+  function fmtP(p) { return p.toFixed(3); }
+
+  function refreshPanel() {
+    var anyOv = CAUSES.some(function (c) { return S.p[c[0]] != null; });
+    var name = (WSETS.filter(function (x) { return x[0] === S.w; })[0] || [S.w, S.w])[1].split(' (')[0];
+    if (S.w !== 'ireland' && S.blend > 0) name += ' + ' + Math.round(S.blend * 100) + '% Irish';
+    if (anyOv) name += ', custom';
+    $('setBadge').textContent = name;
+    $('setBadge').className = anyOv ? 'custom' : '';
+    $('blendRow').style.display = S.w === 'ireland' ? 'none' : '';
+    $('blend').value = String(Math.round(S.blend * 100));
+    $('blendVal').textContent = Math.round(S.blend * 100) + '%';
+    Array.prototype.forEach.call(document.getElementsByName('wset'), function (r) { r.checked = r.value === S.w; });
+    CAUSES.forEach(function (c) {
+      var e = sliderEls[c[0]]; if (!e) return;
+      var ov = S.p[c[0]] != null;
+      var v = ov ? S.p[c[0]] : (lastModelP && lastModelP.key === modelKey() && lastModelP.m[c[0]] != null ? lastModelP.m[c[0]] : baseP(c[0]));
+      e.input.value = String(v);
+      e.val.textContent = fmtP(v);
+      e.ov.textContent = ov ? 'override' : '';
+      e.reset.className = ov ? '' : 'hid';
+    });
+    $('sigHint').hidden = !(S.p.signal === 0 || (S.p.signal == null && baseP('signal') === 0));
+    $('guard').disabled = S.guard === 0;
+    $('guardOff').checked = S.guard === 0;
+    var g = S.guard === 0 ? num($('guard').value) || 1.3 : S.guard;
+    if (S.guard !== 0) $('guard').value = String(g);
+    $('guardVal').textContent = S.guard === 0 ? 'off' : g.toFixed(2);
+    var inp = $('scales').getElementsByTagName('input');
+    for (var i = 0; i < 3; i++) if (document.activeElement !== inp[i]) inp[i].value = S.scales[i] != null ? String(S.scales[i]) : '';
+  }
+  function modelKey() { return S.w + '|' + S.blend; }
+  function afterResponse(data) {
+    if (data.model) lastModelP = { key: modelKey(), m: data.model };
+    var c = data.settings && data.settings.brouter_costs;
+    if (c) {
+      var short = { cost_signal: 'signal', cost_xing_signal: 'crossing', cost_give_way: 'give way', cost_stop: 'stop', cost_mini_rb: 'mini-rb', cost_rb_entry: 'roundabout' };
+      $('costs').textContent = 'router costs: ' + Object.keys(c).map(function (k) { return (short[k] || k) + ' ' + c[k]; }).join(', ');
+    }
+    refreshPanel();
+  }
+  function changed() { saveSettings(); refreshPanel(); scheduleRoute(); }
+
+  function buildPanel() {
+    var box = $('wsets');
+    WSETS.forEach(function (w) {
+      var d = el('div', 'opt'), lab = el('label'), r = document.createElement('input');
+      r.type = 'radio'; r.name = 'wset'; r.value = w[0];
+      r.onchange = function () { S.w = w[0]; lastModelP = null; changed(); };
+      lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + w[1]));
+      d.appendChild(lab); d.appendChild(el('div', 'desc', w[2])); box.appendChild(d);
+    });
+    $('blend').oninput = function () { S.blend = parseInt($('blend').value, 10) / 100; lastModelP = null; changed(); };
+    var sl = $('sliders');
+    CAUSES.forEach(function (c) {
+      var row = el('div', 'srow'), lab = el('div', 'lab'), left = el('span'), right = el('span');
+      left.appendChild(document.createTextNode(c[1] + ' '));
+      var ov = el('span', 'ov'); left.appendChild(ov);
+      var val = el('span', null, '0'), reset = el('a', 'hid', 'reset'); reset.title = 'Back to the weight set value';
+      right.appendChild(val); right.appendChild(reset);
+      lab.appendChild(left); lab.appendChild(right); row.appendChild(lab);
+      var track = el('div', 'track'), inp = document.createElement('input');
+      inp.type = 'range'; inp.min = '0'; inp.max = '1'; inp.step = '0.005';
+      inp.setAttribute('aria-label', c[1]);
+      [['prior', 'Prior'], ['ireland', 'Irish rides'], ['combined', 'Pooled']].forEach(function (t) {
+        var e = MODEL.weight_sets[t[0]] && MODEL.weight_sets[t[0]][c[0]]; if (!e) return;
+        var tk = el('span', 'tick ' + t[0]); tk.style.left = (e.p * 100) + '%';
+        tk.title = t[1] + ': p=' + e.p + (e.p_lo != null ? ' (' + e.p_lo + '-' + e.p_hi + ')' : '') + (e.note ? '. ' + e.note : '');
+        track.appendChild(tk);
+      });
+      track.appendChild(inp); row.appendChild(track); sl.appendChild(row);
+      inp.oninput = function () { S.p[c[0]] = parseFloat(inp.value); changed(); };
+      reset.onclick = function () { delete S.p[c[0]]; changed(); };
+      sliderEls[c[0]] = { input: inp, val: val, ov: ov, reset: reset };
+    });
+    $('resetAll').onclick = function () {
+      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); lastModelP = null;
+      $('scaleErr').textContent = '';
+      Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) { i.className = ''; });
+      changed();
+    };
+    $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(); };
+    $('guardOff').onchange = function () { S.guard = $('guardOff').checked ? 0 : (num($('guard').value) || DEF.guard); changed(); };
+    Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) {
+      i.oninput = function () {
+        var inps = $('scales').getElementsByTagName('input'), vals = [], bad = false;
+        Array.prototype.forEach.call(inps, function (x) {
+          var f = num(x.value); var ok = f !== null && f > 0 && f <= 10;
+          x.className = ok || x.value === '' ? '' : 'bad';
+          if (x.value === '') return;
+          if (!ok) bad = true; else vals.push(f);
+        });
+        if (bad || !vals.length) { $('scaleErr').textContent = 'Scales must be numbers > 0 and <= 10.'; return; }
+        $('scaleErr').textContent = '';
+        S.scales = dedupe(vals);
+        saveSettings(); scheduleRoute();
+      };
+    });
+    refreshPanel();
+  }
 
   // ---------- health (once) + hash restore ----------
   var h = readHash();
+  loadSettings(h);
+  $('nSel').value = String(S.n);
   var f = parseLL(h.from), t = parseLL(h.to);
-  var nh = parseInt(h.n, 10);
-  if (nh >= 3 && nh <= 6) { state.n = nh; $('nSel').value = String(nh); }
   if (f) setPoint('from', f);
   if (t) setPoint('to', t);
   if (f && !t) setMode('to');
   if (f && t) { setMode('from'); map.fitBounds([f, t], { padding: [40, 40] }); }
+  saveSettings();
 
   fetch('/api/health').then(function (r) { return r.json(); }).then(function (j) {
     var b = j.bbox;
@@ -340,7 +595,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('foot').textContent = 'Planner API unreachable.';
   });
 
-  if (f && t) findRoutes();
+  fetch('/api/model').then(function (r) { return r.json(); }).then(function (j) {
+    MODEL = j; buildPanel();
+  }).catch(function () {
+    $('setBadge').textContent = 'model unavailable';
+  }).then(function () { if (f && t) findRoutes(); });
 })();
 </script>
 </body>
