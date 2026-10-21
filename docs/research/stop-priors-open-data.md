@@ -101,6 +101,8 @@ is the check set (xing/signal 0.461 and give_way 0.414 lean the prior's way) but
 for three classes; `combined` is Berlin-weighted on exactly the disputed classes. Flag `stop`: Eric
 rolls stop signs (1.6-2.1 %). The 2.5-4x absolute gap only affects `flow_scale`, a per-request knob.
 
+Switching weight sets: set `FLOW_WEIGHTS=combined|ireland|prior` in the environment, or call `flowplan.stop_model.load(weights=...)`; the default is `prior`.
+
 ## Open questions for Eric
 
 - Stop signs: the prior puts them above give-way (sight lines) and your rides put them below (you roll them). Which should the shipped default encode, or should `stop` simply be set equal to `give_way`?
