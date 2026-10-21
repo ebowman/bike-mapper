@@ -84,3 +84,7 @@ Stops/km fall monotonically fastbike -> flow_lo -> flow -> flow_hi on the Dublin
 - Is a direction-aware right-turn cost required for the spike? If yes, BRouter cannot do it (OSRM can, but has no elevation); the Dublin right-turn density (0.43/km) suggests it matters only in town.
 - Are the weights 300/150/80 (and 150 for roundabout entry) and the ~1/3 contribution of the unpriced 0.5 equal-class heuristic acceptable until dhy.11 gives measured stop probabilities?
 - OK to use brouter.de pre-built tiles for the spike, and do a local mapcreator build only when per-node scores are injected?
+
+### Sample GPX and the straightness defaults (emq.27)
+
+The `data/samples/brouter-*-flow*.gpx` files were regenerated on 2026-10-22 with `scripts/run_brouter.sh route` and now reflect the straightness defaults of `profiles/flow.brf` (turn_cost 400, lane_exit_cost 150, cycleway_base 1.0, lane_bonus 0.7; see docs/planner.md 'Straightness'). Earlier numbers in this note that were measured on the flow samples (and any byte-identity claims) refer to the pre-emq.27 profile; the `baseline` (fastbike) samples are unchanged.

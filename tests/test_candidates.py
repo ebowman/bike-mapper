@@ -193,3 +193,17 @@ def test_lanes_variant_helper():
     assert candidates.lanes_variant(1.0).params == {"flow_scale": 1.0, "lane_bonus": 0.8}
     assert candidates.lanes_variant(0.7).params["lane_bonus"] == 0.7
     assert candidates.lanes_variant(0.9).name == "flow_lanes"
+
+
+@pytest.mark.parametrize("k,v", [("turn_cost", 0), ("turn_cost", 2000), ("turn_cost", "400"), ("lane_exit_cost", 0),
+                                 ("lane_exit_cost", 1000), ("cycleway_base", 0.5), ("cycleway_base", 2.0)])
+def test_straightness_valid(k, v):
+    assert brouter.validate_params({k: v})[k] == v
+
+
+@pytest.mark.parametrize("k,v", [("turn_cost", -1), ("turn_cost", 2000.1), ("lane_exit_cost", 1001),
+                                 ("lane_exit_cost", -0.1), ("cycleway_base", 0.49), ("cycleway_base", 2.01),
+                                 ("turn_cost", float("nan")), ("cycleway_base", "x"), ("lane_exit_cost", None)])
+def test_straightness_invalid(k, v):
+    with pytest.raises(ValueError):
+        brouter.validate_params({k: v})

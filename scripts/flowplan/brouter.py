@@ -11,6 +11,8 @@ HEALTH_PAIR = [(-6.2825, 53.2990), (-6.2150, 53.2210)]
 MAX_FLOW_SCALE = 10.0
 MAX_COST = 1000.0
 MIN_LANE_BONUS, MAX_LANE_BONUS = 0.5, 1.0
+# emq.27 straightness params: name -> (min, max)
+RANGED_PARAMS = {"turn_cost": (0.0, 2000.0), "lane_exit_cost": (0.0, 1000.0), "cycleway_base": (0.5, 2.0)}
 
 # Same value sets and precedence as scripts/build_cycle_overlay.py classify() (duplicated: that module imports
 # osmium at top level, which the server does not need). Keep in sync.
@@ -63,6 +65,14 @@ def validate_params(params: dict | None) -> dict:
             if not math.isfinite(f) or not MIN_LANE_BONUS <= f <= MAX_LANE_BONUS:
                 raise ValueError(f"lane_bonus must be finite and within "
                                  f"{MIN_LANE_BONUS}..{MAX_LANE_BONUS}, got {v!r}")
+        elif k in RANGED_PARAMS:
+            lo, hi = RANGED_PARAMS[k]
+            try:
+                f = float(v)
+            except (TypeError, ValueError):
+                raise ValueError(f"{k} must be numeric, got {v!r}") from None
+            if not math.isfinite(f) or not lo <= f <= hi:
+                raise ValueError(f"{k} must be finite and within {lo:g}..{hi:g}, got {v!r}")
         elif str(k).startswith("cost_"):
             try:
                 f = float(v)

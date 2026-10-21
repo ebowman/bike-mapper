@@ -217,7 +217,7 @@ def test_lane_bonus_echoed_and_keyed(index):
     c = app_client(index, fc)
     base = fc.calls
     j1 = c.get(f"/api/route?{Q}").json()
-    assert j1["settings"]["lane_bonus"] == 1.0 and j1["settings"]["lanes_variant"] is False
+    assert j1["settings"]["lane_bonus"] == 0.7 and j1["settings"]["lanes_variant"] is False
     assert fc.calls == base + 16
     assert all("cycle_km" in r["stats"] for r in j1["routes"])
     j2 = c.get(f"/api/route?{Q}&lane_bonus=0.8").json()
@@ -254,13 +254,13 @@ def test_lanes_variant_added_when_requested(index):
     seen.clear()
     j = c.get(f"/api/route?{Q}&lanes_variant=1&refresh=1").json()
     assert j["candidates_total"] == 20 and j["settings"]["lanes_variant"] is True
-    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.8]
+    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.7]  # default 0.7 already below 0.8
     seen.clear()
     c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.9&refresh=1")
     assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.8, 0.9}  # 0.9 base, lanes variant 0.8
     seen.clear()
-    c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.7&refresh=1")
-    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.7}
+    c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.6&refresh=1")
+    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.6}
 
 
 @pytest.mark.parametrize("v", ["0.4", "1.1", "abc", "nan", "inf"])
@@ -312,3 +312,37 @@ def test_assign_hits_synthetic():
     assert out["summary"]["n_node_charges"] == 1 and out["summary"]["total_brouter_cost"] == 123.0
     assert out["summary"]["km_by_highway"]["primary"] == pytest.approx(0.1)
     assert out["segments"][1]["start_km"] == pytest.approx(0.1)
+
+
+def test_straightness_params_flow_only_echo_and_cache(index):
+    seen = []
+
+    class Rec(FakeClient):
+        def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+            seen.append((profile, dict(params or {})))
+            return super().route(points, profile, alternativeidx, params)
+
+    c = app_client(index, Rec())
+    seen.clear()
+    j = c.get(f"/api/route?{Q}&refresh=1").json()
+    st = j["settings"]
+    assert (st["turn_cost"], st["lane_exit_cost"], st["cycleway_base"], st["lane_bonus"]) == (400, 150, 1.0, 0.7)
+    for prof, p in seen:
+        if prof == "flow":
+            assert (p["turn_cost"], p["lane_exit_cost"], p["cycleway_base"]) == (400, 150, 1.0)
+        else:
+            assert not {"turn_cost", "lane_exit_cost", "cycleway_base", "lane_bonus"} & set(p)
+    seen.clear()
+    j2 = c.get(f"/api/route?{Q}&turn_cost=150&lane_exit_cost=0&lane_bonus=1.0").json()
+    assert j2["cached"] is False and j2["settings"]["turn_cost"] == 150
+    assert {p["turn_cost"] for prof, p in seen if prof == "flow"} == {150}
+    assert c.get(f"/api/route?{Q}&turn_cost=150&lane_exit_cost=0&lane_bonus=1.0").json()["cached"] is True
+    assert c.get(f"/api/route?{Q}&turn_cost=151&lane_exit_cost=0&lane_bonus=1.0").json()["cached"] is False
+
+
+@pytest.mark.parametrize("name,v", [("turn_cost", "-1"), ("turn_cost", "2001"), ("lane_exit_cost", "1001"),
+                                    ("lane_exit_cost", "-5"), ("cycleway_base", "0.4"), ("cycleway_base", "2.1"),
+                                    ("turn_cost", "abc"), ("cycleway_base", "nan")])
+def test_bad_straightness_400(index, name, v):
+    r = app_client(index, FakeClient()).get(f"/api/route?{Q}&{name}={v}")
+    assert r.status_code == 400 and name in r.json()["detail"]

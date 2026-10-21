@@ -39,7 +39,14 @@ assign cost_rb_entry         = 150   # %cost_rb_entry% | roundabout entry cost (
 # Per-request override: &profile:lane_bonus=<x>. Cost is PER METRE: 0.8 over 10 km saves ~2000 cost units (~7 signals at 300).
 # BRouter does NOT clamp or reject costfactor < 1 (verified live with a constant 0.5: CostPerKm 500 honoured), so the bonus
 # is applied directly; only the base is scaled, additive penalties (oneway, traffic, ...) are not.
-assign lane_bonus            = 1.0   # %lane_bonus% | costfactor multiplier for cycle paths and roads with bike lanes/tracks | number
+assign lane_bonus            = 0.7   # %lane_bonus% | costfactor multiplier for cycle paths and roads with bike lanes/tracks | number
+
+# FLOW (emq.27): straightness. Defaults here = the planner's 'Straight & lanes' preset; all overridable per request
+# (&profile:turn_cost=, &profile:lane_exit_cost=, &profile:cycleway_base=). The lane_bonus default moved 1.0 -> 0.7
+# (valid range 0.5..1.0; 1.0 = no lane preference). 'Plain flow' = turn_cost 150, lane_exit_cost 0, lane_bonus 1.0.
+assign turn_cost             = 400   # %turn_cost% | cost of a 90-degree turn (scaled by turn angle by BRouter; roundabouts 0); was 150 | number
+assign lane_exit_cost        = 150   # %lane_exit_cost% | cost charged when leaving a cycle lane/path onto an ordinary road | number
+assign cycleway_base         = 1.0   # %cycleway_base% | base costfactor of highway=cycleway before lane_bonus (stock fastbike 1.3) | number
 
 # Use the following switches to change behaviour
 assign allow_steps           = true   # %allow_steps% | Set to false to disallow steps | boolean
@@ -97,18 +104,31 @@ assign nodeaccessgranted or any_cycleroute lcn=yes
 assign ispaved or surface=paved or surface=asphalt or surface=concrete or surface=paving_stones or surface=sett or smoothness=excellent smoothness=good
 assign isunpaved not or ispaved or ( and surface= smoothness= ) or surface=fine_gravel or surface=cobblestone smoothness=intermediate
 
+# FLOW (emq.23): stricter than hascycleway: an actual lane/track tag on this way (or an opposite-direction lane/track)
+# (cycleway:both has no opposite_* lookup values in lookups.dat; the parser rejects unknown values)
+assign hasbikelane =
+  or cycleway=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+  or cycleway:left=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+  or cycleway:right=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
+     cycleway:both=lane|track|shared_lane|share_busway
+
 # FLOW: turncost is applied by BRouter per turn, scaled by turn angle; it cannot tell left from right.
 assign turncost = if junction=roundabout then 0
-                  else 150
+                  else turn_cost
 # FLOW: roundabout entry. BRouter 1.7.10 OsmPath.java charges the new way's initialcost only when BOTH the
 # previous and the new initialclassifier are non-zero and differ, so every way needs a non-zero classifier:
-# 1 = ordinary, 2 = roundabout, 3 = ferry. Entering a roundabout (1 -> 2) then costs 150.
+# 1 = ordinary, 2 = roundabout, 3 = ferry, 4 = cycle lane/path (emq.27). Entering a roundabout (1 -> 2) costs
+# cost_rb_entry. Fragmentation cost: the NEW way's initialcost is charged only on a classifier change, so an
+# ordinary road (1) charges lane_exit_cost exactly when a route leaves a lane/path (4 -> 1); entering a lane/path
+# (initialcost 0) or continuing on one costs nothing. Interplay: lane -> roundabout -> road charges rb_entry (4 -> 2)
+# and then lane_exit_cost (2 -> 1); acceptable. Roundabout ways with a lane tag stay class 2 (roundabout wins).
 assign initialclassifier =
      if route=ferry then 3
      else if junction=roundabout|circular then 2
+     else if or highway=cycleway hasbikelane then 4
      else 1
 
-assign initialcost switch route=ferry 10000 switch junction=roundabout|circular cost_rb_entry 0
+assign initialcost switch route=ferry 10000 switch junction=roundabout|circular cost_rb_entry switch or highway=cycleway hasbikelane 0 lane_exit_cost
 
 #
 # implicit access here just from the motorroad tag
@@ -176,14 +196,6 @@ assign badoneway =
 
 assign hascycleway = not
   and ( or cycleway= cycleway=no|none ) and ( or cycleway:left= cycleway:left=no ) and ( or cycleway:right= cycleway:right=no ) ( or cycleway:both= cycleway:both=no )
-
-# FLOW (emq.23): stricter than hascycleway: an actual lane/track tag on this way (or an opposite-direction lane/track)
-# (cycleway:both has no opposite_* lookup values in lookups.dat; the parser rejects unknown values)
-assign hasbikelane =
-  or cycleway=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
-  or cycleway:left=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
-  or cycleway:right=lane|track|shared_lane|share_busway|opposite_lane|opposite_track
-     cycleway:both=lane|track|shared_lane|share_busway
 
 assign lane_factor = if or highway=cycleway hasbikelane then lane_bonus else 1.0
 
@@ -282,7 +294,7 @@ assign class_factor =
   switch    highway=steps                             switch allow_steps 120 10000
   switch    route=ferry                               switch allow_ferries 5.67 10000
   switch    highway=bridleway                         5
-  switch    highway=cycleway                          1.3
+  switch    highway=cycleway                          cycleway_base
   switch    isresidentialorliving                     switch isunpaved 10 1.2
   switch    highway=service                           switch isunpaved 10 1.2
   switch or highway=track or highway=road or highway=path highway=footway

@@ -52,6 +52,8 @@ def parse_latlon(s: str, name: str, bbox: dict) -> tuple[float, float]:
 
 DEFAULT_SCALES = (0.5, 1.0, 2.0)
 MAX_GUARD = 3.0
+# emq.27 'Straight & lanes' defaults; equal to the profiles/flow.brf globals. Applied to flow variants only.
+STRAIGHT_DEFAULTS = {"lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0, "cycleway_base": 1.0}
 CACHE_SIZE = 32
 OVERRIDE_CAUSES = ("signal", "stop", "give_way", "rb_entry", "xing_signal", "yield_infer",
                    "yield_equal")
@@ -161,7 +163,9 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
               weights: str | None = None, blend_with: str | None = None,
               blend: str | None = None, guard: str | None = None, scales: str | None = None,
               refresh: str | None = None, router: str = "base",
-              lane_bonus: str | None = None, lanes_variant_: str | None = Query(None, alias="lanes_variant"),
+              lane_bonus: str | None = None, turn_cost: str | None = None,
+              lane_exit_cost: str | None = None, cycleway_base: str | None = None,
+              lanes_variant_: str | None = Query(None, alias="lanes_variant"),
               debug: str | None = None):
         t0 = time.perf_counter()
         start = parse_latlon(from_, "from", bbox)
@@ -197,21 +201,27 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
             raise HTTPException(400, f"'guard' must be within 0..{MAX_GUARD} (got {guard!r})")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         refresh_b = refresh not in (None, "", "0", "false")
-        lane_v = 1.0 if lane_bonus is None else parse_float(lane_bonus, "lane_bonus")
-        try:
-            validate_params({"lane_bonus": lane_v})
-        except ValueError as e:
-            raise HTTPException(400, f"'lane_bonus': {e}") from None
+        straight = {}
+        for name, raw in (("lane_bonus", lane_bonus), ("turn_cost", turn_cost),
+                          ("lane_exit_cost", lane_exit_cost), ("cycleway_base", cycleway_base)):
+            v = STRAIGHT_DEFAULTS[name] if raw is None else parse_float(raw, name)
+            try:
+                validate_params({name: v})
+            except ValueError as e:
+                raise HTTPException(400, f"'{name}': {e}") from None
+            straight[name] = v
+        lane_v = straight["lane_bonus"]
         lanes_b = lanes_variant_ not in (None, "", "0", "false")
         costs = (base_model if router == "base" else m).brouter_costs()
         profile_params = dict(costs)
-        if lane_v < 1.0:  # 1.0 = off: leave the request identical to pre-emq.23 ones
-            profile_params["lane_bonus"] = lane_v
+        # emq.27: always sent explicitly (flow variants only; generate() leaves fastbike untouched), so the
+        # server defaults and the profile defaults cannot drift apart silently
+        profile_params.update(straight)
         for ck, cv in costs.items():
             if not math.isfinite(cv) or not 0 <= cv <= 1000:
                 raise HTTPException(400, f"derived {ck}={cv} is outside 0..1000")
         key = (round(start[1], 5), round(start[0], 5), round(end[1], 5), round(end[0], 5),
-               scales_t, tuple(sorted(costs.items())), lane_v, lanes_b)
+               scales_t, tuple(sorted(costs.items())), tuple(sorted(straight.items())), lanes_b)
         hit = None if refresh_b else cache.get(key)
         if hit is not None:
             kept, dropped, skipped, brouter_ms = hit
@@ -266,6 +276,9 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                              "blend": blend_alpha, "overrides": overrides, "guard": guard_v,
                              "scales": list(scales_t), "n": n, "router": router,
                              "brouter_costs": costs, "lane_bonus": lane_v,
+                             "turn_cost": straight["turn_cost"],
+                             "lane_exit_cost": straight["lane_exit_cost"],
+                             "cycleway_base": straight["cycleway_base"],
                              "lanes_variant": lanes_b},
                 "model": {c: m.p(c) for c in m.classes}, "cached": hit is not None,
                 "candidates_total": len(kept) + len(dropped),
