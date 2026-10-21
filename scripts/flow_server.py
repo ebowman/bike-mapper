@@ -158,12 +158,15 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
     def route(request: Request, from_: str = Query(alias="from"), to: str = Query(), n: int = 4,
               weights: str | None = None, blend_with: str | None = None,
               blend: str | None = None, guard: str | None = None, scales: str | None = None,
-              refresh: str | None = None):
+              refresh: str | None = None, router: str = "base"):
         t0 = time.perf_counter()
         start = parse_latlon(from_, "from", bbox)
         end = parse_latlon(to, "to", bbox)
         n = max(1, min(6, n))
+        if router not in ("base", "table"):
+            raise HTTPException(400, f"'router' must be base or table (got {router!r})")
         m = named_model(weights, "weights") if weights else model
+        base_model = m
         blend_alpha = None
         if blend_with is not None or blend is not None:
             if blend_with is None or blend is None:
@@ -190,7 +193,7 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
             raise HTTPException(400, f"'guard' must be within 0..{MAX_GUARD} (got {guard!r})")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         refresh_b = refresh not in (None, "", "0", "false")
-        costs = m.brouter_costs()
+        costs = (base_model if router == "base" else m).brouter_costs()
         for ck, cv in costs.items():
             if not math.isfinite(cv) or not 0 <= cv <= 1000:
                 raise HTTPException(400, f"derived {ck}={cv} is outside 0..1000")
@@ -242,7 +245,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "weight_set": m.weight_set, "routes": routes,
                 "settings": {"weights": weights or model.weight_set, "blend_with": blend_with,
                              "blend": blend_alpha, "overrides": overrides, "guard": guard_v,
-                             "scales": list(scales_t), "n": n, "brouter_costs": costs},
+                             "scales": list(scales_t), "n": n, "router": router,
+                             "brouter_costs": costs},
                 "model": {c: m.p(c) for c in m.classes}, "cached": hit is not None,
                 "candidates_total": len(kept) + len(dropped),
                 "candidates_deduped": len(kept), "skipped": skipped,

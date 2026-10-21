@@ -168,11 +168,36 @@ def test_cost_change_misses_cache_and_is_echoed(index):
     base = fc.calls
     j1 = c.get(f"/api/route?{Q}").json()
     assert fc.calls == base + 16 and j1["settings"]["brouter_costs"]["cost_signal"] == 300
-    j2 = c.get(f"/api/route?{Q}&p_stop=0").json()
-    assert j2["cached"] is False and fc.calls == base + 32
+    j2 = c.get(f"/api/route?{Q}&p_stop=0&router=table").json()
+    assert j2["cached"] is False and fc.calls == base + 32 and j2["settings"]["router"] == "table"
     assert j2["settings"]["brouter_costs"]["cost_stop"] == 0
-    j3 = c.get(f"/api/route?{Q}&p_stop=0&guard=2").json()  # same costs -> hit
+    j3 = c.get(f"/api/route?{Q}&p_stop=0&router=table&guard=2").json()  # same costs -> hit
     assert j3["cached"] is True and fc.calls == base + 32
+
+
+def test_router_base_is_default_and_sliders_hit_cache(index):
+    fc = Counting()
+    c = app_client(index, fc)
+    base = fc.calls
+    j1 = c.get(f"/api/route?{Q}").json()
+    assert j1["settings"]["router"] == "base" and fc.calls == base + 16
+    costs = j1["settings"]["brouter_costs"]
+    j2 = c.get(f"/api/route?{Q}&p_stop=0").json()
+    assert j2["cached"] is True and fc.calls == base + 16
+    assert j2["settings"]["brouter_costs"] == costs and j2["model"]["stop"] == 0
+    j3 = c.get(f"/api/route?{Q}&blend_with=ireland&blend=0.5").json()
+    assert j3["cached"] is True and fc.calls == base + 16
+    j4 = c.get(f"/api/route?{Q}&weights=ireland").json()  # different base set -> miss once
+    assert j4["cached"] is False and fc.calls == base + 32
+    assert c.get(f"/api/route?{Q}&weights=ireland&p_stop=0.1").json()["cached"] is True
+    assert fc.calls == base + 32
+    jt = c.get(f"/api/route?{Q}&p_stop=0&router=table").json()
+    assert jt["cached"] is False and fc.calls == base + 48
+
+
+def test_invalid_router_400(index):
+    r = app_client(index, FakeClient()).get(f"/api/route?{Q}&router=nope")
+    assert r.status_code == 400 and "router" in r.json()["detail"]
 
 
 def test_model_endpoint_uses_app_model_path(index, tmp_path):
