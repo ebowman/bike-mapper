@@ -32,7 +32,7 @@ def rank(scored: list[ScoredCandidate], n: int = 4, guard: float = 1.3,
     if not scored:
         return []
     ordered = sorted(scored, key=lambda s: (s.expected_stops, s.length_m))
-    limit = guard * min(s.length_m for s in scored)
+    limit = guard * min(s.length_m for s in scored) if guard > 0 else float('inf')  # 0 = off
     within = [s for s in ordered if s.length_m <= limit]
     pool = within if len(within) >= min_keep else ordered
     top = pool[:max(n, 0)]

@@ -82,3 +82,33 @@ def test_expected_stops(combined):
 
 def test_midway_background(model):
     assert model.midway_background_p == 0.003
+
+
+def test_with_overrides(model):
+    m2 = model.with_overrides({"signal": 0.0, "stop": 1.0})
+    assert m2.p("signal") == 0.0 and m2.p("stop") == 1.0
+    assert m2.weight_set == model.weight_set + "+custom"
+    assert model.p("signal") == 0.4  # original untouched
+    assert m2.p("give_way") == model.p("give_way")
+
+
+def test_with_overrides_errors(model):
+    with pytest.raises(ValueError):
+        model.with_overrides({"signal": 1.5})
+    with pytest.raises(ValueError):
+        model.with_overrides({"signal": -0.1})
+    with pytest.raises(KeyError, match="signal"):
+        model.with_overrides({"bogus": 0.1})
+
+
+def test_blend(model, combined):
+    b = stop_model.blend(model, combined, 0.25)
+    for c in CAUSES:
+        assert b.p(c) == pytest.approx(0.75 * model.p(c) + 0.25 * combined.p(c))
+        assert b.mean_stop_s(c) == pytest.approx(
+            0.75 * model.mean_stop_s(c) + 0.25 * combined.mean_stop_s(c))
+    assert b.weight_set == "blend(prior,combined,0.25)"
+    assert stop_model.blend(model, combined, 0).p("signal") == model.p("signal")
+    assert stop_model.blend(model, combined, 1).p("signal") == combined.p("signal")
+    with pytest.raises(ValueError):
+        stop_model.blend(model, combined, 1.1)

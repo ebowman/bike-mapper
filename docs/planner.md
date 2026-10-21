@@ -64,7 +64,16 @@ Classes, in precedence order: signal, stop, give_way, rb_entry, xing_signal, yie
 - `routes[]`: `rank`, `id`, `variant` (fastbike, flow_lo, flow, flow_hi), `profile`, `alt`, `geometry` (GeoJSON LineString, [lon, lat]), `stats` {`distance_km`, `ascent_m`, `brouter_time_s`, `expected_stops`, `stops_per_km`, `expected_stop_s`, `by_class`}, `delta_vs_fastest` {`stops`, `km`} or null, `hits[]` {`lat`, `lon`, `cause`, `p`}
 - `candidates_total`, `candidates_deduped`, `skipped[]` (BRouter requests that failed, with error), `timings_ms` {`brouter`, `score`, `total`}
 
-Errors: 400 bad or out-of-region coordinates, 404 no route, 503 BRouter unreachable.
+Optional model parameters on `/api/route` (all validated; a bad value gives 400 naming the parameter):
+- `weights=prior|ireland|combined` (default: the server's model), `blend_with=<set>&blend=<0..1>` (linear blend of p and mean_stop_s from `weights` toward `blend_with`; the two must be given together), `p_<cause>=<0..1>` for any of the seven causes (applied last, after the blend).
+- `guard` (distance guard factor, 0 = off, max 3.0, default 1.3), `scales` (comma-separated `flow_scale` values for the flow variants, default `0.5,1,2`; each must be > 0 and <= 10; fastbike is always included), `n`, `refresh=1` (bypass the candidate cache).
+- The response echoes `settings` (`weights`, `blend_with`, `blend`, `overrides`, `guard`, `scales`, `n`) and `model` (effective p per cause), plus `cached` (bool). `weight_set` is the effective name (e.g. `blend(prior,ireland,0.50)+custom`).
+
+Candidate cache: an in-process LRU of 32 entries keyed by start and end (rounded to 5 decimals) plus the `scales` tuple, holding the generated candidates. A hit skips BRouter (`timings_ms.brouter` = 0, `cached` true); scoring and ranking always run with the request's model, so changing weights, p, guard or n re-ranks instantly. `refresh=1` bypasses and refills the entry. Requests with no kept candidates are not cached.
+
+`GET /api/model` -> `{default_weight_set, precedence, weight_sets: {name: {cause: {p, p_lo, p_hi, mean_stop_s, note}}}, midway_background_p}` straight from `data/model/stop_model.json`.
+
+Errors: 400 bad or out-of-region coordinates or bad model parameters, 404 no route, 503 BRouter unreachable.
 
 Example: `curl 'http://localhost:8081/api/route?from=53.2990,-6.2825&to=53.2210,-6.2150'`
 

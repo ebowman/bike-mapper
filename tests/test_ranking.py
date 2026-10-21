@@ -41,3 +41,10 @@ def test_delta_vs_fastest():
 def test_no_fastest_gives_none():
     out = rank([sc("a", 0, 1000, 1)])
     assert out[0].delta_vs_fastest is None
+
+
+def test_guard_zero_disables_guard():
+    cands = [sc("fastbike", 0, 10000, 5), sc("flow", 0, 11000, 4), sc("flow_hi", 0, 12000, 3),
+             sc("flow_lo", 0, 30000, 0)]
+    assert rank(list(cands), n=4)[0].cand.variant == "flow_hi"
+    assert rank(list(cands), n=4, guard=0)[0].cand.variant == "flow_lo"

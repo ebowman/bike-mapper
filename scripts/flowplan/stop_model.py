@@ -16,9 +16,10 @@ Decision rules:
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 DEFAULT_PATH = Path(__file__).resolve().parents[2] / "data" / "model" / "stop_model.json"
@@ -49,6 +50,32 @@ class StopModel:
 
     def mean_stop_s(self, cause: str) -> float:
         return float(self._cause(cause)["mean_stop_s"])
+
+    def with_overrides(self, p: dict) -> StopModel:
+        """Copy with per-cause p replaced. 0 <= p <= 1 (ValueError); unknown cause KeyError.
+        weight_set gains a '+custom' suffix (unchanged if p is empty)."""
+        causes = copy.deepcopy(self.causes)
+        for cause, v in p.items():
+            if cause not in causes:
+                raise KeyError(f"unknown cause {cause!r}; known causes: {', '.join(causes)}")
+            f = float(v)
+            if not 0.0 <= f <= 1.0:  # also rejects NaN
+                raise ValueError(f"p for {cause!r} must be within 0..1, got {v!r}")
+            causes[cause]["p"] = f
+        return replace(self, causes=causes,
+                       weight_set=self.weight_set + "+custom" if p else self.weight_set)
+
+
+def blend(a: StopModel, b: StopModel, alpha: float) -> StopModel:
+    """Per-class linear blend (1-alpha)*a + alpha*b of p and mean_stop_s; alpha in [0, 1]."""
+    if not 0.0 <= alpha <= 1.0:
+        raise ValueError(f"blend alpha must be within 0..1, got {alpha!r}")
+    causes = copy.deepcopy(a.causes)
+    for cause in causes:
+        ca, cb = a._cause(cause), b._cause(cause)
+        for k in ("p", "mean_stop_s"):
+            causes[cause][k] = (1 - alpha) * float(ca[k]) + alpha * float(cb[k])
+    return replace(a, causes=causes, weight_set=f"blend({a.weight_set},{b.weight_set},{alpha:.2f})")
 
 
 def load(path=None, weights=None) -> StopModel:
