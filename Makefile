@@ -40,3 +40,9 @@ planner-check:
 	$(MAKE) ui-check
 
 .PHONY: planner-setup brouter planner planner-check
+
+# Cycle infrastructure overlay for the planner map (needs data/osm/ireland.osm.pbf; ~40 s). See docs/planner.md.
+cycle-overlay:
+	uv run scripts/build_cycle_overlay.py
+
+.PHONY: cycle-overlay
