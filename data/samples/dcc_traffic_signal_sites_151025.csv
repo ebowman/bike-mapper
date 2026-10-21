@@ -1,0 +1,851 @@
+Site Number,Site Name,Latitude,Longitude,Type
+1,Abbey St @ Marlborough St (Luas),53.348875,-6.257407,Junction (Luas)
+2,Amiens St @ Seville Pl,53.354711,-6.246679,Junction
+3,Amiens St @ Talbot St,53.351374,-6.250073,Junction
+4,Annesley Pl @ Poplar Row,53.36096,-6.240299,Junction
+5,NCR @ Aughrim St,53.355797,-6.292406,Junction
+6,Baggot St Bridge,53.334055,-6.245199,Junction
+7,Baggot St @ Fitzwilliam St,53.336815,-6.249116,Junction
+8,Baggot St @ Waterloo Rd,53.333171,-6.243319,Junction
+9,Ballybough Rd @ Clonliffe Rd (Luke Kelly Br),53.361367,-6.242793,Junction
+10,Ballygall Rd West @ Clune Rd,53.389739,-6.293341,Junction
+11,Ballymun Rd @ Glasnevin Av,53.389123,-6.264819,Junction
+12,Ballymun Rd @ Griffith Av,53.378896,-6.266859,Junction
+13,Ballymun Rd @ St Pappins Rd,53.385948,-6.265175,Junction
+14,Bath St @ Beach Rd / Dock Rd,53.337734,-6.219957,Junction
+15,Beaumont Rd @ Shantalla Rd,53.385442,-6.233262,Junction
+17,Beresford Pl @ Eden Quay,53.348395,-6.2548,Junction
+18,NCR @ Berkeley Rd,53.360544,-6.269639,Junction
+19,Blackhall Pl @ Benburb St (LUAS),53.347387,-6.282361,Junction (Luas)
+20,Blackhall Pl @ North King St,53.349924,-6.281677,Junction
+21,Capel St @ Bolton St,53.351066,-6.270081,Junction
+22,Kevin St @ Bride St,53.337855,-6.269147,Junction
+23,Cabra Rd @ Annamoe Tce,53.36116,-6.286128,Junction
+24,Camden St @ Charlotte St,53.333651,-6.265073,Junction
+25,Camden St @ Harcourt Rd (Kellys Corner),53.332545,-6.264733,Junction
+26,Capel St Bridge,53.34611,-6.268041,Junction
+27,Cappagh Rd @ Cardiffsbridge Rd,53.389159,-6.312446,Junction
+29,Cathal Brugha St @ Marlboro St,53.352363,-6.259162,Junction (Luas)
+30,Chapelizod Rd @ Ballyfermot Hill,53.347818,-6.346206,Junction
+31,Chapelizod Rd @ Martins Row,53.348517,-6.342813,Junction
+32,Botanic Rd @ Mobhi Rd / Fairfield Rd,53.370333,-6.268485,Junction
+33,Charlemont St @ Grand Parade,53.330247,-6.260148,Junction
+34,Harcourt Rd @ Harcourt St/Charlemont St (LUAS),53.332793,-6.262843,Junction
+35,Nicholas St @ Christchurch Pl,53.342592,-6.271838,Junction
+36,Church St @ King St North,53.350115,-6.274547,Junction
+37,Church St Bridge,53.345957,-6.275742,Junction
+38,SCR @ Clanbrassil St (Leonards Corner),53.332234,-6.27523,Junction
+39,Clare St @ Merrion Sq,53.341062,-6.250689,Junction
+40,Clonliffe Rd @ Jones Rd,53.362621,-6.252298,Junction
+41,Clontarf Rd @ Castle Ave,53.360331,-6.20969,Junction
+42,Concolbert Rd @ Memorial Park Rd,53.342816,-6.316984,Junction
+43,Collins Av @ Grace Park Rd,53.381086,-6.239219,Junction
+44,Constitution Hill @ Western Way,53.354362,-6.273197,Junction (Luas)
+45,SCR @ Conyngham Rd,53.348296,-6.308363,Junction
+46,Crumlin Rd @ Dolphins Barn Bridge,53.332043,-6.29348,Junction
+47,Crumlin Rd @ Sundrive Rd,53.33015,-6.298166,Junction
+48,Dame St @ Parliament,53.344118,-6.26722,Junction
+49,Dame St @ Georges St,53.344116,-6.264594,Junction
+50,Dame St @ Trinity St,53.344243,-6.262293,Junction
+51,Dartry Rd @ Orwell Pk,53.309137,-6.260727,Junction
+52,Dartry Rd @ Temple Rd,53.311082,-6.262385,Junction
+53,Herberton Rd @ Dolphin Rd,53.334037,-6.299189,Junction
+54,SCR @ Dolphin's Barn,53.333527,-6.291346,Junction
+55,Dorset St @ Belvidere Rd,53.360636,-6.260658,Junction
+56,Dorset St @ Dominick St,53.352894,-6.268332,Junction (Luas)
+57,Dorset St @ Eccles St,53.357537,-6.2641,Junction
+58,Dorset St / Frederick St / Blessington St,53.356143,-6.265465,Junction
+59,Dorset St @ Gardiner St,53.358962,-6.262231,Junction
+60,Dorset St @ Granby Row & Ped at Parnell Sq,53.35423,-6.266954,Junction
+61,Dorset St @ North Circular Rd,53.359723,-6.26088,Junction
+62,Drimnagh Rd @ Walkinstown Rd,53.324027,-6.328007,Junction
+63,Drumcondra Rd @ Clonliffe Rd,53.363453,-6.257968,Junction
+64,Swords Rd @ Griffith Av,53.375821,-6.250366,Junction
+65,Drumcondra Rd @ Home Farm Rd,53.373441,-6.252043,Junction
+66,Drumcondra Rd @ Richmond Rd,53.36873,-6.255011,Junction
+67,Drumcondra Rd @ Whitworth Rd,53.361724,-6.259479,Junction
+69,Dublin Rd @ Kilbarrack Rd,53.384871,-6.142946,Junction
+70,Earlsfort Tce @ Hatch St,53.333761,-6.258487,Junction
+71,Emmet Rd @ Tyrconnell Rd,53.339475,-6.321234,Junction
+72,Fairview @ Fairview Strand (Edges Corner),53.362866,-6.236694,Junction
+73,Fairview @ Malahide Rd / Howth Rd,53.364167,-6.229072,Junction
+74,Faussagh Av @ Carnlough Rd,53.366687,-6.29188,Junction
+75,Fenian St @ Holles St,53.341081,-6.245322,Junction
+76,Gardiner Pl / Mountjoy Sq,53.356808,-6.259113,Junction
+77,Grand Canal St @ Haddington Rd,53.337287,-6.234683,Junction
+78,Grange Rd @ Kilbarrack Rd,53.391108,-6.168162,Junction
+80,Griffith Av @ Grace Park Rd,53.374002,-6.243285,Junction
+81,Harolds Cross Bridge,53.329408,-6.275455,Junction
+82,Harolds Cross Rd @ Leinster Rd,53.32164,-6.279175,Junction
+83,Harolds Cross Rd  @ Park,53.32631,-6.277939,Junction
+84,Harolds Cross Rd @ Rathgar Av,53.318708,-6.279002,Junction
+85,SCR @ Heytesbury St,53.332466,-6.268313,Junction
+86,Howth Rd @ Brookwood Av,53.37554,-6.19497,Junction
+87,Howth Rd @ Copeland Ave,53.366125,-6.223561,Junction
+88,Howth Rd @ Station Rd,53.380444,-6.175478,Junction
+90,James Larkin Rd @ Watermill Rd,53.374129,-6.164917,Junction
+91,Jamestown Rd / McKee Ave / Seamus Ennis Rd,53.390197,-6.297819,Junction
+92,Irishtown Rd @ Bath St,53.339589,-6.223328,Junction
+93,Irishtown Rd @ Londonbridge,53.337924,-6.222511,Junction
+94,Jervis St @ Abbey St  (LUAS),53.347604,-6.266148,Junction (Luas)
+95,Jervis St @ Mary St,53.348808,-6.26667,Junction
+96,Kildare Rd @ Windmill Rd,53.325333,-6.309004,Junction
+97,Kimmage Rd Lower @ Sundrive Rd,53.319471,-6.290559,Junction
+98,KCR and Kimmage Rd/Ravensdale,53.312298,-6.299664,Junction
+99,Kimmage Rd West @ Lorcan O Toole Pk,53.31375,-6.309876,Junction
+100,Kimmage Rd West @ Whitehall Rd,53.312564,-6.304897,Junction
+101,Kylemore Rd @ Old Naas Rd,53.328482,-6.343767,Junction
+102,Leeson Pk @ Chelmsford Rd,53.326357,-6.250592,Junction
+103,Leeson St @ Appian Way/Waterloo Rd & ped at Sussex Rd,53.328222,-6.245889,Junction
+104,Leeson St Bridge / Mespil Rd,53.33189,-6.252484,Junction
+105,Long Mile Rd @ Walkinstown Av,53.3237,-6.341007,Junction
+106,Lucan Rd @ Kylemore Rd,53.351264,-6.352942,Junction
+107,Malahide Rd @ Collins Av,53.375512,-6.218754,Junction
+108,Malahide Rd @ Griffith Av,53.368508,-6.22635,Junction
+109,Malahide Rd @ Kilmore Rd,53.379948,-6.210622,Junction
+110,Malahide Rd @ Tonlegee Rd,53.389413,-6.197583,Junction
+111,Merrion Rd @ Ailesbury Rd,53.320539,-6.21549,Junction
+112,Merrion Rd @ Anglesea Rd & Ped @ RDS,53.328807,-6.230806,Junction
+113,Merrion Rd @ Nutley Lane,53.318704,-6.21274,Junction
+114,Merrion Rd @ Sandymount Av,53.326375,-6.224448,Junction
+115,Merrion Row @ Merrion St,53.338098,-6.253812,Junction
+116,Merrion Sq @ Holles St,53.339619,-6.246438,Junction
+117,Milltown Rd @ Dundrum Rd,53.310751,-6.248031,Junction
+118,Morehampton Rd @ Herbert Pk,53.325079,-6.240695,Junction
+119,Mobhi Rd @ Botanic Av,53.371845,-6.266552,Junction
+120,Mount St Bridge @ Warrington Pl,53.337788,-6.240659,Nested Pelican
+121,Mountjoy Sq @ Belvidere Pl,53.357396,-6.257089,Junction
+122,Mountjoy St @ Western Way,53.35485,-6.268734,Junction
+123,Mountpleasant Av @ Charleston Rd,53.32355,-6.260402,Junction
+124,Naas Rd @ Kylemore Rd (LUAS),53.326971,-6.342872,Junction (Luas)
+125,Navan Rd @ Nephin Rd,53.36492,-6.308256,Junction
+126,Nicholas St @ Bride Rd,53.341537,-6.27226,Junction
+127,NCR @ Cabra Rd,53.360722,-6.275144,Junction
+128,NCR @ Belvidere Rd,53.359347,-6.258569,Junction
+129,NCR @ Fitzgibbon St,53.358421,-6.255004,Junction
+130,NCR @ Infirmary Rd,53.352282,-6.298209,Junction
+131,North Rd @ Mellowes Rd,53.389966,-6.301264,Junction
+132,North Strand Rd @ East Wall Rd,53.360487,-6.238897,Junction
+133,Northumberland Rd @ Haddington Rd,53.336119,-6.23853,Junction
+134,Northumberland Rd @ Pembroke Rd,53.332259,-6.235354,Junction
+136,Orwell Rd @ Orwell Pk,53.306949,-6.269835,Junction
+137,Palmerston Rd @ Belgrave Rd,53.320662,-6.259423,Junction
+138,Parkgate St @ Infirmary Rd,53.348199,-6.295636,Junction
+139,Parnell Rd @ Clogher Rd,53.330429,-6.283808,Junction
+140,Parnell Sq @ North Frederick St,53.354516,-6.263631,Junction
+141,Gardiner St @ Parnell St / Summerhill and ped at Rutland St,53.354212,-6.256897,Junction
+142,Patrick St @ Dean St,53.339139,-6.272918,Junction
+143,Pearse St @ Erne St,53.343222,-6.244367,Junction
+144,Pearse St @ Macken St,53.342617,-6.240966,Junction
+145,Pearse St @ Sandwith St,53.343518,-6.246393,Junction
+146,Pearse st @ Westland row & ped at church,53.34413,-6.249295,Junction
+147,Pembroke Rd @ Shelbourne Rd,53.329492,-6.232952,Junction
+148,Phibsboro Rd @ Connaught St & ped at Shopping Centre,53.362533,-6.272693,Junction
+149,NCR @ Phibsboro Rd (Doyles Corner),53.360785,-6.272679,Junction
+150,Phibsboro Rd @ Whitworth Rd,53.364626,-6.271784,Junction
+151,NCR @ Prussia St (Hanlons Corner),53.357216,-6.288761,Junction
+152,Queen St Bridge,53.346679,-6.280189,Junction
+153,Ranelagh Rd @ Fields Tce / Chelmsford Rd,53.325099,-6.254663,Junction
+155,Rathgar Rd @ Orwell Rd,53.311898,-6.274611,Junction
+156,Rathgar Rd @ Frankfort Av,53.317193,-6.27048,Junction
+157,Rathmines Bridge @ Canal Rd,53.32995,-6.264279,Nested Pelican
+158,Rathmines Rd @ Castlewood Av ,53.322264,-6.265737,Junction
+159,Rathmines Rd @ Highfield Rd,53.313203,-6.263704,Junction
+160,Ringsend Rd @ South Lotts Rd,53.341593,-6.231705,Junction
+161,Howth Rd  @ Church,53.37515,-6.19631,Pedestrian
+162,Mobhi Rd @ Griffith Av,53.378263,-6.26512,Junction
+163,St Stephens Green @ Earlsfort Tce,53.336143,-6.257118,Junction
+164,St Stephens Green @ Harcourt St (LUAS),53.337723,-6.262803,Junction (Luas)
+165,Sandford Rd @ Milltown Rd,53.318466,-6.241715,Junction
+166,Gardiner St @ Sean Mc Dermott St,53.353031,-6.256035,Junction
+167,Shelbourne Rd @ Landsdowne Rd,53.333684,-6.231825,Junction
+168,Sheriff St @ Wapping St,53.350227,-6.235014,Junction
+170,SCR @ Donore Av,53.331636,-6.283862,Junction
+171,SCR @ Emmet Rd,53.340612,-6.30767,Junction
+172,SCR @ St Johns Rd,53.343927,-6.308274,Junction
+173,Georges St @ Stephens St,53.341469,-6.265393,Junction
+174,Stillorgan Rd @ Anglesea Rd,53.319385,-6.231966,Junction
+175,Stillorgan Rd @ Nutley Lane,53.313891,-6.222793,Junction
+176,Suir Rd @ Davitt Rd (LUAS),53.33676,-6.306699,Junction (Luas)
+177,Sundrive Rd @ Clogher Rd,53.325584,-6.296707,Junction
+178,NCR @ Summerhill,53.357028,-6.249743,Junction
+179,Swords Rd @ Collins Av,53.38246,-6.244531,Junction
+180,Swords Rd @ Larkhill Rd,53.387681,-6.244285,Junction
+181,Swords Rd @ Shanowen Rd,53.389748,-6.246276,Junction
+182,Gardiner St @ Talbot St,53.350713,-6.254519,Junction
+183,Tara St @ Georges Quay,53.347487,-6.255009,Junction
+184,Tara St @ Poolbeg St,53.346815,-6.255125,Junction
+185,Tara St @ Townsend St & Peds at Fire Station,53.345855,-6.254666,Junction
+187,Terenure Cross,53.309842,-6.283565,Junction
+188,Townsend St @ Moss St & ped at Princes St,53.34579,-6.25212,Junction
+189,Tyrconnell Rd @ Davitt Rd  (LUAS),53.334039,-6.328555,Junction (Luas)
+190,Watling St Bridge,53.347007,-6.283929,Junction
+191,Westland Row @ Lincoln Pl,53.342005,-6.250589,Junction
+192,Wexford St @ Kevin St,53.337531,-6.265853,Junction
+193,Winetavern St Bridge,53.345256,-6.272135,Junction
+194,North Strand Rd @ Annesley Pl,53.359504,-6.240316,Junction
+196,O'Connell Bridge @ Aston Quay,53.346838,-6.258914,Junction (Luas)
+197,O'Connell St @ Bachelors Walk,53.347626,-6.259535,Junction (Luas)
+198,O'Connell St @ Abbey St  (LUAS),53.348388,-6.259644,Junction (Luas)
+199,O'Connell St @ Henry St & ped at Earl St,53.349798,-6.260259,Pedestrian (Luas)
+200,O'Connell St @ Cathal Brugha St,53.351948,-6.26108,Junction
+201,O'Connell St @ Parnell St,53.352417,-6.261129,Junction
+202,Parnell st @ Parnell sq & ped at Dominick st,53.351827,-6.262916,Junction (Luas)
+203,Amiens St @ Buckingham St,53.352744,-6.248907,Pedestrian
+204,Ardlea Rd @ School,53.386535,-6.210361,Pedestrian
+205,Aungier St @ York St,53.339733,-6.265841,Pedestrian
+206,Baggot St @ Pembroke St,53.337662,-6.251543,Junction
+207,Ballybough Rd @ Bayview Ave,53.359325,-6.245566,Pedestrian
+208,Ballybough Rd @ Canal Bridge,53.358182,-6.247718,Pedestrian
+209,Ballyfermot Rd @ Drumfin Rd,53.342807,-6.360573,Junction
+210,Ballyfermot Rd @ Gala,53.342555,-6.357622,Pedestrian
+211,Ballyfermot West Of Roundabout,53.342251,-6.349336,Pedestrian
+212,Ballygall Rd East @ Hillcrest Estate,53.387565,-6.279736,Pedestrian
+213,Glasnevin Ave / Beneavin Rd / Grove Rd,53.390284,-6.287412,Junction
+214,Glasnevin Av @ Glasnevin Drive,53.389925,-6.270197,Pedestrian
+215,Ballymun Rd @ St Michaels ITT & OOT,53.379911,-6.265896,Junction
+216,Botanic Rd @ Marguerite Rd,53.36861,-6.269773,Pedestrian
+218,Bridge St (Ringsend) @ Church,53.341763,-6.227736,Pedestrian
+219,Ballymun Rd @ Our Lady of the Victories School,53.388348,-6.265378,Pedestrian
+220,Camden St / Pleasants St ,53.335457,-6.265205,Pedestrian
+221,Cardiffsbridge Rd @ Wellmount Av,53.385971,-6.312615,Pedestrian
+222,Chapelizod Rd @ Park Gate,53.346708,-6.337055,Pedestrian
+223,Clontarf Rd @ Bull Wall,53.360883,-6.182289,Junction
+224,Clontarf Rd @ Conquer Hill Rd,53.358638,-6.189651,Pelican
+226,College Green @ Grafton St,53.344296,-6.259747,Junction (Luas)
+229,Westmoreland St @ College St,53.345114,-6.25894,Junction
+230,College St @ College Green,53.345087,-6.258871,Pedestrian (Luas)
+232,D-Olier St @ Pearse St / Fleet St / Townsend St,53.345757,-6.257148,Junction
+233,Collins Av @ Albert College Pk,53.388311,-6.260959,Pedestrian
+234,Collins Av @ Falcarragh Rd,53.384696,-6.249933,Pedestrian
+235,Connaught St @ St Peters Rd,53.363261,-6.276666,Pedestrian
+236,Cork Road @ Ormond Road,53.338205,-6.281362,Pedestrian
+237,Crumlin Rd @ Loreto Convent,53.330557,-6.296997,Pedestrian
+238,Crumlin Rd @ Shopping Centre,53.329718,-6.299595,Pedestrian
+243,Donnybrook Rd @ Garda Station,53.32151,-6.235157,Pedestrian
+246,Dunville Av @ Oakley Rd,53.321131,-6.256135,Pedestrian
+247,East Wall Rd @ Footbridge,53.359103,-6.236439,Pedestrian
+248,Fairview Strand @ Philipsburgh Av,53.362829,-6.239723,Junction
+249,Finglas Rd @ Claremont Court,53.370822,-6.280147,Junction
+254,Grand Canal St @ Macken St,53.340128,-6.241537,Junction
+255,Griffith Av @ Clare Rd,53.376759,-6.254793,Pedestrian
+256,Griffith Av @ St Declan Tce,53.369775,-6.231266,Pedestrian
+257,Harcourt St @ the Hospital (LUAS),53.335421,-6.263298,Pedestrian (Luas)
+258,Harolds Cross Rd @ Le Vere Tce,53.328659,-6.276215,Pedestrian
+259,Harolds Cross Rd @ Park View Av,53.323078,-6.278951,Pedestrian
+260,Heytesbury St @ Hospital,53.336127,-6.269057,Pedestrian
+261,Howth Rd @ Dunseverick Rd,53.371034,-6.205228,Pedestrian
+262,Howth Rd  @ St Assam's Rd East,53.38003,-6.164585,Pedestrian
+263,Kilbarrack Rd @ Swansnest Av,53.390823,-6.159996,Pedestrian
+264,Kilmore Rd @ Ardlea Rd,53.386973,-6.214973,Junction
+265,Mount Argus @ the Church,53.320352,-6.286227,Pedestrian
+266,Le Fanu Rd @ Kylemore Ave,53.337605,-6.354153,Junction
+268,Leeson St @ Pembroke St,53.334275,-6.255229,Junction
+269,Lincoln Pl @ Clare St,53.341817,-6.252394,Junction
+271,Malahide Rd @ Donnycarney Rd,53.373023,-6.221667,Pedestrian
+272,College Green / Church Lane,53.344219,-6.261036,Junction
+274,Marrowbone Lane @ Summer St,53.340549,-6.283434,Pedestrian
+275,Merrion Rd @ Herbert Av,53.317252,-6.208186,Pedestrian
+276,Milltown Rd @ School,53.311596,-6.247845,Pedestrian
+279,Navan Rd @ Church,53.366691,-6.3136,Pedestrian
+280,New St @ Long Lane & peds at Daniel St.,53.336318,-6.273025,Junction
+281,North Strand Rd @ Ivy Church,53.358265,-6.241709,Pedestrian
+282,North Strand Rd @ Newcomen Bridge,53.35681,-6.24401,Junction
+285,Halfpenny Bridge & Millennium Footbridge @ Ormond Quay,53.346613,-6.263277,Pedestrian
+288,Pearse St @ Shaw St,53.344709,-6.252177,Junction
+290,Phibsboro Rd @ Monck Pl,53.358737,-6.273097,Pedestrian
+291,Philipsburgh Av @ Shops,53.369054,-6.238766,Pedestrian
+292,Raheny Rd @ Swansnest Rd,53.389996,-6.16953,Pedestrian
+295,Rathmines Rd @ Leinster Rd,53.323927,-6.265494,Junction
+297,Richmond St South @ Lennox St,53.330706,-6.26436,Pedestrian
+298,Mobhi Rd @ Scoil Caitriona,53.375391,-6.264941,Pedestrian
+301,St Stephens Green @ North East Corner,53.338596,-6.255392,Junction
+302,Sandford Rd @ Marlborough Rd,53.322289,-6.247495,Junction
+303,Sandymount Rd @ Shops,53.332715,-6.215875,Pedestrian
+304,SCR @ Rialto Bridge,53.337615,-6.299358,Pedestrian
+305,Georges St @ Exchequer St,53.343029,-6.264531,Pedestrian
+308,Sundrive Rd @ Blarney Pk,53.320811,-6.292805,Pedestrian
+309,Sundrive Rd @ Convent,53.324541,-6.295814,Pedestrian
+311,Templeogue Rd @ Fortfield Rd,53.30182,-6.297239,Junction
+312,Terenure Rd Nth @ Ashdale Rd,53.314615,-6.28258,Pedestrian
+314,Tonlegee Rd @ Shops,53.388925,-6.195389,Pelican
+316,Walkinstown Av @ Walkinstown Green,53.319664,-6.336781,Pedestrian
+319,Ballyfermot South Of Roundabout,53.341367,-6.348529,Pedestrian
+320,Ballyfermot North Of Roundabout,53.342909,-6.348861,Pedestrian
+322,Kylemore Rd @ Bluebell Av,53.33102,-6.345645,Junction
+323,Malahide Rd @ St Brendans Av,53.386883,-6.200782,Pedestrian
+324,Bride St @ Golden Lane,53.340559,-6.270032,Junction
+325,Crumlin Rd @ Ivy Gardens,53.327661,-6.309291,Pedestrian
+326,Crumlin Rd @ Ivy Grounds,53.328281,-6.305983,Pedestrian
+327,Finglas Rd @ Old Finglas Rd,53.377704,-6.287545,Junction
+328,Grafton St @ Suffolk St,53.343422,-6.259186,Junction (Luas)
+329,Clonskeagh Rd @ Hospital,53.316653,-6.23869,Pedestrian
+330,Ranelagh Rd @ Northbrook Rd,53.328297,-6.258168,Pedestrian
+331,Malahide Rd @ Killester Av (St Davids),53.378495,-6.21337,Junction
+332,Swords Rd @ Plunkett School,53.379,-6.247005,Pedestrian
+333,Davitt Rd / Benbulbin Rd / Footbridge (LUAS),53.335896,-6.312535,Junction
+334,Clonliffe Rd @ Clonliffe Gardens,53.361779,-6.24678,Pedestrian
+335,Griffith Av Ext @ Ballygall Rd East,53.379451,-6.27644,Junction
+336,Church St @ May Lane ,53.348002,-6.274762,Junction
+337,Charlemont St @ Flats,53.331619,-6.261812,Pedestrian
+340,Finglas Rd / Premier Square,53.382041,-6.291203,Junction
+342,Sandford Rd @ Belmont Av,53.319717,-6.243607,Pedestrian
+343,SCR @ Islandbridge Flats,53.345781,-6.308218,Pedestrian
+344,Cabra Rd @ Dowth Av,53.361021,-6.283234,Pedestrian
+346,Drumcondra Rd @ St Patricks College / Ormond Rd,53.370745,-6.253763,Pedestrian
+347,Prospect Rd @ Lindsay Rd,53.365865,-6.271247,Pedestrian
+348,Ballyfermot Rd @ Cleggan Park,53.343528,-6.369191,Pedestrian
+349,Clogher Rd @ Rutland Av,53.32694,-6.289881,Pedestrian
+351,Church St @ Brunswick St,53.35067,-6.274204,Junction
+352,Dawson St @ Nassau St,53.342899,-6.257792,Junction (Luas)
+354,Amiens St @ Beresford Pl,53.348997,-6.251606,Junction
+355,Memorial Bridge @ Customs House Quay,53.348385,-6.251786,Junction
+356,Memorial Bridge @ Georges Quay,53.34746,-6.25179,Junction
+359,Mount Brown @ Camac Stores,53.34155,-6.297829,Pedestrian
+360,St Stephens Green @ Dawson St,53.339471,-6.258812,Junction (Luas)
+362,Rathmines Rd @ Church,53.327822,-6.264698,Pedestrian
+363,Rathmines Rd @ Military Rd,53.327074,-6.264843,Pedestrian
+366,Thomas St @ Meath St & Ped @ Johns Lane,53.342732,-6.279268,Junction
+367,Cornmarket @ Bridge St,53.343352,-6.274926,Junction
+368,Thomas St @ Francis St,53.343215,-6.276142,Junction
+369,Thomas St @ Bridgefoot St,53.343379,-6.281104,Junction
+370,St Johns Rd West @ Stevens Lane (LUAS),53.346228,-6.291525,Junction (Luas)
+371,Cardiffsbridge Rd @ Shopping Centre,53.384591,-6.31264,Pedestrian
+372,Inchicore Rd @ Grattan Crescent,53.341616,-6.319021,Junction
+374,Tyrconnell Rd @ Ring Tce,53.335855,-6.326562,Pedestrian
+377,Station Rd @ Railway Bridge,53.381623,-6.175712,Pedestrian
+378,Milltown Rd @ Churchtown Rd,53.308293,-6.25442,Junction
+379,Drimnagh Rd @ Errigal Rd,53.324865,-6.321087,Junction
+380,Tonlegee Rd @ Tonlegee Lime Wood,53.390885,-6.183473,Junction
+381,Oscar Traynor Rd @ Coolock Drive,53.391951,-6.205276,Junction
+383,Merrion Rd @ Serpentine Av ,53.327855,-6.226933,Junction
+384,Tonlegee Rd @ Millbrook Rd,53.390959,-6.178687,Junction
+386,Oscar Traynor Rd @ Kilmore Rd,53.394481,-6.212029,Junction
+387,Meath St @ The Coombe,53.339915,-6.278046,Pedestrian
+388,Oscar Traynor @ Clonshaugh Industrial Estate,53.397135,-6.219588,Junction
+390,Crumlin Rd @ Kildare Rd,53.325288,-6.317859,Junction
+391,Milltown Rd @ Ramleh Park,53.314665,-6.246329,Pedestrian
+394,Rathfarnham Rd @ Bushy Park Rd,53.306987,-6.283729,Junction
+395,Crumlin Rd @ Cooley Rd,53.325978,-6.316274,Junction
+396,James St @ Echlin St,53.343479,-6.288372,Pedestrian
+399,James St @ Watling St,53.343649,-6.284914,Junction
+402,St Stephens Green @ Grafton St. (LUAS),53.339968,-6.260512,Pedestrian
+403,Gardiner St @ Abbey St/Beresford Pl & ped adjacent (LUAS),53.349348,-6.253281,Junction (Luas)
+404,Parkgate St @ Heuston Bridge and ped adjacent (LUAS),53.34775,-6.29186,Junction (Luas)
+405,Harts Corner & Peds @ Smurfits and Vincents School,53.367454,-6.272099,Junction
+408,Cabra Rd @ Quarry Rd.,53.361469,-6.290767,Junction
+410,Naas Rd @ Carriglea Rd (LUAS),53.328254,-6.3368,Junction (Luas)
+411,Merrion Rd @ Merrion Village,53.317713,-6.20991,Junction
+412,Ballyfermot Rd East Of Roundabout,53.34228,-6.346188,Pedestrian
+416,Gardiner Pl @ Temple St,53.355928,-6.26111,Junction
+418,Capel St @ Abbey St (LUAS),53.347297,-6.268342,Junction (Luas)
+419,Parnell St / Jervis St / Chapel Lane,53.350149,-6.266878,Junction
+420,Victoria Quay @ Frank Sherwin Bridge and peds at station (LUAS),53.346868,-6.291444,Junction
+421,St Stephens Green @ Kildare Street,53.339014,-6.256616,Junction
+422,Navan Rd @ Ratoath Rd,53.361587,-6.298221,Junction
+423,SCR @ Brookfield Rd,53.338623,-6.299462,Junction
+425,Kilmore Rd @ East of Roundabout,53.384196,-6.215786,Pelican
+428,Grace Park Rd @ St Josephs,53.370073,-6.248101,Pedestrian
+429,NCR @ Charleville Rd,53.358905,-6.281625,Pedestrian
+430,Ballygall Rd East @ Fitzmaurice Rd,53.382539,-6.276368,Junction
+431,Skellys Lane @ Montrose Av,53.385197,-6.224687,Junction
+433,Mellows Rd @ Community Centre,53.390041,-6.311399,Pedestrian
+434,Stannaway Rd @ Cashel Rd,53.318288,-6.303181,Junction
+435,Faussagh Rd @ St Eithne Rd,53.364554,-6.286014,Pedestrian
+437,Terenure Rd North @ Eagle Hill Ave,53.312129,-6.282596,Pedestrian
+438,Manor St @ Manor Pl,53.352377,-6.283848,Pedestrian
+439,Townsend St @ Lombard St,53.345732,-6.248428,Junction
+441,Merrion Gates,53.316286,-6.205342,Junction
+443,Clontarf Rd @ Embankment Rd & ped at St Anthonys Church,53.363169,-6.221922,Junction
+445,East Wall Rd / Alfie Byrne Rd,53.357895,-6.234192,Junction
+447,North Rd @ Plunkett Av,53.39853,-6.307075,Pedestrian
+448,Morehampton Rd @ Belmont Av,53.322833,-6.237902,Pedestrian
+451,Strand Rd @ Roslyn Pk,53.333229,-6.211408,Pedestrian
+452,Merrion Rd @ Shrewsbury Rd,53.324279,-6.221443,Pedestrian
+453,Kylemore Rd @ Rehab Centre,53.335752,-6.346912,Pedestrian
+454,Nassau St @ Kildare St & Molesworth St,53.342175,-6.25455,Junction
+455,Navan Rd @ Skreen Rd,53.363481,-6.30392,Pedestrian
+456,Malahide Rd @ Greencastle Rd,53.391514,-6.194901,Junction
+457,Kilbarrack Rd @ Kilbarrack Av,53.386999,-6.147565,Pedestrian
+458,Finglas Rd @ Ballyboggan Rd,53.375806,-6.286491,Junction
+459,Finglas Rd @ Slaney Rd,53.372624,-6.283616,Junction
+460,Rathgar Av @ Garville Av,53.31547,-6.276505,Junction
+461,Malahide Rd @ Mount Temple,53.369948,-6.224693,Pedestrian
+462,Grand Canal St @ Clanwilliam Pl,53.338799,-6.239191,Junction
+463,Tyrconnell Rd @ Tyrconnell Pk,53.337906,-6.323271,Pedestrian
+464,Kimmage Rd @ Corrib Rd,53.314823,-6.296007,Pedestrian
+465,Merrion Sq @ Mount St Upr,53.33824,-6.247718,Junction
+467,Malahide Rd @ Darndale RDB/Blunden Dr,53.396919,-6.187347,Pedestrian
+468,Grange Rd @ Newbrook Av,53.396273,-6.162563,Junction
+470,Navan Rd @ Baggot Rd/Kinvara Pk,53.368239,-6.317839,Junction
+471,Walkinstown Av @ Roundabout,53.317676,-6.334112,Pedestrian
+472,Ballyfermot Rd @ Kennelsfort Rd,53.345381,-6.379893,Junction
+473,Fortfield Rd @ Wainsfort Rd,53.310125,-6.302911,Junction
+476,East Wall Rd @ East Rd,53.354983,-6.22922,Junction
+477,Walkinstown Rd @ Kilnamanagh Rd,53.32134,-6.330981,Junction
+478,SCR / Rialto St,53.336025,-6.297441,Pedestrian
+479,Sandford Rd @ Anna Villa,53.323409,-6.250035,Pedestrian
+480,Strand Rd @ Sandymount Tower,53.3248,-6.206972,Pedestrian
+481,Kylemore Rd @ Kylemore Av,53.338495,-6.34803,Pedestrian
+483,Gardiner St @ Church,53.357604,-6.260029,Pedestrian
+484,Berkeley Rd @ St Josephs Church,53.357886,-6.268684,Pedestrian
+485,Finglas Rd / Shopping Centre / Glenhill Est,53.384088,-6.294061,Junction
+486,James St @ Hospital (LUAS),53.342496,-6.293686,Junction (Luas)
+487,Naas Rd @ La Touche Rd (Muirfield Rd) (LUAS),53.329261,-6.334448,Junction (Luas)
+488,Ballyfermot Rd @ Ballyfermot Pde,53.342162,-6.351317,Junction
+489,Prussia St @ Shopping Centre,53.356098,-6.287815,Pedestrian
+490,Terenure Rd East @ Church,53.310349,-6.281773,Pedestrian
+492,Howth Rd / St Lawrence Rd / Ashbrook,53.36811,-6.212068,Junction
+493,Beaumont Rd @ Hospital,53.385752,-6.228818,Junction
+494,Howth Rd @ James Larkin Rd,53.382361,-6.149561,Junction
+495,Priorswood Rd @ Ferrycarrig Park,53.400058,-6.19837,Pedestrian
+496,Morehampton Rd @ Bloomfield Av,53.326619,-6.243145,Junction
+498,Kylemore Rd @ By-Pass,53.348645,-6.35317,Junction
+500,Griffith Av @ Philipsburgh Av,53.371902,-6.237244,Junction
+501,Chapelizod Bypass @ Concolbert Rd,53.342938,-6.321374,Junction
+502,SCR @ Bulfin Rd,53.339486,-6.307961,Junction
+503,SCR @ Inchicore Rd / Old Kilmainham Lane,53.341829,-6.307583,Junction
+504,Orwell Rd @ Zion Rd,53.309955,-6.273603,Junction
+505,Skellys Lane West Of Roundabout,53.384323,-6.218056,Pelican
+506,Clontarf Rd @ Vernon Ave,53.358786,-6.195975,Junction
+507,Faussagh Rd @ Dowth Av,53.363735,-6.282404,Junction
+508,Swords Rd @ Omni Park Shopping Centre,53.392833,-6.245973,Junction
+509,Bremen Grove Nth Bound @ Sean Moore Rd,53.339254,-6.216508,Pedestrian
+510,Finglas Rd @ Wellmount Rd,53.38733,-6.298602,Junction
+511,Seafield Rd @ Vernon Av,53.363931,-6.195366,Junction
+513,Amiens St @ Store St (LUAS),53.349864,-6.250993,Junction (Luas)
+514,Kimmage Rd Lwr @ Mount Argus View,53.319874,-6.28805,Junction
+515,Navan Rd / Kempton Est,53.371264,-6.329215,Junction
+516,Collins Av @ Shanowen Ave,53.387613,-6.258203,Junction
+517,Collins Av @ Collinswood,53.380386,-6.236131,Junction
+518,Barryscourt Rd @ Shopping Centre,53.396099,-6.210927,Pedestrian
+519,Old Finglas Rd @ Ballygall Rd,53.377613,-6.276753,Junction
+520,St Agnes Rd @ Church,53.319146,-6.315168,Pedestrian
+521,Grace Park Rd. @ Grace Park Heights,53.379369,-6.240419,Junction
+522,Harcourt St @ Hatch St (LUAS),53.333944,-6.262979,Junction (Luas)
+524,Tonlegee Rd / Rathvale Drive,53.390446,-6.189038,Junction
+526,Emmet Rd / Bulfin Rd,53.340452,-6.315578,Pedestrian
+527,Collins Ave @ Belton Pk,53.377382,-6.224694,Pedestrian
+528,Finglas Rd @ Tolka Valley Rd,53.379786,-6.28828,Junction
+530,Sundrive Rd @ Stanaway Rd,53.322401,-6.294285,Junction
+531,Howth Rd @ Castle Ave,53.371323,-6.202188,Junction
+532,Oscar Traynor Rd @ Woodlawn,53.397437,-6.230359,Junction
+533,Navan Rd @ Hampton Green,53.362658,-6.301897,Junction
+536,Strand Rd @ Gilford Rd,53.328072,-6.208759,Pedestrian
+540,Oscar Traynor Rd / Dundaniel Rd,53.397886,-6.224128,Junction
+541,Nephin Rd @ St Declan's School,53.366684,-6.30495,Pedestrian
+542,Shantalla Rd @ Shantalla Ave,53.387839,-6.238206,Pedestrian
+543,Kilmore Rd @ Ardmore Drive,53.388295,-6.214775,Pedestrian
+544,Chapelizod Hill Rd / Kylemore Rd,53.345945,-6.3514,Junction
+545,Station Rd / Springdale Rd,53.382847,-6.176501,Junction
+546,Howth Rd / Collins Ave East,53.370805,-6.2066,Pedestrian
+547,Fortfield Rd @ Greenlea Rd,53.306713,-6.301091,Pedestrian
+548,Clareville Rd @ School,53.317534,-6.285995,Pedestrian
+549,Kilmore Rd @ Kilbarron Rd,53.391854,-6.214927,Junction
+550,Warrington Pl @ Mount St Up,53.336509,-6.242615,Junction
+551,Ballyfermot Rd @ Colepark Road ,53.342325,-6.354235,Pedestrian
+552,Ballyfermot Rd @ Cherry Orchard Hospital,53.344392,-6.376485,Pedestrian
+553,Ballyfermot Rd @ O-Hogan Rd,53.34239,-6.338905,Junction
+554,Ballyfermot Rd @ Blackditch Dr,53.343176,-6.365081,Pedestrian
+555,Ballymun Rd @ DCU,53.384836,-6.265353,Pedestrian
+556,Finglas Rd @ Glasnevin Cemetery,53.369779,-6.277817,Pedestrian
+557,Ballymun Rd @ Comprehensive School,53.393035,-6.263689,Pedestrian
+558,Whitworth Rd @ Claude Rd,53.363385,-6.265871,Pedestrian
+559,Custom House Qy @ Common St,53.347901,-6.246241,Junction
+560,Homefarm Rd @ Ferguson Rd,53.374524,-6.256956,Pedestrian
+561,Howth Rd @ Supervalue,53.380105,-6.177532,Pedestrian
+562,Botanic Ave @ Mannix Rd,53.368628,-6.260838,Pedestrian
+563,Botanic Ave @ Botanic Park,53.370281,-6.263775,Pedestrian
+564,Eglinton Rd @ Eglinton Sq,53.31906,-6.233989,Pedestrian
+565,Iona Rd @ Church,53.365851,-6.264383,Pedestrian
+566,Ballymun Rd @ Santry Ave,53.401501,-6.264616,Junction
+568,Finglas Village,53.388817,-6.298634,Pedestrian
+569,Grange Rd / Howth View Pk,53.394033,-6.166281,Junction
+570,Old Finglas Rd @ Violet Hill Rd,53.378089,-6.282588,Junction
+571,N32 @ Belcamp College,53.404628,-6.18839,Pedestrian
+573,Naas Rd @ The Gap (LUAS),53.332771,-6.329582,Pedestrian (Luas)
+575,Raheny Rd @ Grange Park Rd,53.386947,-6.17362,Junction
+576,Palmerston Rd @ Cowper Rd,53.31613,-6.258663,Junction
+577,Dunville Ave @ Shuttle (LUAS),53.321052,-6.254575,Junction (Luas)
+578,Mellows Rd @ Swimming Pool,53.389787,-6.305414,Pedestrian
+579,Tolka Valley Rd @ St Helena's Rd,53.37877,-6.296612,Pedestrian
+580,Tolka Valley Rd @ Cardiffisbridge Rd,53.379361,-6.310933,Pedestrian
+582,Bridge St @ Cooke St,53.344195,-6.276349,Junction
+583,Beaver Row @ Beech Hill Av,53.318091,-6.233411,Pedestrian
+584,East Wall Rd @ Sherrif St,53.349669,-6.226924,Junction
+585,Grange Rd @ Donaghmede Shopping Centre,53.395425,-6.163114,Pedestrian
+586,Malahide Rd @ Elm Mount Rd,53.37732,-6.215553,Junction
+587,Walkinstown R'about @ Kestral,53.317764,-6.332609,Pedestrian
+588,SCR @ Herberton Rd/Uppercross Rd,53.33599,-6.298898,Pedestrian
+589,Pembroke St @ Irishtown Rd,53.340156,-6.223261,Pedestrian
+590,Grange Rd @ Community School,53.399648,-6.159334,Pedestrian
+591,Kilmore Rd @ Maryfield Crescent,53.382666,-6.212962,Junction
+592,Balcurris Rd /Sillogue Ped,53.396903,-6.267094,Pedestrian
+593,Alfie Byrne Rd @ Dart Station,53.361097,-6.22778,Pedestrian
+594,Malahide Rd @ Brian Rd,53.367594,-6.227566,Pedestrian
+595,Blackhorse Ave @ Glenbeigh Rd,53.356639,-6.29659,Pedestrian
+596,Griffith Ave @ Beresford Estate,53.374519,-6.245806,Junction
+597,Navan Rd @ Ashtown Gr,53.369758,-6.32459,Junction
+598,Strand Rd @ Marine Dr,53.334647,-6.214274,Junction
+599,Terenure Pl @ Templeogue Rd,53.309498,-6.284764,Junction
+600,East Wall Rd @ Dublin Port,53.352471,-6.224958,Junction
+601,Navan Rd @ Ashtown R'about,53.3717,-6.332251,Pedestrian
+602,Glasnevin Ave @ Laneway,53.390061,-6.274294,Pedestrian
+603,Malahide Rd @ Ardlea Rd (North-South),53.382947,-6.204656,Pelican
+604,Malahide Rd @ Ardlea Rd (East-West),53.382622,-6.206226,Pelican
+605,Swords Rd @ Iveragh Rd,53.381117,-6.245413,Pedestrian
+606,Crumlin Rd @ Ardagh Rd,53.328878,-6.303362,Pedestrian
+607,Blackhorse Ave @ Turnstyle Pub,53.364969,-6.319266,Pedestrian
+608,Malahide Rd @ St Brendans Church,53.388089,-6.199225,Pedestrian
+610,Morehampton Rd @ Wellington Pl,53.327678,-6.244416,Junction
+611,Oscar Traynor Rd @ Clonshaugh Rd,53.39599,-6.216388,Junction
+612,Abbey Street Middle @ Liffey St (LUAS),53.347938,-6.263644,Pedestrian (Luas)
+613,Leeson St @ Dartmouth Rd,53.330619,-6.251844,Junction
+614,Sussex Rd @ Burlington Rd,53.329463,-6.248547,Junction
+615,Donnybrook Rd @ Eglinton Rd,53.319449,-6.232506,Junction
+616,Kilbarron Rd @ Trim Rd,53.39309,-6.221341,Junction
+617,Tonlegee Rd / Moatfield Rd,53.389974,-6.19314,Junction
+618,Ranelagh @ Sallymount Ave,53.324187,-6.252352,Pedestrian
+619,Errigal Rd @ Brandon Rd,53.326383,-6.322198,Junction
+620,Wellington Rd @ Clyde Rd,53.328087,-6.241683,Junction
+622,Aungier St @ Longford St,53.340691,-6.265586,Junction
+623,Rathgar Rd / Grosvenor Rd @ Charleville Rd ,53.321366,-6.267498,Junction
+624,Griffith Av @ Walnut Rise (Courtlands),53.377471,-6.258001,Junction
+625,Halfpenny Bridge ,53.34567,-6.265035,Pedestrian
+626,Kilbarrack Rd @ Thornville Rd,53.389135,-6.152513,Junction
+627,Castle Av @ Seafield Rd,53.365245,-6.204829,Pedestrian
+628,Prussia St @ Aughrim St,53.353312,-6.285299,Pedestrian
+629,Crumlin Rd @ Rafters Rd,53.326767,-6.313415,Pedestrian
+630,Mount Prospect Ave @ Clontarf Rd,53.366847,-6.172646,Nested Pelican
+631,Vernon Ave @ Mount Prospect Ave,53.367161,-6.194884,Junction
+632,Vernon Ave @ Sybil Hill Rd,53.369173,-6.194367,Junction
+633,Vernon Ave @ Kincora Rd,53.36248,-6.195647,Junction
+634,Grange Rd @ Grange Abbey,53.398459,-6.160034,Pedestrian
+635,Grange Rd @ Donaghmede Pk,53.398346,-6.156382,Pedestrian
+636,Strand Rd @ St Albans Park,53.320291,-6.205983,Pedestrian
+637,Keeper Rd @ Herberton Rd,53.331221,-6.29795,Junction
+638,Stannaway Rd @ Bangor Rd,53.320579,-6.298335,Junction
+639,Tonlegee Rd @ Springdale Road,53.39027,-6.191512,Junction
+640,Collins Ave @ DCU,53.386364,-6.254896,Junction
+641,Templeogue Rd @ Terenure College,53.303864,-6.293915,Pedestrian
+642,Templeogue Rd @ Busgate,53.305705,-6.290912,Junction
+647,NCR @ O'Connells School,53.357563,-6.251277,Pedestrian
+648,Shelbourne Rd / Crampton Ave,53.332328,-6.231722,Junction
+649,Skellys Lane / Whitethorn Rise,53.384411,-6.221057,Junction
+650,Milltown Rd @ St Annes,53.313018,-6.247253,Junction
+651,Sarsfield Rd @ Landon Rd,53.342196,-6.32894,Junction
+652,Ballygall Rd East @ Church,53.383702,-6.2765,Pedestrian
+653,Nicholas St @ Bull Alley St,53.340595,-6.272395,Pedestrian
+654,Sarsfield Rd @ Concolbert Rd (Railway Bridge),53.342179,-6.325136,Junction
+655,Clontarf Rd / Seaview Ave Nth,53.361404,-6.214597,Junction
+656,Collins Ave / Celtic Pk Rd,53.378534,-6.230036,Junction
+658,Ringsend @ Barrow St,53.341939,-6.236165,Junction
+659,Grace Park Rd / Sion Hill Rd,53.375937,-6.242347,Junction
+660,North Wall Quay @ Guild St,53.347605,-6.241202,Junction
+661,Emmet Rd @ Luby Rd,53.340641,-6.311762,Pedestrian
+662,Mercer St @ York St,53.339338,-6.264454,Junction
+663,Mercer St @ Car Park,53.33965,-6.264258,Junction
+664,St Johns Rd @ Military Rd,53.345907,-6.296126,Junction
+665,Lord Edward St / Fishamble St (& Lord Edward St @ Cows Lane),53.343606,-6.270068,Junction
+666,Dame St @ Olympia,53.344169,-6.266209,Pedestrian
+667,Navan Rd @ Library,53.362105,-6.299983,Junction
+668,Harcourt St Ped (LUAS),53.336765,-6.26315,Pedestrian (Luas)
+670,Ratoath Rd @ John Paul Park,53.368073,-6.303784,Pedestrian
+671,Rathmines Rd Upper @ Rathmines Close,53.316721,-6.265234,Pedestrian
+672,Glasnevin Ave @ Autobahn,53.389949,-6.272032,Pedestrian
+677,East Wall Rd @ Alexandra Rd,53.351254,-6.225855,Junction
+679,Drimnagh Rd @ Slievebloom Rd,53.324163,-6.327237,Junction
+680,Oscar Traynor Rd @ Coolock Village,53.390168,-6.199851,Junction
+682,North King St @ Coleraine/Linenhall,53.350294,-6.272273,Pedestrian
+684,Terenure Rd East Busgate,53.311019,-6.278282,Junction
+686,Rathmines Rd @ Rathmines College,53.325472,-6.265237,Pelican
+687,Old Finglas Rd @ St. Brigids School,53.377189,-6.275296,Pedestrian
+688,Blunden Drive @ Ayrfield Church,53.396677,-6.1823,Pedestrian
+689,Newbrook Rd @ Newbrook Ave,53.394478,-6.161067,Pedestrian
+690,Ballymun Rd @ Old Finglas Rd,53.376133,-6.270027,Junction
+691,Swords Rd @ Regency Hotel,53.377617,-6.248155,Junction
+692,Kylemore Rd @ Landen Rd,53.337597,-6.347597,Junction
+693,Terenure Rd West @ Greenlea Rd,53.310557,-6.289794,Junction
+694,Brookwood Ave @ Brookwood Rise,53.377301,-6.196351,Junction
+695,Sybil Hill Rd @ St Pauls School,53.373275,-6.194027,Pedestrian
+696,Vernon Ave @ Blackheath,53.36589,-6.195127,Junction
+697,Castle Ave @ Blackheath,53.366915,-6.203997,Junction
+699,Harold's Cross Rd / Mount Argus Rd,53.324146,-6.279777,Junction
+700,Fassaugh Ave / Killala Rd,53.367348,-6.299733,Junction
+701,Malahide Rd @ Casino Pk,53.372135,-6.22266,Junction
+702,Bushy Park Rd @ Riverside Ave,53.307467,-6.278622,Pedestrian
+703,Mobhi Rd @ Stella Ave,53.377002,-6.264728,Pedestrian
+704,Mobhi Rd @ St Mobhi Drive,53.373079,-6.265813,Pedestrian
+705,Ratoath Rd @ Valley Park Rd,53.382966,-6.317987,Junction
+706,Londonbridge Rd @ Shuttle,53.337647,-6.226662,Junction
+707,Richmond Villa's @ South Richmond St,53.332049,-6.264609,Junction
+708,Seville Place @ Oriel St,53.35237,-6.24356,Pedestrian
+709,Philipsburgh Ave @ Shuttle,53.367944,-6.239567,Junction
+710,Jervis St/Swift Row @ Strand St,53.346803,-6.265947,Junction
+711,Capel St @ Strand St (LUAS),53.346432,-6.268149,Junction
+712,Philipsburgh Ave @ Melrose Ave,53.364838,-6.239865,Pedestrian
+713,Artane Castle RDB @ Kilmore Rd,53.384531,-6.21629,Pedestrian
+714,Portland Row @ Dunne St,53.35603,-6.24837,Pedestrian
+715,Glasnevin Hill @ Church,53.373421,-6.268691,Pedestrian
+716,Ratoath Rd @ Cappagh Rd,53.390816,-6.319788,Junction
+717,Memorial Pk Rd @ Inchicore Rd,53.342027,-6.316843,Junction
+718,Mountjoy Sq West @ Grenville St,53.355731,-6.257995,Pedestrian
+720,Cork St @ Coombe/Dean St,53.339356,-6.274991,Junction
+722,Adelaide Road @ Peters Place (LUAS),53.332703,-6.260479,Pedestrian (Luas)
+723,Ailesbury Road @ Church,53.319448,-6.230166,Pedestrian
+724,Sean Moore Rd @ Pine Rd,53.340249,-6.214765,Pedestrian
+725,Pigeon House Rd @ Tom Clarke Bridge,53.342624,-6.215042,Pedestrian
+726,Ballymun Rd @ Coultry Gardens/Church,53.399607,-6.26408,Pedestrian
+727,Malahide Rd @ N32,53.40285,-6.180071,Junction
+728,Richmond Rd @ Grace Park Rd,53.367475,-6.250821,Pedestrian
+729,Cork St @ Ardee St,53.33867,-6.279439,Junction
+730,Faussagh Ave @ Church,53.367229,-6.295876,Pedestrian
+731,Faussagh Rd @ GAA Club,53.365371,-6.28926,Pedestrian
+733,Cork St @ Donore Ave/Marrowbone Lane,53.33731,-6.285952,Junction
+734,Alfie Byrne Rd @ East Pt Business Pk,53.359634,-6.23199,Junction
+735,Malahide Rd @ Grove Lane,53.401637,-6.18076,Pedestrian
+736,Brookwood Ave,53.38053,-6.200682,Pedestrian
+737,Brookwood Rise,53.3785,-6.193925,Pedestrian
+738,Tyrconnell Rd @ Jamestown Rd,53.3348,-6.327736,Junction
+739,Irishtown Rd  @ Health Centre,53.341177,-6.225904,Pedestrian
+740,Grace Park Rd @ Rosmini,53.371688,-6.245034,Pedestrian
+741,North King St / Queen St,53.349914,-6.280252,Junction
+742,Brunswick St @ Georges Lane,53.35053,-6.279824,Junction
+743,Blackhall Place @ Blackhall St,53.348685,-6.281942,Junction
+744,St Stephens Green @ Newman Church,53.336755,-6.259887,Pedestrian
+745,Ballymun Rd @ Shangan / Shopping Centre,53.396547,-6.264009,Junction
+746,North Wall Quay @ Excise Walk,53.347801,-6.243842,Pedestrian
+747,Main St Raheny @ Watermill Rd,53.378886,-6.175693,Junction
+748,Howth Rd Raheny @  St Assams Rd West/Bank of Ireland,53.380328,-6.172593,Pedestrian
+749,SCR @ Bloomfield Ave,53.332292,-6.271578,Pedestrian
+750,Drumcondra Rd @ Botanic Ave,53.367407,-6.255393,Junction
+751,SCR @ Washington St,53.331356,-6.279351,Pedestrian
+752,Kildare Rd @ Bangor Rd,53.324936,-6.302289,Junction
+753,Black Hall St @ Queen St,53.348446,-6.279865,Pedestrian
+754,Cork St @ Coombe Hospital,53.335369,-6.289478,Pedestrian
+755,Ballymun Rd @ Gateway Crescent Nth/Sth,53.394225,-6.264055,Junction
+756,Ballyfermot Rd @ Le Fanu Rd,53.342419,-6.356215,Junction
+757,North Brunswick St @ School,53.350682,-6.276794,Pedestrian
+758,Leeson St Fitzwilliam Pl @ Adelaide Rd,53.33234,-6.253252,Junction
+759,Cork St / St Lukes Ave / Brabazon St,53.338735,-6.277968,Pedestrian
+760,Blackhall St Bridge @ Ushers Island (Joyce Bridge South),53.346298,-6.281997,Junction
+761,Blackhall St Bridge @ Ellis Quay (Joyce Bridge North),53.346885,-6.282501,Junction
+762,Ballyfermot Rd @ De La Salle School,53.342289,-6.343675,Pedestrian
+763,Ballymun Rd @ Hampstead Ave,53.380966,-6.265633,Pedestrian
+764,Leeson St @ CUS,53.33489,-6.255917,Pedestrian
+765,Mount St @ Love Lane,53.338381,-6.242184,Pedestrian
+766,Edenmore Village @ Shops,53.388245,-6.182148,Pedestrian
+767,Longmile Rd @ School ITT & OOT,53.328482,-6.343767,Junction
+768,Davitt Rd @ Lansdowne Valley Pake Ped Crossing (LUAS),53.334212,-6.326618,Pedestrian
+769,Davitt Rd @ Kilworth Rd (LUAS),53.334362,-6.325109,Junction
+770,Davitt Rd @ Sperrin Rd Ped Crossing (LUAS),53.335275,-6.317469,Pedestrian
+771,James St @ Stevens Lane (LUAS),53.343241,-6.290989,Junction (Luas)
+772,Benburb St @ Temple Street West (LUAS),53.348054,-6.289722,Junction (Luas)
+773,Benburb St @ Queen St (LUAS),53.347183,-6.280159,Junction (Luas)
+774,Smithfield Crossing (LUAS),53.347156,-6.278311,Junction (Luas)
+775,Bow Street Crossing (LUAS),53.347111,-6.276985,Junction (Luas)
+776,Church St @ Chancery St (LUAS),53.34707,-6.274992,Junction (Luas)
+777,Chancery St @ Chancery Place (LUAS),53.346801,-6.272844,Junction (Luas)
+778,Chancery St @ Arran Street East (LUAS),53.3469,-6.27047,Junction (Luas)
+780,Adelaide Road @ Hospital,53.332423,-6.256284,Pedestrian
+781,Milltown Rd @ College Entrance  (Richmond St South) (LUAS),53.310512,-6.252027,Junction (Luas)
+782,O Connell St @ Princes St North,53.34907,-6.26005,Pedestrian
+783,Bulfin Rd @ The Shops,53.339761,-6.315052,Pedestrian
+785,N32 @ Bewleys,53.404056,-6.183694,Junction
+786,Templeogue Rd @ Lakeland Pk,53.305697,-6.290874,Pedestrian
+787,Coolock Village @ Ulster Bank,53.387864,-6.200876,Pedestrian
+788,Galtymore @ The Shops,53.334098,-6.319621,Pedestrian
+789,Gilford Rd Ped,53.330668,-6.215795,Pedestrian
+790,Sandymount Rd Ped,53.335657,-6.219877,Pedestrian
+791,Howth Rd @ Hollybrook Park,53.366857,-6.218631,Junction
+792,Wellmount Rd @ St Michaels School,53.386824,-6.301781,Pedestrian
+793,Essex Quay @ Exchange St Lower,53.345225,-6.268957,Pedestrian
+794,Kilbarrack Rd @ The Dart Station,53.389946,-6.156479,Pedestrian
+795,Chapelizod road @ King's hall (ped),53.347516,-6.341208,Pedestrian
+796,Eden Quay,53.347939,-6.257392,Junction (Luas)
+797,Malahide Rd / Clare Hall Shopping Centre,53.400925,-6.181884,Junction
+798,Ballyboggan Rd @ Ratoath Rd,53.376811,-6.309315,Junction
+799,Kylemore Rd @ New Access Road to Jamestown Rd #,53.334957,-6.346318,Junction
+800,Killeen Rd @ Park West Ind Est,53.332933,-6.355783,Junction
+801,St Stephens Green @ Hume St,53.337983,-6.255803,Junction
+802,Collins Ave @ Clanawley Rd,53.373101,-6.20985,Pedestrian
+803,Priorswood Rd @ Buttercup Park,53.397814,-6.188098,Pedestrian
+805,Springdale Rd @ St Josephs Hospital,53.382742,-6.179632,Pedestrian
+806,Nutley Lane @ St Vincents Hospital,53.317579,-6.215505,Junction
+807,"City Quay, Lombard St",53.346625,-6.247754,Nested Pelican
+808,Custom House Quay @ Sean O'Casey Bridge,53.34805,-6.247896,Pedestrian
+809,Vernon Ave @ CRC,53.370071,-6.201194,Pedestrian
+810,Cardiffsbridge Rd @ Deanstown Ave,53.383593,-6.311929,Pedestrian
+811,Howth Rd @ Ennafort Park,53.377431,-6.187251,Pedestrian
+812,Merrion Rd @ Sydney Parade Ave,53.319423,-6.213612,Pedestrian
+813,Park West Ave @ Park West,53.331508,-6.373196,Pedestrian
+814,Bunratty Rd @ Civic Centre,53.393521,-6.207428,Pedestrian
+815,McKelvey Rd /St Margarets Rd,53.399501,-6.303154,Pedestrian
+816,DPT 1,53.353347,-6.223352,Junction
+817,DPT 2,53.354299,-6.224464,Junction
+818,DPT 3,53.354893,-6.221744,Junction
+819,Grand Canal St @ Barrow St,53.338312,-6.236822,Pedestrian
+820,Glin Rd @ Macroom Rd,53.399339,-6.205722,Pedestrian
+821,Jamestown Rd @ Sycamore Rd,53.39626,-6.293222,Junction
+822,N32 / Clonshaugh Rd,53.409815,-6.214359,Junction
+826,Ballyfermot Rd @ Lidl,53.343796,-6.372084,Junction
+828,Ballymun Rd @ Civic Offices,53.395693,-6.264074,Pedestrian
+830,Swords Rd @ Whitehall Church,53.384077,-6.243644,Pedestrian
+832,Fairview Strand @Richmond Rd,53.362401,-6.242117,Junction
+833,Pearse St @ Bolands Bridge Ped,53.342392,-6.239451,Junction
+834,M1/Coolock Interchange Ramp,53.398108,-6.238685,Junction
+835,Swords Rd Nthbnd @ Tunnel Portal,53.396273,-6.23979,Junction
+836,Waterloo Rd @ Burlington Rd,53.33118,-6.244276,Pedestrian
+838,St Johns Rd @ Heuston S.Q.,53.34562,-6.299146,Junction
+839,Clontarf Rd @ Dollymount Park,53.362898,-6.178408,Nested Pelican
+840,Capel St @ Mary St,53.348519,-6.268828,Pedestrian
+841,Blunden Drive @ Darndale Roundabout,53.397227,-6.185557,Pedestrian
+842,NCR @ Mater hospital,53.360485,-6.267528,Pedestrian
+843,Conyngham Rd @ Phoenix Park,53.348227,-6.301249,Pedestrian
+844,Herbert Park @ The Park,53.328194,-6.233883,Pedestrian
+845,Highfield Rd @ the church,53.312345,-6.272627,Pedestrian
+846,Anglesea Rd Ped,53.321519,-6.23054,Pedestrian
+848,Rock Rd @ Elm Park,53.313819,-6.202828,Junction
+849,Ranelagh Rd @ Luas Station,53.326105,-6.255747,Pedestrian
+850,East Rd @ Church Rd,53.35254,-6.232209,Junction
+851,Darndale @ Community Centre,53.400937,-6.194885,Pedestrian
+852,Berkley St @ Nelson St,53.356739,-6.267994,Pedestrian
+853,Collins Ave East @ Clancarthy Rd,53.375017,-6.217651,Pedestrian
+854,Merrion Road @ Merlyn Drive,53.322293,-6.218318,Pedestrian
+855,Seville Place @ Ferrymans Crossing,53.351259,-6.24203,Pedestrian
+856,Guild St @ Sheriff St,53.350533,-6.240965,Junction
+857,Oscar Traynor Road @ Oscar Traynor Woods ,53.39716,-6.233133,Pedestrian
+858,Oscar Traynor Rd @ Larch Hill Estate,53.397761,-6.226959,Junction
+859,Hole in the Wall Road @ Clongriffen Road,53.402576,-6.162162,Junction
+860,Mayor Street @ Commons Street,53.349617,-6.245754,Junction (Luas)
+861,Mayor Street @ Guild Street,53.349119,-6.240669,Junction (Luas)
+862,Mayor Street @ National Conference Centre,53.348935,-6.23893,Junction (Luas)
+863,Mayor Street @ Spencer Dock West,53.348839,-6.237784,Junction (Luas)
+865,Mayor Street @ New Wapping St,53.348704,-6.235304,Junction (Luas)
+866,Mayor Street @ Castleforbes Rd,53.348557,-6.23209,Junction (Luas)
+867,Mayor Street @ The Point,53.348304,-6.229728,Junction (Luas)
+868,Sir John Rogersons Quay @ Macken St Bridge,53.346194,-6.240836,Junction
+870,Macken St @ Hanover St,53.344494,-6.240785,Junction
+872,Hole in the Wall Road @ Father Collins Park,53.405933,-6.163208,Pedestrian
+873,North Wall Quay @ Spencer Dock,53.347406,-6.238067,Junction
+874,Clonshaugh Rd Pedestrian Crossing,53.407418,-6.21543,Pedestrian
+875,Malahide Road @ Belmayne,53.406538,-6.177219,Junction
+876,Main St Chapelizod,53.347516,-6.341208,Pedestrian
+877,Kylemore Rd @ Canal Bridge,53.332056,-6.3464,Pedestrian
+878,Balbutcher Lane South/Carrig Rd,53.399558,-6.276004,Junction
+879,North King St@Red Cow Lane Ped,53.349755,-6.277562,Pedestrian
+880,Raheny Rd @ Belmont Park,53.3852,-6.175073,Pedestrian
+882,Baggot St @ Herbert Place,53.334415,-6.245636,Junction
+883,Charlemont St @ Charlemont Mall,53.330511,-6.260438,Nested Pelican
+884,NCR @ Marlborough Rd,53.355094,-6.293402,Pedestrian
+885,Eccles St @ The Hospital,53.358562,-6.26723,Pedestrian
+886,Harmonstown Rd / Springdale Rd,53.383949,-6.183638,Junction
+888,Clare Hall Ave East of Malahide Road,53.40229,-6.176476,Pedestrian
+889,Clare Hall Belmayne West of Roundabout,53.401673,-6.171253,Pedestrian
+890,Grange road @ hole in the wall rdb east & south,53.398172,-6.161157,Pedestrian
+891,Cedar Brook Ave / Barneville Walk,53.335706,-6.380298,Junction
+892,Clanbrasil St @ Lombard St West,53.333919,-6.274917,Pedestrian
+893,Sir John Rogersons Quay @ Forbes St,53.345953,-6.237992,Junction
+894,James's Walk @ Reuben St,53.338241,-6.293221,Pedestrian
+895,Kevin St Upper Pedestrian,53.338672,-6.271996,Pedestrian
+896,Castle Ave @ Vernon Ave,53.370145,-6.203001,Pedestrian
+897,North Wall Quay @ New Wapping St,53.347478,-6.235535,Junction
+898,North Wall Quay @ The Point Depot,53.346938,-6.230158,Junction
+899,Santry Ave / Northwood,53.400106,-6.257649,Junction
+900,Santry Ave @ Aldi,53.398854,-6.250999,Pedestrian
+901,Santry Ave @ Heiton Buckley,53.397775,-6.246764,Pedestrian
+902,NCR @ New Hospital Entrance,53.360221,-6.265651,Pedestrian
+904,East Wall Rd @ Church Rd,53.356885,-6.231852,Junction
+905,Ratoath Rd @ Tolka Valley Cycle Park,53.379054,-6.314165,Pedestrian
+906,Drumcondra Rd @ St Patricks College / Skylon Hotel,53.372201,-6.252868,Pedestrian
+908,Burgh Quay / Marlborough St,53.347342,-6.25728,Junction (Luas)
+909,Thomas St West @ Crane Street,53.343357,-6.282958,Pedestrian
+910,Emmet Rd @ Vincent St West,53.339706,-6.318105,Pedestrian
+911,Kildare St @ Molesworth St,53.340806,-6.255314,Junction
+912,Ratoath Rd @ Drumcliffe Rd,53.364189,-6.299197,Pedestrian
+913,Ratoath Rd @ St Catherines,53.370475,-6.306385,Pedestrian
+914,Oscar Traynor @ Barryscourt Road,53.39448,-6.212434,Junction
+915,Beaumont Road @ Beaumont Grove,53.384712,-6.236145,Junction
+916,Fassaugh Road @ Connaught St,53.363636,-6.281263,Pedestrian
+917,Swords Road / Magenta Crescent,53.395157,-6.24539,Pedestrian
+918,Griffith Ave@ Educate Together School,53.379147,-6.269747,Pedestrian
+919,Dawson St / Moleworth St ped,53.34099,-6.258309,Pedestrian (Luas)
+920,Dawson St / Duke St ped,53.341779,-6.258082,Pedestrian (Luas)
+921,Westmoreland St / Fleet St,53.345836,-6.259321,Junction
+922,O'Connell St / Savoy ped,53.351222,-6.260882,Pedestrian (Luas)
+923,Marlborough St / Parnell St,53.35337,-6.25966,Junction (Luas)
+924,Marlborough St / Talbot St,53.399607,-6.26408,Junction (Luas)
+925,Parnell St / Dominic St,53.350921,-6.265119,Junction (Luas)
+926,"North Circular Road, Ped",53.359757,-6.278523,Pedestrian
+927,Cabra Rd Ped,53.3609,-6.27929,Pedestrian
+928,Constitution Hill @ Preband Street,53.353482,-6.272999,Junction
+929,Prebend St/ Bus Eireann Bus Garage,53.353656,-6.274314,Junction
+930,Chapelizod Bypass @ Kylemore Rd,53.349823,-6.354442,Junction
+931,Collins Avenue East @ Killester College,53.371392,-6.20727,Pedestrian
+932,Bolton Street@Henrietta Street,53.352372,-6.26894,Pedestrian
+933,South Circular Road @ Dufferin (Mosque),53.331186,-6.281252,Pedestrian
+934,Howth Road @ All Saints Road,53.376483,-6.190527,Pedestrian
+935,Sheriff Street Upper @ New Road,53.349739,-6.229505,Junction
+936,Bachelors Walk Bus Gate,53.347184,-6.261005,Junction
+937,Clontarf Road @ St. Annes Park @ The Pond,53.371571,-6.166918,Pedestrian
+938,Balbutcher Lane @ Shangan Road,53.397635,-6.266166,Junction
+939,Grange Road @ hole in the Wall RDB West,53.399028,-6.162248,Junction
+940,Morehampton Road @ Donnybrook Fair,53.324275,-6.239914,Pedestrian
+941,Hanover Street East @ Creighton Street,53.345299,-6.24635,Pedestrian
+942,River Road @ Ratoath Rd,53.377845,-6.31232,Pedestrian
+943,Stillorgan Road / RTE,53.314754,-6.225972,Junction
+944,Stillorgan Road / RTE Ped,53.315875,-6.227737,Junction
+945,Crumlin Village @ Windmill Road,53.320587,-6.315907,Junction
+946,Clontarf Road @ Dollymount Ave,53.364363,-6.17638,Nested Pelican
+947,Balbutcher Lane @ Poppintree,53.403,-6.27386,Pedestrian
+948,Ratoath Road @ Fassaugh Avenue,53.367086,-6.302202,Pedestrian
+949,River Rd @ Ashtown,53.377472,-6.332771,Pedestrian
+950,Sybil Hill @ St Annes Park,53.372142,-6.194285,Pedestrian
+951,Kylemore Road @ Kylemore College,53.345073,-6.350855,Pedestrian
+952,Tonlegee Road St Monicas,53.391046,-6.175185,Pedestrian
+953,Balbutcher Lane @ Hampton Wood,53.40352,-6.28213,Junction
+954,Kimmage Road / Ravensdale Park,53.313841,-6.297452,Junction
+955,Belmayne Temp School - Toucan crossing,53.40259,-6.17052,Pedestrian
+956,Grangegorman @ Marne Villa,53.355796,-6.27816,Pedestrian
+957,"BroomBridge Shuttle, Royal Canal Cycle way",53.373109,-6.299807,Junction
+958,Grangegorman @ St Brendans Way,53.354586,-6.278648,Pedestrian
+959,Sandymount Green @ Claremount Road,53.332055,-6.215755,Pedestrian
+960,Sandymount Green @ East Side Shops,53.332071,-6.214829,Pedestrian
+961,Port Tunnel - Metering Ramp,53.407162,-6.228414,Junction
+962,Dolphins Barn Street Rueben Street,53.334163,-6.290199,Pedestrian
+963,Barrow st @ Google (shuttle),53.338985,-6.236767,Junction
+964,North Circular Road @ TUD,53.357519,-6.286843,Pedestrian
+965,Hole in the Wall Rd  / Marsfield Rd / Belmayne,53.40817,-6.16199,Junction
+966,Cabra Road at Carnlough Road,53.361571,-6.293466,Junction
+967,Beach Road @Sean Moore Road @Cranfield Place,53.3375,-6.2195,Junction
+968,Bride St / Bride Road,53.341474,-6.270088,Junction
+970,Sillogue Rd / Sillogue Ave / Holy Spirit NS,53.39494,-6.27056,Pedestrian
+971,Shantalla Road @ Swords Road,53.387778,-6.240063,Junction
+972,Ballygall Road East @ Johnstown Pk,53.385382,-6.278343,Pedestrian
+973,Sillogue Road Sillogue Ave- Sillogue Gardens,53.392598,-6.266479,Pedestrian
+974,Blackhorse Ave @ Nephin Road,53.362777,-6.311751,Pedestrian
+975,Winetavern St @ Cook St Ped,53.344357,-6.271742,Pedestrian
+976,Clontarf Rd @ St Anthonys Church,53.36246,-6.217855,Pedestrian
+977,Griffith Avenue @ Griffith Wood,53.371449,-6.235359,Junction
+978,Ballyboggan Road@ Broombridge Road,53.3758,-6.29984,Pedestrian
+979,Mary's Lane @ George's Hill,53.348314,-6.27144,Pedestrian
+980,Parnell Street @ Hill St,53.353727,-6.258049,Junction
+983,Belmayne Main St @ Belmayne Ave,53.403327,-6.170466,Junction
+988,Sundrive Road @ Ferns Road,53.32347,-6.295342,Pedestrian
+989,Armagh Rd @ Scoil Colm and Scoil Eoin,53.320416,-6.307309,Pedestrian
+990,Parnell Road @ Aughavanagh Road,53.331018,-6.288054,Pedestrian
+991,Brookwood Ave @ Gracefield Rd,53.382374,-6.201839,Junction
+992,Coolock Drive @ Bunratty Rd,53.39273,-6.204484,Junction
+994,M50 J2 Interchange South @ R104 Coolock Lane,53.397541,-6.237475,Junction
+995,Cherry Orchard Avenue @ Blackditch Road,53.337473,-6.373371,Pedestrian
+997,Grace Park Road @ Ierne Social and Sports Club,53.368316,-6.249754,Pedestrian
+1002,Heuston Station Access (Luas),53.347145,-6.291381,Junction (Luas)
+1003,Clontarf Road @ Howth Road,53.364307,-6.228011,Junction
+1005,Toucan @ Marino Mart,53.364079,-6.232259,Pedestrian
+1006,Toucan @ Annesley Bridge Road,53.361077,-6.238493,Pedestrian
+1007,Alfie Byrne Toucan,53.35834,-6.233674,Pedestrian
+1008,Russell St Ped,53.360037,-6.253712,Pedestrian
+1009,Rathmines Road Upper @ Kildare Place School Ped,53.318717,-6.264379,Pedestrian
+1011,Aston Quay @ Aston Place,53.346584,-6.260696,Junction
+1012,Anglesea Rd @ RDS Ped,53.327562,-6.230879,Pedestrian
+1013,Priorswood Rd @ The Link Road,53.398547,-6.194409,Junction

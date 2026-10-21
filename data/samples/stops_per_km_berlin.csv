@@ -1,0 +1,1478 @@
+way_id,name,highway,length_km,stops_fwd,stops_bwd,stops_per_km_fwd,stops_per_km_bwd
+4067957,Schöneicher Straße,secondary,0.418,1.5,1.5,3.59,3.59
+4071961,Hauptstraße,primary,0.153,0.0,0.0,0.00,0.00
+4323788,Kronprinzessinnenweg,secondary,0.176,0.0,1.0,0.00,5.69
+4381079,Konrad-Adenauer-Straße,tertiary,0.150,0.5,1.0,3.34,6.67
+4381082,Heinrich-von-Gagern-Straße,tertiary,0.181,1.5,3.0,8.30,16.61
+4396321,Kantstraße,secondary,0.066,1.0,,15.09,
+4396816,Lehrter Straße,residential,0.147,0.0,0.0,0.00,0.00
+4399612,John-Foster-Dulles-Allee,tertiary,0.199,0.0,0.0,0.00,0.00
+4411244,Tunnel Tiergarten Spreebogen,trunk,0.497,0.0,,0.00,
+4412930,Paul-Löbe-Allee,tertiary,0.083,0.5,,6.05,
+4422232,Havelchaussee,tertiary,0.465,0.0,0.5,0.00,1.08
+4424237,Königstraße,primary,1.913,0.5,0.0,0.26,0.00
+4425425,Am Postfenn,tertiary,1.397,0.5,0.0,0.36,0.00
+4431631,Jesse-Owens-Allee,tertiary,0.111,0.5,1.0,4.49,8.97
+4441630,Behlertstraße,tertiary,0.223,0.0,,0.00,
+4441941,Kohlhasenbrücker Straße,tertiary,0.830,0.0,0.0,0.00,0.00
+4442443,Stahnsdorfer Damm,residential,0.371,0.0,0.0,0.00,0.00
+4449164,Gatower Straße,secondary,0.205,0.5,0.0,2.44,0.00
+4453022,Behlertstraße,tertiary,0.141,0.5,1.0,3.55,7.11
+4484163,Königsweg,tertiary,0.142,0.5,0.0,3.52,0.00
+4484427,Prenzlauer Allee,primary,0.050,1.0,,19.89,
+4515873,Nußbaumallee,residential,0.267,1.5,2.0,5.61,7.48
+4515878,Kastanienallee,residential,0.315,2.0,2.5,6.35,7.94
+4515880,Branitzer Platz,residential,0.352,2.0,,5.68,
+4515884,Nußbaumallee,residential,0.069,0.5,0.5,7.24,7.24
+4555285,Passenheimer Straße,tertiary,0.240,1.5,1.0,6.24,4.16
+4581760,Olympischer Platz,residential,0.085,0.5,,5.90,
+4588826,Heerstraße,residential,0.909,2.5,,2.75,
+4606258,Kollwitzstraße,residential,0.102,1.0,0.0,9.82,0.00
+4609242,Straße des 17. Juni,primary,0.051,0.0,,0.00,
+4609244,Straße des 17. Juni,primary,0.053,0.0,,0.00,
+4610362,Monbijouplatz,tertiary,0.125,0.0,,0.00,
+4610476,Georgenstraße,residential,0.112,0.0,,0.00,
+4611699,Unter den Linden,primary,0.129,0.5,,3.87,
+4613293,Max-Beer-Straße,residential,0.153,0.0,0.0,0.00,0.00
+4613294,Schendelgasse,residential,0.067,0.5,0.5,7.49,7.49
+4613295,Almstadtstraße,residential,0.197,1.0,0.5,5.08,2.54
+4613298,Hirtenstraße,residential,0.103,0.5,1.0,4.86,9.71
+4613299,Weydingerstraße,residential,0.184,1.5,2.0,8.17,10.89
+4613300,Linienstraße,residential,0.269,1.0,0.5,3.72,1.86
+4613308,Memhardstraße,tertiary,0.075,1.0,,13.36,
+4616170,Insterburgallee,residential,0.253,1.0,1.0,3.95,3.95
+4631474,Gaudystraße,residential,0.288,0.5,0.5,1.73,1.73
+4631478,Milastraße,residential,0.077,0.0,0.5,0.00,6.49
+4631988,Dolomitenstraße,residential,0.294,1.0,0.5,3.41,1.70
+4631994,Maximilianstraße,residential,0.110,0.5,0.0,4.54,0.00
+4632867,Neue Schönholzer Straße,residential,0.203,0.0,0.0,0.00,0.00
+4642338,Bahnhofstraße,residential,0.476,0.0,0.5,0.00,1.05
+4684083,Zepernicker Landstraße,residential,0.599,0.0,1.0,0.00,1.67
+4686103,Oberbaumbrücke,secondary,0.150,0.0,,0.00,
+4694754,Heerstraße,residential,0.067,0.5,,7.46,
+4696043,Landsberger Allee,primary,0.152,0.0,0.0,0.00,0.00
+4696044,Landsberger Allee,primary,0.143,0.0,0.0,0.00,0.00
+4696052,Landsberger Allee,primary,0.079,0.0,0.0,0.00,0.00
+4728982,Tannenstraße,residential,0.208,1.5,1.5,7.22,7.22
+4741948,Holzmarktstraße,secondary,0.284,1.0,,3.52,
+4752924,Am Großen Wannsee,residential,0.132,0.5,,3.79,
+4764190,Grabbeallee,primary,0.085,1.0,,11.76,
+4764209,Grabbeallee,primary,0.077,1.0,,12.98,
+4764689,Dietzgenstraße,primary,0.057,2.0,1.0,35.27,17.63
+4770321,Badeweg,residential,0.137,1.0,0.0,7.28,0.00
+4773486,B 1,primary,0.129,0.0,0.0,0.00,0.00
+4776166,Stiftsweg,tertiary,0.223,0.0,,0.00,
+4776200,,primary_link,0.215,1.0,,4.65,
+4776204,Breite Straße,secondary,0.067,1.0,,14.92,
+4776650,Schloßallee,residential,0.438,1.0,0.5,2.29,1.14
+4777063,Marienstraße,tertiary,0.370,0.0,0.0,0.00,0.00
+4777091,Hermann-Hesse-Straße,primary,0.076,0.0,0.0,0.00,0.00
+4777674,Friedrich-Engels-Straße,tertiary,0.187,0.0,0.0,0.00,0.00
+4777754,Leipziger Straße,primary,0.073,0.0,0.0,0.00,0.00
+4777758,An der Vorderkappe,residential,0.105,0.5,1.0,4.75,9.51
+4778084,Schopenhauerstraße,residential,0.202,0.0,0.0,0.00,0.00
+4778737,Kohlhasenbrücker Straße,tertiary,0.085,0.0,0.5,0.00,5.86
+4779145,Friedrich-Ebert-Straße,residential,0.227,2.5,,11.00,
+4782514,Holzmarktstraße,secondary,0.199,0.0,,0.00,
+4782524,Greifswalder Straße,primary,0.189,0.5,,2.64,
+4790799,Tunnel Alexanderplatz,primary,0.243,0.0,,0.00,
+4790809,Tunnel Alexanderplatz,primary,0.299,0.0,,0.00,
+4790813,Mollstraße,primary,0.114,2.0,,17.58,
+4804320,B 96a,primary,0.057,0.5,0.0,8.78,0.00
+4804321,B 96a,primary,0.147,0.0,0.0,0.00,0.00
+4804323,Clara-Zetkin-Straße,primary,0.377,1.5,1.5,3.98,3.98
+4810934,Königstraße,primary,0.115,0.0,,0.00,
+4810935,Königstraße,primary,0.056,0.0,,0.00,
+4905712,L 402,secondary,0.249,0.0,0.5,0.00,2.01
+4906455,Rotberger Straße,secondary,0.197,0.0,0.5,0.00,2.54
+5051951,Mühlenstraße,residential,0.117,0.0,1.0,0.00,8.51
+5211193,Am Sportplatz,secondary,0.150,0.0,0.0,0.00,0.00
+5399870,L 292,secondary,2.429,0.0,0.0,0.00,0.00
+5399910,Schönfelder Straße,secondary,0.102,0.5,0.5,4.89,4.89
+5653443,Weesower Straße,secondary,0.120,0.5,1.0,4.17,8.34
+5658564,Schönfelder Straße,tertiary,0.067,0.5,0.0,7.44,0.00
+5733119,Florastraße,residential,0.213,0.5,0.5,2.35,2.35
+5738959,Summter Straße,residential,0.368,1.0,1.5,2.71,4.07
+6191326,Mühlenstraße,secondary,0.160,0.0,0.0,0.00,0.00
+6191333,Altstadt,residential,0.100,0.0,0.0,0.00,0.00
+6573924,Lindenstraße,residential,0.283,2.5,2.0,8.84,7.07
+6631673,B 2,primary,0.191,0.0,0.0,0.00,0.00
+6639674,Potsdamer Straße,secondary,0.110,0.5,0.5,4.56,4.56
+7385238,Dorfstraße,secondary,0.265,0.0,0.5,0.00,1.88
+7726220,Dorfstraße,tertiary,0.544,0.5,1.0,0.92,1.84
+7996027,Karower Weg,residential,0.115,1.0,,8.73,
+8149654,Schwedter Straße,residential,0.137,0.5,0.5,3.66,3.66
+8149657,Choriner Straße,residential,0.054,1.0,2.0,18.68,37.37
+8149663,Wörther Straße,residential,0.220,0.5,1.0,2.27,4.55
+8658094,Behmstraße,tertiary,0.135,0.0,,0.00,
+8893073,Sputendorfer Straße,tertiary,0.499,0.5,1.0,1.00,2.00
+9161791,Groß Kienitzer Landstraße,secondary,0.872,0.0,0.0,0.00,0.00
+9188885,Heidelberger Straße,residential,0.144,0.5,,3.47,
+9189983,Krontaler Straße,residential,0.165,0.5,0.0,3.03,0.00
+9364960,Hauptstraße,tertiary,0.113,0.5,0.0,4.41,0.00
+9702843,Josef-Nawrocki-Straße,residential,0.067,0.0,,0.00,
+9708746,Birkholzer Chaussee,secondary,0.733,0.0,0.5,0.00,0.68
+9708759,Schwanebecker Straße,secondary,0.053,0.0,0.0,0.00,0.00
+9708762,Schwanebecker Straße,secondary,0.065,0.0,0.0,0.00,0.00
+9808048,Allee nach Sanssouci,residential,0.105,0.0,0.5,0.00,4.77
+9857734,Altlandsberger Weg,unclassified,1.535,1.0,0.0,0.65,0.00
+9873997,Heerstraße,residential,0.233,1.0,,4.29,
+9887761,Allee nach Glienicke,tertiary,0.308,0.5,0.0,1.62,0.00
+9890815,Straße der Einheit,residential,0.070,0.5,,7.13,
+10416378,Schönwalder Chaussee,secondary,0.079,0.5,0.0,6.31,0.00
+10416383,Röbellweg,residential,0.318,0.0,0.0,0.00,0.00
+10422731,Lankestraße,residential,0.111,1.0,0.5,8.97,4.49
+10422818,Wannseestraße,residential,0.082,1.0,0.5,12.25,6.12
+10649206,Michendorfer Chaussee,primary,0.806,0.0,0.0,0.00,0.00
+10649210,Michendorfer Chaussee,primary,0.076,0.0,0.0,0.00,0.00
+10654885,Hans-Thoma-Straße,tertiary,0.126,0.5,,3.98,
+10654946,Am Neuen Garten,tertiary,0.169,1.0,1.0,5.92,5.92
+10654982,Reiterweg,tertiary,0.146,0.0,1.0,0.00,6.83
+10790842,Bernauer Damm,secondary,0.108,0.0,0.0,0.00,0.00
+10855364,Müggelheimer Damm,secondary,0.080,1.0,0.0,12.43,0.00
+11114397,Stargarder Straße,residential,0.219,1.0,0.5,4.56,2.28
+11284123,Erich-Weinert-Straße,residential,0.504,2.0,3.0,3.97,5.95
+11286305,Am Stadtrand,residential,0.354,2.0,2.5,5.65,7.06
+11844421,Rathenower Straße,secondary,0.164,0.5,,3.05,
+12613415,Oranienburger Straße,primary,0.126,0.0,0.0,0.00,0.00
+12678107,Großbeerenstraße,residential,0.194,3.0,1.0,15.45,5.15
+12691799,Zeppelinstraße,primary,0.926,2.5,3.0,2.70,3.24
+13009355,Zur Historischen Mühle,tertiary,0.086,0.5,2.5,5.82,29.09
+13864477,Templiner Straße,tertiary,0.114,0.0,0.0,0.00,0.00
+13884694,Lindenstraße,tertiary,0.075,0.5,0.5,6.66,6.66
+13884767,Friedrich-Ebert-Straße,tertiary,0.485,0.5,0.5,1.03,1.03
+14153206,Hobrechtsfelder Weg,residential,0.234,0.0,0.0,0.00,0.00
+15102751,Chausseestraße,primary,0.254,0.5,0.5,1.97,1.97
+15221133,Bahnhofstraße,secondary,0.227,0.0,1.0,0.00,4.40
+15224007,Mühlenbecker Chaussee,secondary,0.072,0.0,0.0,0.00,0.00
+15242401,Buchhorster Straße,secondary,0.080,0.5,0.0,6.22,0.00
+15564869,Olympische Straße,secondary,0.062,1.0,0.0,16.15,0.00
+15564871,Olympische Straße,secondary,0.055,0.0,0.0,0.00,0.00
+15971197,Schloßbrücke,primary,0.050,0.0,,0.00,
+16266681,Königsteinstraße,residential,0.179,0.0,0.5,0.00,2.80
+16416331,Hauptstraße,secondary,0.405,0.0,0.0,0.00,0.00
+17267888,Berliner Straße,primary,0.328,1.0,,3.05,
+18295286,Dorfstraße,secondary,0.200,0.5,,2.50,
+19383842,Heinrich-Schlusnus-Straße,residential,0.071,0.0,1.0,0.00,14.04
+20164468,Heerstraße,primary,0.078,2.0,,25.54,
+20551555,L 211,secondary,0.103,0.0,0.5,0.00,4.84
+20551556,K 6503,tertiary,0.061,1.0,0.5,16.46,8.23
+20551558,L 21,secondary,1.037,0.0,1.0,0.00,0.96
+20551562,,secondary,0.106,0.0,,0.00,
+20816888,Karl-Liebknecht-Straße,tertiary,1.103,0.5,0.5,0.45,0.45
+20821966,Hauptstraße,primary,0.220,2.0,1.0,9.07,4.54
+20821971,Blankenfelder Chaussee,primary,0.488,2.0,,4.10,
+20821973,Dietzgenstraße,primary,0.177,0.5,,2.83,
+20821975,Blankenfelder Chaussee,primary,0.496,1.0,,2.02,
+20821980,Schönfließer Straße,primary,0.308,0.5,1.0,1.62,3.25
+20850571,An der Vorderkappe,residential,0.220,0.5,,2.27,
+22045147,Suermondtstraße,secondary,0.507,0.5,,0.99,
+22055007,Holzmarktstraße,secondary,0.056,0.0,,0.00,
+22055263,Holzmarktstraße,secondary,0.164,0.0,,0.00,
+22762349,Chris-Gueffroy-Allee,residential,0.056,0.0,0.0,0.00,0.00
+22768986,Beermannstraße,residential,0.085,0.0,0.0,0.00,0.00
+22875770,An der Wuhlheide,secondary,0.147,0.0,,0.00,
+22888475,Im Haselwinkel,residential,0.090,0.5,0.5,5.54,5.54
+22910280,Alt Kleinziethen,tertiary,0.226,1.0,0.0,4.42,0.00
+22929672,Bernauer Damm,secondary,1.446,0.0,0.0,0.00,0.00
+22955116,Teufelsseestraße,residential,0.376,1.0,1.5,2.66,3.99
+22972473,Charlottenstraße,residential,0.052,1.0,3.0,19.09,57.28
+23018563,Heerstraße,unclassified,0.364,2.0,,5.49,
+23033698,Straße zum Müggelturm,unclassified,0.951,0.0,1.0,0.00,1.05
+23035699,Liebenwalder Straße,secondary,0.199,0.0,0.5,0.00,2.51
+23043049,An der Pirschheide,residential,0.144,0.0,1.0,0.00,6.94
+23045205,Waldmüllerstraße,residential,0.192,0.0,0.5,0.00,2.60
+23045208,Lankestraße,residential,0.075,0.0,0.0,0.00,0.00
+23045210,Königstraße,primary,0.217,0.0,0.0,0.00,0.00
+23045306,Sakrower Landstraße,unclassified,0.118,0.0,0.5,0.00,4.24
+23062709,Alte Lanker Straße,secondary,0.292,0.5,0.5,1.71,1.71
+23062711,Fichtestraße,residential,0.241,1.0,1.0,4.15,4.15
+23093537,Schillerstraße,residential,0.077,0.0,1.0,0.00,13.03
+23109081,Kronprinzessinnenweg,secondary,0.230,0.0,0.0,0.00,0.00
+23121409,Lessingstraße,residential,0.463,0.0,0.5,0.00,1.08
+23121410,Am Fließ,residential,0.184,1.0,0.5,5.43,2.71
+23126683,Teufelsseechaussee,residential,0.842,0.0,0.0,0.00,0.00
+23133774,Kladower Straße,unclassified,1.593,0.0,0.0,0.00,0.00
+23206742,Hauptstraße,secondary,0.154,1.0,1.5,6.50,9.75
+23304577,Schönerlinder Chaussee,secondary,0.387,2.0,1.0,5.17,2.59
+23304578,Berliner Allee,secondary,0.248,0.0,0.5,0.00,2.01
+23431917,Friedrichshagener Straße,secondary,1.146,0.0,0.5,0.00,0.44
+23553297,Schönfließer Straße,primary,0.429,0.0,0.5,0.00,1.17
+23621330,Hermsdorfer Straße,residential,0.052,1.0,0.5,19.14,9.57
+23658231,L 73,secondary,0.076,0.0,0.5,0.00,6.55
+23751944,Chausseestraße,secondary,0.156,0.5,0.0,3.21,0.00
+23751945,Kiekebuscher Dorfstraße,secondary,0.217,0.0,0.0,0.00,0.00
+23752644,Kreuzbergstraße,residential,0.151,0.0,0.0,0.00,0.00
+23755731,Charlottenstraße,residential,0.076,0.0,0.0,0.00,0.00
+23809678,Neue Schönhauser Straße,residential,0.166,0.0,,0.00,
+23859441,Kiefholzstraße,tertiary,0.217,0.0,0.5,0.00,2.30
+23859442,Treptower Straße,tertiary,0.226,0.0,0.5,0.00,2.21
+23883336,Altlandsberger Weg,unclassified,0.071,0.0,0.0,0.00,0.00
+23883337,Altlandsberger Weg,unclassified,0.955,1.0,0.0,1.05,0.00
+23883439,Mehrower Dorfstraße,secondary,0.235,0.0,0.0,0.00,0.00
+23973611,Bahnhofstraße,residential,0.377,1.5,1.5,3.98,3.98
+23982355,Mehrower Straße,secondary,0.057,0.0,0.0,0.00,0.00
+23993941,Invalidensiedlung,residential,0.527,0.5,0.0,0.95,0.00
+24028718,Havelchaussee,tertiary,1.210,0.5,0.0,0.41,0.00
+24033655,Kladower Damm,secondary,0.095,2.0,2.0,21.16,21.16
+24205745,Neuenhagener Chaussee,secondary,0.599,0.0,0.5,0.00,0.83
+24240245,Unter den Linden,residential,0.072,1.0,,13.92,
+24240246,Unter den Linden,primary,0.050,1.0,,19.88,
+24241790,Weinmeisterstraße,tertiary,0.144,1.5,3.0,10.45,20.89
+24243101,Ebertsbrücke,tertiary,0.061,0.0,0.0,0.00,0.00
+24276781,Am Petzinsee,residential,0.305,0.0,0.5,0.00,1.64
+24325176,Krontaler Straße,residential,0.081,0.0,0.0,0.00,0.00
+24326506,Schönhauser Allee,secondary,0.058,0.0,,0.00,
+24541318,Carl-Schmäcke-Straße,tertiary,0.201,0.0,0.0,0.00,0.00
+24552316,Kastanienallee,residential,0.371,0.5,0.0,1.35,0.00
+24552355,Mühlenbecker Straße,secondary,0.444,0.0,0.0,0.00,0.00
+24612812,Michendorfer Chaussee,primary,0.088,0.0,0.5,0.00,5.65
+24612847,Templiner Straße,tertiary,0.566,0.5,0.5,0.88,0.88
+24656690,Dorfstraße,secondary,0.505,0.0,0.0,0.00,0.00
+24656703,Mehrower Straße,secondary,0.389,0.5,0.0,1.29,0.00
+24656985,Altlandsberger Weg,tertiary,0.429,0.0,0.5,0.00,1.17
+24660835,Am Brückenpark,primary,0.073,0.0,0.0,0.00,0.00
+24704435,Mehringdamm,primary,0.119,1.0,,8.43,
+24711575,L 402,secondary,0.254,0.5,0.0,1.97,0.00
+24764733,Straße zum Müggelhort,unclassified,1.482,0.0,0.0,0.00,0.00
+24826380,August-Bebel-Straße,tertiary,0.490,0.0,1.0,0.00,2.04
+24847650,Vogelsdorfer Straße,tertiary,0.752,1.0,1.0,1.33,1.33
+24847658,Vogelsdorfer Straße,tertiary,0.197,0.5,1.0,2.54,5.08
+24853883,Grünelinde,tertiary,0.586,0.5,0.0,0.85,0.00
+24869967,Köpenicker Chaussee,secondary,0.324,0.0,,0.00,
+24913519,Karl-Liebknecht-Straße,primary,0.075,0.0,,0.00,
+25000113,Müggelseedamm,secondary,0.077,0.0,1.0,0.00,13.06
+25036025,Großbeerenstraße,residential,0.137,0.0,0.0,0.00,0.00
+25042806,Wilhelmstraße,secondary,0.160,0.0,0.0,0.00,0.00
+25552720,Schönhorster Straße,residential,0.851,0.0,0.0,0.00,0.00
+25575463,Rotkehlchenweg,residential,0.210,0.0,1.0,0.00,4.76
+25609061,Michendorfer Chaussee,primary,0.079,0.0,0.5,0.00,6.31
+25610137,An der Mühle,residential,0.076,0.5,1.0,6.59,13.18
+25612028,Potsdamer Straße,tertiary,0.429,0.0,0.0,0.00,0.00
+25612030,B 2,primary,0.128,0.0,0.0,0.00,0.00
+25612183,B 2,primary,0.088,1.0,1.0,11.35,11.35
+25621685,Neuenhagener Chaussee,tertiary,1.130,0.0,0.5,0.00,0.44
+25656647,Bahnhofstraße,secondary,0.118,0.0,0.0,0.00,0.00
+25788142,Oranienburger Straße,primary,0.637,1.0,1.0,1.57,1.57
+25813924,Berliner Allee,primary,0.194,0.5,,2.58,
+25825159,Gehrenseestraße,secondary,0.059,0.0,0.0,0.00,0.00
+25825163,Gehrenseebrücke,secondary,0.115,0.0,0.0,0.00,0.00
+25935116,Olympische Straße,secondary,0.187,0.0,0.5,0.00,2.68
+25946462,Schönerlinder Chaussee,secondary,0.336,0.0,0.0,0.00,0.00
+26196586,Oranienburger Chaussee,primary,1.352,0.5,0.0,0.37,0.00
+26244468,Georg-Knorr-Straße,unclassified,0.191,0.5,,2.62,
+26614075,Eichkampstraße,tertiary,0.957,0.0,0.5,0.00,0.52
+27058862,L 402,secondary,2.053,0.0,0.5,0.00,0.24
+27276761,Hermsdorfer Straße,residential,0.334,0.5,1.0,1.50,3.00
+27439066,Rotberger Dorfstraße,secondary,0.069,0.0,0.5,0.00,7.29
+27567570,Hauptstraße,secondary,0.670,0.5,0.5,0.75,0.75
+27567574,L 292,secondary,0.945,0.0,0.0,0.00,0.00
+27568030,Dorfstraße,secondary,0.596,0.0,0.5,0.00,0.84
+27689740,Michendorfer Chaussee,primary,0.459,0.0,0.0,0.00,0.00
+27689741,Michendorfer Chaussee,primary,0.209,0.0,0.0,0.00,0.00
+27944055,Landsberger Allee,primary,0.146,0.0,,0.00,
+28304125,Grenzstraße,residential,0.202,1.0,1.0,4.96,4.96
+28402260,Wilhelmstraße,secondary,0.065,1.0,2.0,15.30,30.60
+28573301,Oranienburger Chaussee,primary,0.274,0.0,0.5,0.00,1.82
+28658327,Kantstraße,secondary,0.081,0.0,,0.00,
+28817107,Weinbergstraße,secondary,0.447,0.5,0.5,1.12,1.12
+28817108,Beelitzer Straße,secondary,0.077,0.5,0.0,6.47,0.00
+28817825,Hauptstraße,tertiary,0.245,1.0,1.5,4.09,6.13
+28817826,Hauptstraße,tertiary,0.059,0.5,0.5,8.49,8.49
+28817864,Hauptstraße,tertiary,0.172,0.5,0.5,2.91,2.91
+28817865,Hauptstraße,tertiary,0.093,0.5,0.5,5.37,5.37
+28829858,Eichkampstraße,residential,0.380,1.0,0.5,2.63,1.31
+28950715,Kronprinzessinnenweg,secondary,0.085,1.0,,11.75,
+28950718,Königstraße,primary,0.178,0.0,,0.00,
+28950720,Königstraße,primary,0.084,2.0,,23.81,
+29236078,,unclassified,1.584,0.0,0.0,0.00,0.00
+29277662,Nikolskoer Weg,residential,1.050,1.5,1.0,1.43,0.95
+29560616,Schönerlinder Straße,secondary,0.192,1.5,2.0,7.80,10.40
+30134848,Hosemannstraße,tertiary,0.079,0.0,0.0,0.00,0.00
+30135010,Berliner Allee,primary,0.117,1.0,,8.58,
+30150679,Ahrensfelder Chaussee,secondary,0.056,1.0,0.5,17.87,8.93
+30298343,Am Neuen Palais,tertiary,0.201,2.0,1.5,9.96,7.47
+30604693,Hauptstraße,secondary,0.085,0.5,0.0,5.90,0.00
+30805074,Unter den Linden,residential,0.055,3.0,,54.72,
+30961317,Mariendorfer Damm,primary,0.140,0.0,,0.00,
+30964185,Waßmannsdorfer Grund,residential,0.196,0.0,0.0,0.00,0.00
+31024359,Neuenhagener Chaussee,secondary,0.104,0.0,0.0,0.00,0.00
+31091036,Fürstenwalder Damm,secondary,0.294,0.0,0.0,0.00,0.00
+31092349,Rudolf-Rühl-Allee,secondary,1.092,0.5,0.0,0.46,0.00
+31128285,Groß Kienitzer Landstraße,secondary,0.161,0.5,0.5,3.10,3.10
+31145656,Schönhauser Allee,secondary,0.105,3.0,,28.54,
+31306481,Schöneicher Landstraße,secondary,2.975,0.0,0.0,0.00,0.00
+31306520,Schöneicher Straße,secondary,0.468,0.0,0.0,0.00,0.00
+31609650,Holzmarktstraße,secondary,0.202,0.0,,0.00,
+31617185,Schönfließer Straße,residential,0.232,3.5,2.0,15.11,8.64
+31621010,Bismarckstraße,primary,0.120,0.0,,0.00,
+31652071,Havelchaussee,tertiary,2.246,0.5,0.0,0.22,0.00
+31690942,Bahnhofstraße,secondary,0.159,0.5,0.5,3.15,3.15
+31744272,Dammweg,tertiary,0.076,0.0,,0.00,
+31744279,Dammweg,tertiary,0.086,0.0,,0.00,
+31773580,Tempelhofer Damm,primary,0.078,0.5,,6.44,
+31852120,Am Fuchsberg,unclassified,0.343,0.0,0.0,0.00,0.00
+31985151,Stralauer Platz,secondary,0.205,0.0,,0.00,
+32204098,Königs Wusterhausener Straße,secondary,0.285,1.0,1.5,3.50,5.25
+32486911,Heerstraße,residential,0.119,0.5,,4.20,
+32501117,Karl-Liebknecht-Straße,tertiary,0.083,0.0,0.5,0.00,6.00
+32893176,Rotberger Dorfstraße,secondary,0.062,0.0,0.5,0.00,8.05
+32893178,L 402,secondary,0.599,0.0,0.0,0.00,0.00
+32893179,L 402,secondary,0.113,0.5,0.0,4.43,0.00
+32975880,Großbeerenstraße,residential,0.127,0.0,0.0,0.00,0.00
+32976592,Köpenicker Straße,secondary,0.206,0.0,0.0,0.00,0.00
+33078071,Kronprinzessinnenweg,secondary,0.162,0.0,0.5,0.00,3.09
+33078790,Havelchaussee,tertiary,0.815,0.0,0.0,0.00,0.00
+33079042,Havelchaussee,tertiary,0.488,0.5,0.0,1.02,0.00
+33079043,Havelchaussee,tertiary,0.213,0.5,0.0,2.35,0.00
+33116082,Sakrower Landstraße,unclassified,0.163,0.0,0.0,0.00,0.00
+33875276,Pasewalker Straße,living_street,0.104,0.0,0.0,0.00,0.00
+34547531,Liebenwalder Straße,secondary,0.247,0.5,1.0,2.02,4.04
+34547534,Hauptstraße,secondary,0.203,1.5,1.5,7.38,7.38
+34547537,Buchhorster Straße,secondary,0.472,0.0,0.0,0.00,0.00
+34561455,Dietzgenstraße,primary,0.090,1.0,2.0,11.11,22.23
+35154389,Masurenallee,secondary,0.145,2.0,,13.83,
+35269774,Friedrichstraße,secondary,0.101,2.0,,19.72,
+35583999,Königin-Elisabeth-Straße,secondary,0.279,0.5,,1.79,
+35609507,Berliner Straße,secondary,0.267,0.0,0.0,0.00,0.00
+35867465,Berliner Straße,secondary,0.065,0.0,,0.00,
+36337926,Straße des 17. Juni,primary,0.379,2.0,,5.28,
+36792637,Potsdamer Straße,secondary,0.064,0.0,0.5,0.00,7.76
+36919335,Liebenwalder Straße,secondary,0.667,0.0,1.0,0.00,1.50
+36933488,Krummenseer Weg,residential,0.318,0.5,0.5,1.57,1.57
+36940514,Staehleweg,residential,0.239,0.0,0.0,0.00,0.00
+37031343,Dietzgenstraße,primary,0.230,3.0,3.5,13.03,15.20
+37057239,Dorfstraße,tertiary,0.918,0.0,0.0,0.00,0.00
+37538146,Sakrower Landstraße,unclassified,0.314,0.0,0.0,0.00,0.00
+37574743,Neue Scheune,residential,0.169,0.0,0.0,0.00,0.00
+37638503,Kladower Damm,secondary,0.241,1.0,1.0,4.14,4.14
+37910700,Straße zum Müggelturm,unclassified,0.168,0.0,0.0,0.00,0.00
+37999208,Trappenfelder Straße,residential,0.683,0.0,0.0,0.00,0.00
+38001087,Trappenfelder Straße,unclassified,0.644,0.0,0.0,0.00,0.00
+38245320,Bahnhofstraße,secondary,0.109,0.0,0.0,0.00,0.00
+38323310,Greifswalder Straße,primary,0.058,0.0,,0.00,
+38434914,Am Schwielowsee,tertiary,0.527,0.5,0.0,0.95,0.00
+38653074,Fercher Straße,tertiary,0.395,0.0,0.5,0.00,1.26
+38702994,Lindenstraße,residential,0.172,0.5,0.5,2.91,2.91
+38703014,Kanalstraße,residential,0.448,0.5,1.0,1.12,2.23
+38763678,Bolivarallee,tertiary,0.182,0.0,,0.00,
+39486740,Am Schwielowsee,tertiary,0.096,0.0,0.0,0.00,0.00
+39486742,Fercher Straße,tertiary,0.131,0.5,0.5,3.82,3.82
+39486746,Lindenstraße,tertiary,0.293,0.5,0.5,1.70,1.70
+39519132,Potsdamer Straße,tertiary,0.257,0.0,0.0,0.00,0.00
+39519176,Luckenwalder Straße,tertiary,0.255,0.0,0.5,0.00,1.96
+39640019,Eichhornstraße,residential,0.380,2.5,1.5,6.58,3.95
+39640026,Bussardheck,residential,0.327,1.0,1.0,3.05,3.05
+39640043,Hubertusallee,residential,1.476,2.5,2.5,1.69,1.69
+39668475,Am Kanal,tertiary,0.332,6.0,,18.08,
+39839436,Wilhelmstraße,secondary,0.060,0.0,0.0,0.00,0.00
+40215397,Schwedter Straße,residential,0.177,0.0,0.0,0.00,0.00
+40232732,Mehrower Chaussee,secondary,0.364,0.0,0.0,0.00,0.00
+40232737,Mehrower Dorfstraße,secondary,0.124,0.5,0.5,4.03,4.03
+40451058,Michael-Brückner-Straße,primary,0.063,1.0,,15.92,
+40517718,Wartenberger Straße,secondary,0.158,3.5,,22.10,
+40674692,Hönower Straße,secondary,0.472,0.0,0.0,0.00,0.00
+40795375,Dorfstraße,secondary,0.156,0.0,0.0,0.00,0.00
+40905572,Groß Kienitzer Dorfstraße,secondary,0.332,0.5,0.0,1.51,0.00
+41014132,Am Sportplatz,secondary,0.100,0.5,0.0,5.00,0.00
+41108858,Kronprinzessinnenweg,secondary,0.128,2.5,,19.60,
+41260024,Bornholmer Straße,primary,0.334,1.5,,4.49,
+41461575,Rosa-Luxemburg-Damm,secondary,0.198,0.0,0.5,0.00,2.52
+41828679,Oderberger Straße,residential,0.373,0.0,0.5,0.00,1.34
+42156202,Oderberger Straße,residential,0.136,0.0,0.0,0.00,0.00
+42343407,Stahnsdorfer Straße,residential,0.149,0.0,0.5,0.00,3.35
+42695661,Heerstraße,unclassified,0.241,1.0,,4.16,
+42757179,Flaischlenstraße,residential,0.145,0.5,0.5,3.45,3.45
+42821881,Tunnel Tiergarten Spreebogen,trunk,0.895,0.5,,0.56,
+42978160,Voltaireweg,tertiary,0.463,0.0,0.5,0.00,1.08
+43026969,Fichtestraße,residential,0.317,1.5,1.0,4.73,3.16
+43029490,Berliner Straße,primary,0.181,1.0,,5.52,
+43063527,An der Wuhlheide,secondary,0.280,0.0,,0.00,
+43063529,An der Wuhlheide,secondary,0.187,0.0,,0.00,
+43159019,Allee nach Glienicke,residential,0.094,0.0,1.0,0.00,10.63
+43159028,Allee nach Glienicke,tertiary,0.293,0.5,0.5,1.71,1.71
+43322815,Michendorfer Chaussee,primary,0.055,0.0,0.0,0.00,0.00
+43332474,Königstraße,primary,0.245,0.0,,0.00,
+43332475,Königstraße,primary,0.067,1.0,,15.03,
+43386271,Stahnsdorfer Damm,tertiary,0.505,0.0,0.5,0.00,0.99
+43394507,Königstraße,primary,0.093,2.5,,26.90,
+43542800,Schönhauser Allee,secondary,0.067,0.0,,0.00,
+43585029,August-Bebel-Straße,tertiary,0.394,1.0,1.0,2.54,2.54
+43586422,Wetzlarer Straße,tertiary,0.384,0.0,0.5,0.00,1.30
+43711314,Berliner Allee,secondary,0.117,0.5,0.5,4.28,4.28
+43711321,Schönwalder Chaussee,secondary,0.098,0.0,0.5,0.00,5.12
+43711327,Schönwalder Chaussee,secondary,0.419,0.0,0.5,0.00,1.19
+43996516,B 2,primary,0.063,0.0,1.0,0.00,15.97
+43998757,Potsdamer Straße,tertiary,0.486,1.5,1.0,3.08,2.06
+43999650,Potsdamer Straße,tertiary,0.097,1.0,0.5,10.28,5.14
+44122832,Linienstraße,residential,0.083,1.0,0.5,12.01,6.01
+44417492,Mehrower Straße,secondary,0.198,0.0,0.5,0.00,2.52
+44904067,Schöneicher Straße,secondary,0.229,0.0,0.5,0.00,2.18
+44904071,Schöneicher Straße,secondary,0.423,0.5,0.5,1.18,1.18
+45124038,Birkholzer Dorfstraße,secondary,0.117,0.5,0.0,4.29,0.00
+45476597,Mühlenbecker Straße,secondary,0.165,0.5,0.0,3.03,0.00
+46618193,Werneuchener Chaussee,primary,0.536,0.0,0.0,0.00,0.00
+46759319,Schönwalder Chaussee,secondary,0.312,0.0,0.0,0.00,0.00
+46759320,Schönwalder Chaussee,secondary,0.303,0.0,0.0,0.00,0.00
+46933221,Summter Chaussee,secondary,1.503,0.0,0.0,0.00,0.00
+46933222,Liebenwalder Straße,secondary,0.305,0.5,0.5,1.64,1.64
+47016365,Alexanderstraße,primary,0.060,1.0,,16.68,
+47059460,Karl-Marx-Allee,primary,0.092,0.0,,0.00,
+47513852,Liebenwalder Straße,secondary,0.254,0.5,0.0,1.97,0.00
+47854101,Dorfstraße,secondary,0.409,1.0,0.0,2.45,0.00
+47975561,B 96a,primary,0.053,0.0,0.0,0.00,0.00
+48079575,Oranienburger Straße,primary,0.054,1.0,0.5,18.38,9.19
+48794509,Am Waldrand,residential,0.263,0.5,0.0,1.90,0.00
+48859721,Tunnel Tiergarten Spreebogen,trunk,0.949,0.0,,0.00,
+50054449,Berliner Straße,primary,0.130,0.5,,3.86,
+51863695,Dorfstraße,primary,0.380,0.0,0.0,0.00,0.00
+51939088,An der Wuhlheide,secondary,0.351,0.0,,0.00,
+52414088,Kaiserdamm,primary,0.249,0.0,,0.00,
+52578939,Kaiserdamm,primary,0.089,0.5,,5.60,
+53564138,Franz-Schmidt-Straße,unclassified,0.774,0.0,0.5,0.00,0.65
+53580433,Straße der Einheit,residential,0.363,1.5,1.5,4.13,4.13
+54048862,Schloßplatz,primary,0.131,2.0,,15.24,
+55741054,Rochstraße,residential,0.116,0.0,0.0,0.00,0.00
+57692645,L 30,secondary,2.108,0.0,0.0,0.00,0.00
+58241630,Leipziger Straße,primary,0.326,0.0,0.0,0.00,0.00
+59204275,Vesaliusstraße,residential,0.067,0.5,0.5,7.43,7.43
+59636549,Hauptstraße,secondary,0.109,0.5,,4.61,
+59994274,Schwarzer Weg,tertiary,0.832,0.0,0.0,0.00,0.00
+59994306,Altlandsberger Weg,tertiary,0.054,0.0,0.0,0.00,0.00
+59994309,Dorfstraße,secondary,0.514,0.5,0.5,0.97,0.97
+59994317,Trappenfelder Straße,unclassified,0.165,0.5,0.5,3.03,3.03
+59994335,Altlandsberger Weg,tertiary,0.614,0.0,0.0,0.00,0.00
+60333312,Reinhardtstraße,tertiary,0.091,0.0,0.0,0.00,0.00
+60763085,Schloßallee,residential,0.171,0.5,1.0,2.92,5.84
+60819742,Markgrafendamm,secondary,0.213,0.0,0.0,0.00,0.00
+60913023,Lichtenrader Damm,primary,0.510,0.0,,0.00,
+61584187,Schloßplatz,primary,0.080,1.0,,12.43,
+62319170,Kronprinzessinnenweg,secondary,0.059,0.5,,8.44,
+66588998,Hönower Chaussee,secondary,0.622,0.0,0.0,0.00,0.00
+67713451,Otto-von-Bismarck-Allee,tertiary,0.098,0.5,,5.12,
+67713452,Paul-Löbe-Allee,tertiary,0.083,0.5,,6.05,
+68283959,Hermsdorfer Straße,residential,0.391,1.0,0.5,2.55,1.28
+68283961,Hermsdorfer Straße,unclassified,0.260,0.0,0.0,0.00,0.00
+70041844,Mittelstraße,primary,0.082,0.5,0.5,6.13,6.13
+70366434,Schwarzer Weg,tertiary,0.226,0.0,0.5,0.00,2.22
+70905121,Heerstraße,residential,0.499,2.0,,4.01,
+70905122,Heerstraße,residential,0.092,1.0,,10.87,
+71374234,Wannseestraße,residential,0.158,0.5,0.5,3.17,3.17
+71438688,Kirschgarten,residential,0.668,0.5,0.5,0.75,0.75
+72175242,Heerstraße,residential,0.518,0.5,,0.96,
+72175275,Olympische Straße,secondary,0.213,2.0,2.0,9.38,9.38
+76212438,Otto-von-Bismarck-Allee,tertiary,0.118,0.5,,4.24,
+78298215,Straße des 17. Juni,primary,0.374,2.0,,5.35,
+79131641,Dorfstraße,tertiary,0.247,1.0,1.0,4.06,4.06
+79131690,Rudower Chaussee,unclassified,0.342,0.5,0.0,1.46,0.00
+79429057,Bernhard-Beyer-Straße,tertiary,0.687,0.5,0.0,0.73,0.00
+79565566,Krampnitzer Straße,residential,0.226,0.5,0.0,2.21,0.00
+79565568,Straße nach Sacrow,unclassified,2.116,0.0,0.0,0.00,0.00
+80883536,Chausseestraße,secondary,0.237,0.0,0.0,0.00,0.00
+82019362,Neubeerener Straße,secondary,0.063,0.0,0.5,0.00,7.88
+82251914,Neubeerener Straße,secondary,0.342,0.5,0.5,1.46,1.46
+82469459,Grabbeallee,primary,0.059,0.0,,0.00,
+84792455,Königin-Elisabeth-Straße,primary,0.149,0.0,,0.00,
+87664971,Stahnsdorfer Damm,tertiary,0.235,0.0,0.0,0.00,0.00
+88578454,Neuenhagener Chaussee,secondary,0.088,0.5,0.0,5.67,0.00
+88754924,Karl-Liebknecht-Straße,residential,0.463,0.5,0.0,1.08,0.00
+93466597,Krampnitzer Straße,residential,0.566,0.0,0.5,0.00,0.88
+93466602,Rotkehlchenweg,unclassified,0.188,0.0,0.5,0.00,2.66
+97329990,Krampnitzer Straße,unclassified,0.079,0.0,0.0,0.00,0.00
+98410014,Pölnitzweg,tertiary,0.199,1.5,1.0,7.52,5.02
+100635870,Kastanienallee,residential,0.395,0.5,0.0,1.27,0.00
+100836811,Berliner Straße,primary,0.270,1.0,,3.71,
+101351232,Berliner Straße,primary,0.242,0.0,0.5,0.00,2.06
+102945288,Heerstraße,primary,0.503,2.5,3.0,4.97,5.97
+103592352,Summter Chaussee,secondary,0.965,1.0,0.0,1.04,0.00
+103635785,Friedrich-Ebert-Straße,unclassified,0.059,2.0,,34.14,
+103639241,Am Kanal,tertiary,0.076,2.0,,26.15,
+106597743,Falkplatz,living_street,0.222,0.0,0.0,0.00,0.00
+108654698,Am Fuchsberg,unclassified,1.361,0.0,0.0,0.00,0.00
+110767231,Landsberger Allee,primary,0.077,0.0,0.5,0.00,6.46
+110898260,Triglawstraße,residential,0.065,0.5,0.5,7.73,7.73
+111283466,Berliner Allee,primary,0.079,0.0,,0.00,
+111283473,Schönerlinder Straße,secondary,0.741,0.5,0.5,0.68,0.68
+111656206,Berliner Straße,primary,0.227,1.0,0.5,4.40,2.20
+111790987,Berliner Straße,secondary,0.244,0.0,0.5,0.00,2.05
+112128419,Karl-Liebknecht-Straße,primary,0.092,1.0,,10.91,
+114009223,Liebenwalder Straße,secondary,0.429,0.0,0.0,0.00,0.00
+116609599,Schwanebecker Straße,secondary,0.439,0.5,0.0,1.14,0.00
+116609600,Birkholzer Chaussee,secondary,0.283,0.0,0.0,0.00,0.00
+118956160,,tertiary,0.175,0.0,0.0,0.00,0.00
+119201840,Mühlenstraße,primary,0.164,0.5,0.0,3.06,0.00
+120415502,Russische Kolonie,residential,0.133,0.5,0.0,3.75,0.00
+120853580,Senefelderstraße,living_street,0.055,0.5,0.5,9.04,9.04
+122778920,Waßmannsdorfer Allee,tertiary,0.123,0.0,0.5,0.00,4.08
+123102508,Sakrower Landstraße,unclassified,0.177,0.5,0.5,2.82,2.82
+123102512,Sakrower Landstraße,unclassified,0.126,0.0,0.0,0.00,0.00
+129536779,Dorfstraße,tertiary,0.182,0.5,0.5,2.75,2.75
+130118934,Marktstraße,secondary,0.111,2.0,,17.99,
+132613373,Havelchaussee,tertiary,0.259,0.0,0.0,0.00,0.00
+132742855,Beelitzer Straße,secondary,0.439,0.5,0.5,1.14,1.14
+134199574,Kolonie,secondary,0.273,0.0,0.5,0.00,1.83
+134240439,Pölnitzweg,tertiary,0.097,0.0,0.5,0.00,5.18
+136086602,Berliner Straße,secondary,0.067,0.0,,0.00,
+136814968,Spandauer Damm,secondary,0.105,0.0,,0.00,
+141575936,Gnomenplatz,residential,0.113,0.5,1.0,4.41,8.82
+141575941,Haakonweg,residential,0.153,0.5,0.5,3.27,3.27
+143407274,Britzer Straße,residential,0.102,0.0,0.5,0.00,4.90
+143742580,Fürstenwalder Damm,secondary,1.059,0.0,0.0,0.00,0.00
+143769171,Charlottenstraße,residential,0.203,0.5,1.0,2.46,4.92
+146757631,Schönhauser Allee,secondary,0.082,2.0,,24.53,
+146816784,Senefelderstraße,residential,0.051,0.0,0.5,0.00,9.81
+146831609,Dorfstraße,tertiary,0.192,0.0,0.5,0.00,2.60
+147076646,Pasewalker Straße,living_street,0.117,0.0,0.0,0.00,0.00
+147086146,L 77,secondary,0.131,0.0,1.0,0.00,7.62
+147646826,Greifswalder Straße,primary,0.072,0.0,,0.00,
+147659842,Schwedter Straße,residential,0.078,0.5,0.5,6.42,6.42
+148614163,Friedrichshagener Straße,secondary,0.081,1.0,3.0,12.33,36.99
+148709865,Schönhauser Allee,primary,0.351,0.5,,1.42,
+150517902,Hauptstraße,primary,0.126,0.0,0.0,0.00,0.00
+150912138,Kronprinzessinnenweg,tertiary,0.429,0.0,0.0,0.00,0.00
+151742481,Rudower Chaussee,residential,0.092,0.0,0.0,0.00,0.00
+151821014,Waßmannsdorfer Allee,tertiary,0.114,0.0,0.5,0.00,4.40
+152046230,An der Wuhlheide,secondary,0.359,0.0,,0.00,
+152850006,Stahnsdorfer Straße,residential,0.222,0.5,1.0,2.25,4.51
+153780135,Fercher Straße,tertiary,1.233,0.0,0.0,0.00,0.00
+153780136,Fercher Straße,tertiary,0.219,0.5,0.5,2.28,2.28
+153879661,Philipp-Jacob-Rauch-Straße,living_street,0.164,0.5,1.0,3.04,6.08
+154043354,Otto-von-Bismarck-Allee,residential,0.085,1.0,,11.72,
+154130419,Am Fuchsberg,unclassified,0.099,0.0,1.0,0.00,10.08
+154903509,Bäkestraße,tertiary,0.091,0.0,0.0,0.00,0.00
+155033905,Königstraße,primary,0.682,0.0,0.0,0.00,0.00
+155037650,,tertiary,0.149,1.0,0.0,6.70,0.00
+155069305,Katzbachstraße,secondary,0.050,1.0,0.0,19.99,0.00
+156364570,Anna-Louisa-Karsch-Straße,tertiary,0.101,2.0,1.0,19.71,9.85
+157390073,Yitzhak-Rabin-Straße,tertiary,0.188,1.0,0.0,5.31,0.00
+157868784,Berliner Chaussee,primary,0.126,0.0,0.5,0.00,3.96
+159040735,Zur Historischen Mühle,tertiary,0.152,0.5,0.0,3.29,0.00
+159679497,,unclassified,0.722,0.5,0.5,0.69,0.69
+160130937,Greifswalder Straße,primary,0.277,0.0,,0.00,
+160685691,Michendorfer Chaussee,primary,1.276,0.0,0.0,0.00,0.00
+160685701,Michendorfer Chaussee,primary,1.151,0.0,0.0,0.00,0.00
+160685704,Michendorfer Chaussee,primary,0.085,0.0,0.0,0.00,0.00
+160685706,Michendorfer Chaussee,primary,0.434,0.0,0.0,0.00,0.00
+161753875,Raumerstraße,residential,0.170,0.0,0.5,0.00,2.94
+161754079,Dunckerstraße,residential,0.310,0.5,1.0,1.61,3.22
+163385717,Hardenbergplatz,residential,0.113,0.0,,0.00,
+163649860,Heerstraße,residential,0.051,1.0,,19.69,
+164874299,Friedrichstraße,residential,0.117,0.5,0.0,4.29,0.00
+165356204,Blankenfelder Chaussee,primary,0.290,0.0,,0.00,
+165356205,Blankenfelder Chaussee,primary,1.052,0.5,,0.48,
+166482119,Königstraße,primary,0.085,0.5,,5.86,
+166493784,Potsdamer Straße,tertiary,0.280,0.0,0.5,0.00,1.79
+166735849,Am Böttcherberg,residential,0.098,0.5,,5.08,
+166993925,Kladower Straße,residential,0.393,1.0,1.0,2.54,2.54
+168307255,Hohenschönhauser Straße,tertiary,0.251,2.5,,9.95,
+168817478,Am Schwielowsee,tertiary,0.150,0.0,0.5,0.00,3.33
+169076569,Straße zum Müggelturm,unclassified,0.442,0.5,0.0,1.13,0.00
+169091123,Baumgartenbrück,unclassified,1.001,1.0,0.5,1.00,0.50
+169107608,Am Schwielowsee,tertiary,0.216,0.5,0.0,2.32,0.00
+169195795,Unter den Linden,primary,0.125,0.5,,3.99,
+169717723,Torstraße,secondary,0.088,1.0,2.0,11.40,22.81
+170442975,An der Mühle,residential,0.139,0.0,0.5,0.00,3.59
+170442979,An der Mühle,residential,1.304,0.0,0.0,0.00,0.00
+170442983,Hönower Chaussee,tertiary,0.080,0.0,0.5,0.00,6.26
+170442984,Hönower Chaussee,tertiary,0.422,0.5,0.0,1.19,0.00
+170442989,Hönower Chaussee,tertiary,0.543,0.0,0.0,0.00,0.00
+171095992,Grabbeallee,primary,0.070,0.5,,7.12,
+171484594,Scheidemannstraße,tertiary,0.093,2.0,0.0,21.61,0.00
+172439812,Grabbeallee,primary,0.186,0.0,,0.00,
+176031302,John-Foster-Dulles-Allee,tertiary,0.191,0.0,0.0,0.00,0.00
+176031318,Schönhorster Straße,residential,0.386,1.0,0.5,2.59,1.30
+176396797,,secondary,0.121,0.0,,0.00,
+176396803,L 77,secondary,1.765,1.0,1.0,0.57,0.57
+176753739,Dorfstraße,primary,0.202,0.5,0.0,2.47,0.00
+176753760,Schönhauser Straße,tertiary,0.304,0.0,0.5,0.00,1.65
+176753762,Schönhauser Straße,tertiary,0.078,0.5,0.5,6.45,6.45
+177486322,Schönfließer Straße,primary,0.163,0.0,0.5,0.00,3.06
+177615722,Oberspreestraße,secondary,0.193,0.0,0.5,0.00,2.59
+179756418,Am Waldrand,residential,0.115,0.5,1.5,4.34,13.01
+180592636,Hauptstraße,secondary,0.084,0.5,,5.93,
+180797802,Oberspreestraße,secondary,0.156,0.0,,0.00,
+182782708,Hohenschönhauser Straße,tertiary,0.301,0.5,0.0,1.66,0.00
+183238299,Landsberger Allee,primary,0.084,0.0,0.0,0.00,0.00
+183255892,Ludwigshöheweg,residential,0.173,0.0,0.0,0.00,0.00
+183614195,Eichenallee,residential,0.173,0.5,0.5,2.90,2.90
+183621694,Heerstraße,primary,0.055,0.0,1.0,0.00,18.15
+184077630,Kollwitzstraße,residential,0.194,0.0,0.0,0.00,0.00
+185271046,Dolomitenstraße,residential,0.082,0.0,0.5,0.00,6.11
+187656409,Berliner Chaussee,tertiary,0.070,0.0,1.0,0.00,14.31
+188240631,Konrad-Adenauer-Straße,tertiary,0.075,0.0,0.0,0.00,0.00
+188386313,Unter den Linden,primary,0.059,1.0,,16.97,
+188865507,Köpenicker Straße,secondary,0.103,0.5,0.0,4.87,0.00
+189633508,Templiner Straße,tertiary,0.129,0.0,0.0,0.00,0.00
+190795303,Hauptstraße,residential,0.105,0.0,0.5,0.00,4.75
+192156442,Hauptstraße,secondary,0.075,2.0,,26.56,
+192316815,Gehrenseestraße,secondary,0.513,2.5,2.0,4.87,3.90
+193861984,Friedrich-Engels-Straße,tertiary,0.103,0.5,0.0,4.83,0.00
+193861986,Leipziger Straße,primary,0.059,0.5,0.0,8.40,0.00
+195439145,Mühlenstraße,secondary,0.093,0.0,,0.00,
+196631171,An der Wuhlheide,secondary,0.091,2.0,,22.03,
+197689743,Berliner Allee,secondary,0.127,0.5,0.5,3.93,3.93
+202844171,Berliner Allee,primary,0.640,0.0,0.0,0.00,0.00
+203708275,Potsdamer Straße,tertiary,0.123,0.5,1.0,4.06,8.11
+206170874,Straße des 17. Juni,primary,0.113,0.0,,0.00,
+207740643,Friedrich-Ebert-Straße,residential,0.166,0.0,0.5,0.00,3.02
+211795080,Kollwitzstraße,residential,0.090,0.0,0.0,0.00,0.00
+213883625,Dahlewitzer Dorfstraße,tertiary,0.439,1.0,0.0,2.28,0.00
+214731500,Bergfelder Chaussee,primary,0.537,0.0,0.0,0.00,0.00
+215393338,Waßmannsdorfer Allee,tertiary,0.225,0.5,0.0,2.23,0.00
+216226945,Philipp-Jacob-Rauch-Straße,living_street,0.247,0.5,1.0,2.02,4.04
+217126772,Hebbelstraße,residential,0.079,0.0,0.0,0.00,0.00
+217386888,Fürstenwalder Damm,secondary,0.095,1.0,,10.57,
+217877709,Schwielowseestraße,tertiary,0.703,0.5,0.0,0.71,0.00
+217877710,Schwielowseestraße,tertiary,0.438,0.5,0.5,1.14,1.14
+218257872,Baumgartenbrück,residential,0.141,0.0,0.0,0.00,0.00
+218260308,Am Petzinsee,residential,0.342,1.0,0.5,2.93,1.46
+218260797,Fercher Straße,tertiary,0.441,0.5,0.5,1.13,1.13
+218269410,Fercher Straße,tertiary,0.222,0.0,0.5,0.00,2.25
+218318368,Friedrich-Ebert-Straße,tertiary,0.121,0.5,0.5,4.15,4.15
+218413101,Oranienburger Chaussee,primary,0.228,0.5,0.0,2.20,0.00
+219112972,Russische Kolonie,residential,0.171,0.5,0.5,2.93,2.93
+219739844,Am Petzinsee,residential,0.421,0.0,0.0,0.00,0.00
+220116547,Leipziger Straße,primary,0.223,0.0,0.0,0.00,0.00
+220116558,Albert-Einstein-Straße,residential,0.092,0.0,0.0,0.00,0.00
+222645093,Am Brückenpark,primary,0.185,0.0,0.0,0.00,0.00
+222740717,Hauffstraße,primary,0.217,2.0,1.5,9.21,6.91
+223015650,Straße nach Sacrow,unclassified,0.189,0.0,0.5,0.00,2.64
+223018669,Straße nach Sacrow,unclassified,0.052,0.5,0.0,9.66,0.00
+223018690,Straße nach Sacrow,unclassified,0.896,0.0,0.0,0.00,0.00
+223139860,Knaackstraße,residential,0.131,0.5,0.0,3.82,0.00
+223247333,Am Neuen Garten,tertiary,0.056,0.0,0.5,0.00,8.94
+223247337,Hebbelstraße,residential,0.140,0.5,1.0,3.57,7.14
+225930811,Buchhorster Straße,secondary,0.063,0.0,0.0,0.00,0.00
+225930812,Buchhorster Straße,secondary,0.274,0.0,0.5,0.00,1.83
+225931599,L 30,secondary,0.140,0.5,0.0,3.56,0.00
+225931601,Mühlenbecker Chaussee,secondary,0.147,0.5,0.0,3.39,0.00
+225931603,Mühlenbecker Chaussee,secondary,0.222,0.0,0.0,0.00,0.00
+227985293,Kaiserdamm,primary,0.178,0.0,,0.00,
+229068360,Dorfstraße,secondary,0.089,0.0,0.5,0.00,5.59
+229932992,Fercher Straße,tertiary,0.311,0.0,0.0,0.00,0.00
+232363331,Am Bahnhof,tertiary,0.198,1.0,0.0,5.06,0.00
+236092221,Unter den Linden,primary,0.064,2.0,,31.39,
+236738135,Mühlenbecker Straße,secondary,0.754,0.5,0.0,0.66,0.00
+236738142,B 96a,primary,1.673,0.0,0.5,0.00,0.30
+236818204,Teufelsseechaussee,residential,0.575,0.5,0.0,0.87,0.00
+237201578,Alte Lanker Straße,secondary,0.219,0.5,0.5,2.29,2.29
+237325907,Bahnhofstraße,secondary,0.111,0.0,0.5,0.00,4.50
+237325911,Mühlenbecker Straße,secondary,0.821,0.0,0.0,0.00,0.00
+237665257,Mühlenbecker Straße,secondary,0.598,0.5,0.5,0.84,0.84
+238053685,Müggelheimer Damm,secondary,0.126,0.5,,3.98,
+238053690,Oberspreestraße,secondary,0.113,2.0,,17.63,
+240034376,Krontaler Straße,residential,0.262,0.0,0.0,0.00,0.00
+241092241,Straße nach Blumberg,secondary,1.228,0.0,0.0,0.00,0.00
+241594961,Straße nach Blumberg,secondary,0.059,0.0,0.0,0.00,0.00
+242570602,Pasewalker Straße,living_street,0.071,0.0,,0.00,
+242574271,Summter Chaussee,secondary,2.056,0.0,0.0,0.00,0.00
+244598697,Seeweg,residential,0.142,0.0,0.0,0.00,0.00
+245852953,Dietzgenstraße,primary,0.092,0.0,0.5,0.00,5.42
+245852954,Dietzgenstraße,primary,0.199,2.0,1.0,10.07,5.03
+246044844,Alexanderstraße,secondary,0.078,1.0,,12.88,
+246509766,Am Wiesenrand,primary,0.245,0.5,0.0,2.04,0.00
+247883737,Fercher Straße,tertiary,0.263,0.0,0.0,0.00,0.00
+250429135,Schönfließer Straße,primary,0.266,0.5,0.5,1.88,1.88
+251884680,Unter den Linden,primary,0.112,0.0,,0.00,
+254818536,L 338,secondary,0.154,0.0,,0.00,
+257132949,L 73,secondary,0.069,2.0,1.0,28.82,14.41
+260037640,Am Brückenpark,primary,0.061,1.0,0.0,16.28,0.00
+260037643,Hauffstraße,primary,0.280,0.0,0.5,0.00,1.78
+260037644,Hauffstraße,primary,0.159,0.5,0.0,3.14,0.00
+260353625,Schönhauser Allee,primary,0.159,0.5,,3.14,
+262378121,Neubeerener Straße,secondary,0.101,0.0,1.0,0.00,9.87
+263274780,Michendorfer Chaussee,primary,0.301,1.0,1.0,3.32,3.32
+263274781,Michendorfer Chaussee,primary,0.082,1.0,0.0,12.25,0.00
+264083487,Berliner Straße,secondary,0.172,0.0,0.0,0.00,0.00
+265094132,Berliner Straße,tertiary,0.246,0.5,,2.03,
+266454541,Josef-Nawrocki-Straße,residential,0.071,0.0,,0.00,
+269298097,Am Großen Wannsee,residential,0.105,0.0,0.0,0.00,0.00
+269707365,Kollwitzstraße,residential,0.093,1.0,1.0,10.79,10.79
+273390876,Andreasstraße,tertiary,0.155,0.0,0.0,0.00,0.00
+278952564,Alte Lanker Straße,secondary,0.248,0.0,0.0,0.00,0.00
+279808663,Fürstenwalder Damm,secondary,0.135,2.0,1.0,14.86,7.43
+280667874,Karl-Marx-Allee,primary,0.168,0.0,,0.00,
+281154275,Krummenseer Weg,residential,0.092,1.0,1.0,10.88,10.88
+281154276,Berliner Straße,primary,0.052,0.0,0.0,0.00,0.00
+281312276,Großbeerenstraße,unclassified,0.629,0.0,0.0,0.00,0.00
+281479938,Karl-Marx-Allee,primary,0.058,0.5,,8.55,
+281519113,Willmersdorfer Chaussee,secondary,0.184,0.0,0.5,0.00,2.72
+281623515,Hermsdorfer Straße,unclassified,0.248,0.0,0.0,0.00,0.00
+281628779,B 96a,primary,0.730,0.0,0.5,0.00,0.69
+281628787,Birkenwerderstraße,primary,0.254,0.5,0.5,1.97,1.97
+281637549,Schönfließer Straße,primary,0.080,0.0,0.5,0.00,6.23
+281648786,Hauptstraße,tertiary,0.190,0.5,0.5,2.63,2.63
+283006412,Bölschestraße,tertiary,0.135,0.0,0.0,0.00,0.00
+283802197,Mehrower Dorfstraße,secondary,0.074,0.0,0.5,0.00,6.72
+286837510,Karl-Marx-Allee,primary,0.114,0.0,,0.00,
+287764737,Karl-Marx-Allee,primary,0.068,3.0,,44.31,
+288406367,Karl-Marx-Allee,primary,0.094,0.0,,0.00,
+288749954,Prenzlauer Allee,primary,0.099,3.0,,30.43,
+289072656,Hauptstraße,secondary,0.062,0.5,0.5,8.07,8.07
+295975390,Chausseestraße,primary,0.226,0.5,0.5,2.22,2.22
+296082997,Eichner Chaussee,secondary,0.510,0.0,0.0,0.00,0.00
+296599839,Mollstraße,primary,0.093,0.0,,0.00,
+297133119,Mollstraße,primary,0.058,0.0,,0.00,
+297138724,Hermann-Hesse-Straße,primary,0.057,0.0,0.0,0.00,0.00
+297373653,Ackerstraße,residential,0.249,0.0,0.0,0.00,0.00
+298026906,Platz der Vereinten Nationen,primary,0.090,1.0,,11.12,
+298198124,Karl-Marx-Straße,tertiary,0.308,0.5,1.0,1.62,3.25
+298355122,Ortnitstraße,tertiary,0.575,0.0,0.5,0.00,0.87
+299833242,Lindenstraße,residential,0.088,1.0,,11.37,
+300170893,Birkenwerderstraße,primary,0.507,0.5,0.5,0.99,0.99
+301241681,Alexanderstraße,primary,0.058,1.5,,26.03,
+301672501,Luckenwalder Straße,tertiary,0.209,0.0,0.0,0.00,0.00
+301672508,Potsdamer Straße,secondary,0.123,0.0,0.0,0.00,0.00
+302224350,Rosa-Luxemburg-Damm,secondary,0.087,0.5,0.0,5.74,0.00
+302322744,Neubeerener Straße,secondary,0.064,1.0,0.0,15.66,0.00
+304491681,L 211,secondary,2.277,0.0,0.0,0.00,0.00
+305093247,Alexanderstraße,primary,0.068,0.0,,0.00,
+306383503,Berliner Straße,primary,0.108,0.0,,0.00,
+306383505,Berliner Straße,primary,0.281,0.0,,0.00,
+306385203,Berliner Straße,primary,0.229,0.5,,2.18,
+306385206,Berliner Straße,primary,0.125,0.0,,0.00,
+306385208,Berliner Straße,primary,0.117,1.0,,8.53,
+306385211,Berliner Straße,primary,0.134,3.0,,22.46,
+307508305,Am Jungfernsee,residential,0.348,1.5,2.0,4.32,5.75
+308033757,Fercher Straße,tertiary,0.067,0.0,0.5,0.00,7.51
+308319504,Am Sportplatz,unclassified,0.454,0.0,0.0,0.00,0.00
+308636075,Dorfstraße,secondary,0.057,2.0,1.0,34.94,17.47
+310230307,Mühlenbecker Straße,secondary,0.548,0.5,0.5,0.91,0.91
+310307464,An der Wuhlheide,secondary,0.290,0.0,,0.00,
+310357284,Memhardstraße,tertiary,0.050,2.0,,39.92,
+310702243,Berliner Allee,primary,0.116,0.5,0.0,4.31,0.00
+311958616,Luisenhof,living_street,0.077,0.5,1.5,6.47,19.40
+312651888,Tucholskystraße,residential,0.127,0.0,1.0,0.00,7.90
+317878192,Mühlenstraße,secondary,0.113,0.0,,0.00,
+317918067,Karl-Liebknecht-Straße,residential,0.254,0.0,0.5,0.00,1.96
+318282850,Karl-Liebknecht-Straße,primary,0.082,2.0,,24.30,
+319486942,Reiterweg,tertiary,0.099,1.0,0.0,10.14,0.00
+320769353,Hauptstraße,secondary,0.688,1.5,1.0,2.18,1.45
+327805903,Kaiser-Friedrich-Straße,secondary,0.276,3.0,,10.88,
+327805908,Neue Kantstraße,secondary,0.072,2.0,,27.62,
+328253843,Bölschestraße,tertiary,0.190,0.0,0.0,0.00,0.00
+329578499,Am Wiesenrand,primary,0.056,0.0,0.0,0.00,0.00
+329578514,Michendorfer Chaussee,primary,0.510,0.0,0.0,0.00,0.00
+329578516,Michendorfer Chaussee,primary,0.085,1.0,0.0,11.77,0.00
+330382992,Neubeerener Straße,secondary,0.312,0.0,0.0,0.00,0.00
+331206922,Am Stadtrand,residential,0.488,0.5,0.5,1.02,1.02
+333310715,Kaiserdamm,primary,0.216,0.0,,0.00,
+333597045,Karl-Liebknecht-Straße,tertiary,0.362,0.0,0.5,0.00,1.38
+338690994,Fürstenbrunner Weg,secondary,0.055,1.0,,18.24,
+339201177,Bodestraße,living_street,0.130,0.5,0.0,3.85,0.00
+339201219,Schloßplatz,primary,0.076,0.5,,6.61,
+340498982,Unter den Linden,primary,0.135,2.0,,14.79,
+340498988,Unter den Linden,primary,0.052,2.0,,38.73,
+344108419,Am Seegraben,primary,0.073,1.0,,13.71,
+344361832,Potsdamer Straße,tertiary,0.051,0.0,0.5,0.00,9.88
+344361833,Potsdamer Straße,tertiary,0.121,1.0,0.0,8.29,0.00
+344660198,Sakrower Landstraße,unclassified,0.179,0.0,0.0,0.00,0.00
+345672639,Friedrich-Ebert-Straße,residential,0.183,0.5,,2.73,
+345754464,Havelchaussee,tertiary,1.298,0.0,0.0,0.00,0.00
+350169718,Alleestraße,tertiary,0.066,1.0,0.0,15.09,0.00
+350169729,Behlertstraße,tertiary,0.075,1.0,,13.31,
+350169730,Behlertstraße,tertiary,0.108,0.0,,0.00,
+350645633,Charlottenstraße,residential,0.167,0.0,0.5,0.00,2.99
+357165701,Baumgartenbrück,unclassified,0.172,0.5,0.0,2.90,0.00
+359195617,Karl-Liebknecht-Straße,tertiary,0.060,2.0,1.0,33.19,16.59
+360677939,Havelchaussee,tertiary,0.069,0.0,0.0,0.00,0.00
+361846677,Mühlenstraße,primary,0.083,1.0,0.0,12.03,0.00
+362052266,Potsdamer Straße,secondary,0.238,0.0,0.5,0.00,2.10
+362478527,Berliner Allee,primary,0.097,2.0,,20.62,
+362479315,Ahrensfelder Chaussee,secondary,0.627,3.0,2.0,4.78,3.19
+363443435,Oberspreestraße,secondary,0.057,0.5,0.0,8.85,0.00
+363443436,Oberspreestraße,secondary,0.245,0.5,0.0,2.04,0.00
+364933911,Mühlenbecker Chaussee,secondary,0.131,0.0,0.5,0.00,3.82
+364933925,Mühlenbecker Chaussee,secondary,0.123,0.5,0.5,4.05,4.05
+364933929,Mühlenbecker Chaussee,secondary,0.059,0.0,0.5,0.00,8.42
+365829349,Pölnitzweg,tertiary,0.331,0.5,0.0,1.51,0.00
+367389831,Gehrenseestraße,secondary,0.183,0.0,0.0,0.00,0.00
+369223459,Rosa-Luxemburg-Straße,tertiary,0.053,2.0,,37.43,
+371242755,Josef-Nawrocki-Straße,residential,0.130,0.0,,0.00,
+374734385,Friedrichstraße,secondary,0.055,2.0,,36.14,
+374734389,Friedrichstraße,secondary,0.055,2.0,,36.40,
+376730204,Kronprinzessinnenweg,secondary,0.394,0.5,0.5,1.27,1.27
+377650033,Am Wiesenrand,primary,0.073,0.0,1.0,0.00,13.63
+378715768,Charlottenstraße,residential,0.114,1.5,,13.13,
+378965430,Bergfelder Chaussee,primary,0.731,0.0,0.0,0.00,0.00
+378965431,Bergfelder Chaussee,primary,0.092,0.0,0.5,0.00,5.45
+379156456,Hönower Chaussee,secondary,0.805,0.5,0.0,0.62,0.00
+379506035,Wilhelmstraße,secondary,0.085,0.0,0.0,0.00,0.00
+379799096,Weesower Straße,secondary,0.261,0.0,0.5,0.00,1.91
+391407783,Landsberger Allee,primary,0.051,0.0,0.0,0.00,0.00
+391583311,Fercher Straße,tertiary,0.145,0.5,0.5,3.45,3.45
+392680165,Albert-Einstein-Straße,residential,0.154,0.0,0.0,0.00,0.00
+395031548,Mehrower Dorfstraße,secondary,0.217,0.5,0.5,2.30,2.30
+395603832,L 21,secondary,0.193,0.0,0.0,0.00,0.00
+398128955,Wetzlarer Straße,tertiary,0.064,0.5,0.0,7.81,0.00
+398128957,Wetzlarer Straße,tertiary,0.143,0.5,,3.50,
+400581009,Ahrensfelder Chaussee,secondary,0.145,1.0,2.0,6.88,13.76
+406385655,Dorfstraße,secondary,0.172,0.0,0.0,0.00,0.00
+406951775,Friedrich-Ebert-Straße,residential,0.096,0.5,0.5,5.22,5.22
+414498858,Müggelheimer Damm,secondary,0.173,0.0,0.5,0.00,2.89
+414861254,Grabbeallee,primary,0.111,3.0,,27.04,
+416461639,Landsberger Allee,primary,0.209,0.0,,0.00,
+416461641,Landsberger Allee,primary,0.125,2.0,,15.96,
+416507525,Berliner Chaussee,tertiary,0.090,1.0,0.0,11.15,0.00
+417092738,L 292,secondary,2.491,0.0,0.0,0.00,0.00
+419527306,Mühlenstraße,secondary,0.094,1.0,,10.61,
+421790594,Hardenbergplatz,residential,0.092,0.0,,0.00,
+424698097,Wetzlarer Straße,tertiary,0.068,1.0,0.0,14.63,0.00
+428550555,Charlottenburger Chaussee,secondary,0.387,1.0,,2.59,
+431356088,Mühlenstraße,secondary,0.067,1.0,,14.93,
+431356089,Mühlenstraße,secondary,0.061,1.0,,16.40,
+431356092,Mühlenstraße,secondary,0.118,0.0,,0.00,
+431356094,Mühlenstraße,secondary,0.081,2.0,,24.74,
+431571651,Friedrichshagener Straße,secondary,0.164,0.0,0.0,0.00,0.00
+432116461,Fürstenwalder Damm,secondary,0.486,0.0,0.5,0.00,1.03
+432205758,Blumberger Chaussee,primary,0.060,0.0,1.0,0.00,16.56
+432205765,Dorfstraße,primary,0.088,2.0,1.0,22.72,11.36
+432205788,Landsberger Allee,primary,0.082,1.0,0.5,12.12,6.06
+432205792,Mehrower Straße,secondary,0.190,0.0,0.0,0.00,0.00
+437325047,Oranienburger Straße,tertiary,0.116,0.0,0.0,0.00,0.00
+437325054,Tucholskystraße,tertiary,0.075,3.0,1.5,39.95,19.98
+437878263,Oranienburger Chaussee,primary,0.098,0.0,0.5,0.00,5.13
+437878264,Oranienburger Chaussee,primary,0.111,0.0,0.0,0.00,0.00
+439075585,Mühlenbecker Straße,secondary,0.060,1.0,0.0,16.63,0.00
+440342095,Sakrower Landstraße,unclassified,0.079,0.5,0.0,6.36,0.00
+440729909,Roelckestraße,tertiary,0.062,0.0,0.0,0.00,0.00
+441758652,Liebenwalder Straße,secondary,0.262,0.0,0.5,0.00,1.91
+441758653,Liebenwalder Straße,secondary,0.113,0.0,0.5,0.00,4.44
+441808889,Bahnhofstraße,residential,0.108,1.0,0.0,9.27,0.00
+442179982,Berliner Straße,tertiary,0.081,1.0,,12.34,
+442222166,Schönhauser Allee,secondary,0.086,2.0,,23.25,
+450221283,Grabbeallee,primary,0.254,4.0,,15.76,
+450221287,Hermann-Hesse-Straße,primary,0.065,0.0,0.0,0.00,0.00
+456430247,Bahnhofstraße,residential,0.108,0.0,0.5,0.00,4.63
+456510899,An der Wuhlheide,secondary,0.153,0.0,,0.00,
+456662392,Schöneicher Straße,secondary,0.070,0.0,1.0,0.00,14.30
+457722465,Schönhauser Allee,primary,0.062,2.0,,32.27,
+459925688,Sonnenallee,secondary,0.098,2.0,,20.37,
+460193355,Altlandsberger Weg,tertiary,0.458,0.0,0.0,0.00,0.00
+461349955,Wetzlarer Straße,tertiary,0.054,0.0,1.0,0.00,18.38
+461900067,Holzmarktstraße,secondary,0.118,2.0,,16.89,
+461905068,Tiergartenstraße,secondary,0.219,0.5,0.0,2.29,0.00
+465376253,Friedrichstraße,secondary,0.087,2.0,,22.91,
+470195630,K 6909,tertiary,0.921,0.0,0.5,0.00,0.54
+470195631,Friedrich-Ebert-Straße,tertiary,0.305,0.5,0.5,1.64,1.64
+470195632,Straße der Einheit,tertiary,0.173,0.0,0.5,0.00,2.88
+470195637,Potsdamer Straße,tertiary,0.424,0.5,0.0,1.18,0.00
+470352347,Heynstraße,residential,0.144,0.0,0.0,0.00,0.00
+472377515,Schönerlinder Chaussee,secondary,0.304,0.0,0.5,0.00,1.65
+476737123,Leipziger Straße,primary,0.085,1.0,0.0,11.76,0.00
+486330581,Olympischer Platz,residential,0.281,0.0,,0.00,
+489480667,Mehringdamm,primary,0.161,2.5,,15.50,
+489480669,Mehringdamm,primary,0.177,0.0,,0.00,
+491170981,Buchhorster Straße,secondary,0.122,0.5,0.0,4.11,0.00
+492308382,Schönerlinder Chaussee,secondary,0.396,0.0,0.5,0.00,1.26
+492340367,Geschwister-Scholl-Straße,tertiary,0.145,0.0,0.5,0.00,3.45
+497740793,Heinrich-Heine-Weg,residential,0.077,0.0,1.0,0.00,12.90
+506295118,Bouchéstraße,residential,0.183,0.5,0.0,2.73,0.00
+516456554,Müggelheimer Straße,secondary,0.102,0.0,,0.00,
+522030553,Schönwalder Chaussee,secondary,0.926,0.0,0.0,0.00,0.00
+522039893,Birkholzer Straße,secondary,0.954,0.5,0.0,0.52,0.00
+523630409,Memhardstraße,tertiary,0.051,0.0,,0.00,
+526958582,Bleicheroder Straße,tertiary,0.327,0.0,,0.00,
+530085625,Unter den Linden,primary,0.066,3.0,,45.56,
+531059073,Carl-Schmäcke-Straße,tertiary,0.166,0.0,0.0,0.00,0.00
+531059074,Carl-Schmäcke-Straße,tertiary,0.372,1.0,0.0,2.69,0.00
+541295978,Friedrichstraße,secondary,0.053,1.0,,18.97,
+542286749,Bernauer Straße,secondary,0.236,0.5,0.5,2.12,2.12
+545428051,Dorfstraße,secondary,0.375,0.5,0.5,1.33,1.33
+547218604,Grabbeallee,primary,0.077,1.0,,13.02,
+549817228,Weesower Dorfstraße,secondary,0.485,1.0,0.5,2.06,1.03
+560370523,Oranienburger Straße,tertiary,0.102,0.0,0.0,0.00,0.00
+564427607,Maulbeerallee,tertiary,0.602,0.0,0.0,0.00,0.00
+564427608,Maulbeerallee,tertiary,0.280,0.0,0.0,0.00,0.00
+586077883,Bergfelder Straße,primary,0.173,0.5,0.5,2.88,2.88
+589135364,L 30,secondary,1.073,0.0,0.0,0.00,0.00
+597436800,L 77,secondary,0.119,1.0,0.0,8.39,0.00
+599382813,Buchhorster Straße,secondary,0.081,0.0,0.5,0.00,6.18
+603494939,Schwarzer Weg,tertiary,0.187,0.0,0.0,0.00,0.00
+604168576,Kronprinzessinnenweg,secondary,0.063,0.5,0.0,7.89,0.00
+612374218,Oranienburger Straße,primary,0.093,0.0,0.5,0.00,5.38
+612374219,Oranienburger Straße,primary,0.198,0.5,0.0,2.52,0.00
+613589354,Schönerlinder Chaussee,secondary,0.185,0.5,0.0,2.70,0.00
+618056541,Bundesstraße 2,primary,1.065,1.0,1.0,0.94,0.94
+620708663,Kastanienallee,residential,0.080,0.5,0.5,6.24,6.24
+624251120,Alte Lanker Straße,secondary,0.179,0.5,0.0,2.80,0.00
+624251122,Bernauer Straße,secondary,1.884,0.0,0.0,0.00,0.00
+624268785,Heerstraße,residential,0.077,0.0,,0.00,
+627437613,Rosa-Luxemburg-Damm,secondary,0.153,0.5,0.5,3.28,3.28
+627552343,Mehrower Weg,tertiary,2.459,0.0,1.0,0.00,0.41
+629652781,Sakrower Landstraße,unclassified,0.071,0.0,0.0,0.00,0.00
+631446882,Schloßallee,residential,0.073,0.5,0.0,6.87,0.00
+641346554,Liebenwalder Straße,secondary,0.731,1.0,0.0,1.37,0.00
+644762285,Berliner Straße,primary,0.054,0.5,0.0,9.28,0.00
+644762288,Berliner Allee,primary,0.151,0.5,0.5,3.30,3.30
+644765772,L 235,secondary,1.020,0.0,0.0,0.00,0.00
+644765775,Weesower Chaussee,secondary,0.148,0.0,0.5,0.00,3.39
+649959246,Annemarie-Renger-Straße,tertiary,0.150,3.0,2.5,20.02,16.68
+653456363,Arthur-Scheunert-Allee,secondary,0.165,0.5,0.5,3.02,3.02
+660905551,August-Bebel-Straße,tertiary,0.171,0.5,0.5,2.92,2.92
+662931692,Am Petzinsee,residential,0.114,0.5,0.5,4.38,4.38
+665357070,Großbeerenstraße,unclassified,0.166,0.0,0.5,0.00,3.01
+667302891,Hauptstraße,secondary,0.202,1.0,,4.96,
+667660221,Charlottenstraße,residential,0.123,0.5,0.0,4.08,0.00
+673262195,Müggelheimer Straße,secondary,0.169,0.0,,0.00,
+673687108,Großbeerenstraße,unclassified,0.272,0.5,0.5,1.84,1.84
+677205899,Karl-Liebknecht-Straße,residential,0.070,1.0,1.0,14.24,14.24
+679122771,Dorfstraße,secondary,0.148,0.5,0.0,3.38,0.00
+679122772,Dorfstraße,secondary,0.191,0.5,0.5,2.62,2.62
+679714114,Oberspreestraße,secondary,0.127,0.0,0.5,0.00,3.93
+680545821,Zur Historischen Mühle,tertiary,0.070,0.5,0.0,7.18,0.00
+682466008,Havelchaussee,tertiary,0.995,0.0,0.5,0.00,0.50
+685145017,Grabbeallee,primary,0.102,0.0,,0.00,
+686874479,L 292,secondary,1.890,0.0,0.0,0.00,0.00
+690918763,Gatower Straße,secondary,0.061,0.0,0.5,0.00,8.16
+692169747,Rudolf-Rühl-Allee,secondary,0.121,0.0,0.5,0.00,4.14
+692616658,Kladower Damm,secondary,0.373,0.0,0.5,0.00,1.34
+699211935,Choriner Straße,residential,0.346,0.0,0.0,0.00,0.00
+704246857,Am Markt,secondary,0.057,0.0,0.0,0.00,0.00
+707580241,Königstraße,primary,0.056,0.5,,8.90,
+708296765,Holzmarktstraße,secondary,0.051,2.0,,39.12,
+713131104,Eichner Dorfstraße,secondary,0.222,0.0,0.0,0.00,0.00
+713131105,Blumberger Chaussee,primary,0.058,1.0,0.0,17.12,0.00
+713576589,Linienstraße,residential,0.148,0.0,0.5,0.00,3.38
+713576590,Linienstraße,residential,0.175,0.5,0.5,2.85,2.85
+713642272,Hauptstraße,secondary,0.392,0.5,0.0,1.28,0.00
+717177006,Linienstraße,residential,0.136,0.5,0.0,3.67,0.00
+717177007,Linienstraße,residential,0.256,1.5,0.5,5.85,1.95
+717741321,Linienstraße,residential,0.096,0.0,0.0,0.00,0.00
+718809953,Havelchaussee,tertiary,1.232,0.0,0.5,0.00,0.41
+719380757,L 77,secondary,0.456,0.0,1.0,0.00,2.19
+728838409,Alexanderstraße,primary,0.067,0.0,,0.00,
+744464193,Mühlenstraße,primary,0.055,0.0,0.0,0.00,0.00
+749876418,Alexanderstraße,secondary,0.138,2.0,,14.50,
+753730625,Sakrower Landstraße,unclassified,0.136,0.5,0.0,3.68,0.00
+755597811,Eichner Chaussee,secondary,0.407,0.5,0.5,1.23,1.23
+760410929,Bölschestraße,tertiary,0.075,0.5,0.5,6.67,6.67
+761344053,Suermondtstraße,secondary,0.261,3.0,,11.50,
+774550917,Hönower Chaussee,secondary,0.187,0.0,0.0,0.00,0.00
+774550918,Hönower Chaussee,secondary,0.253,0.0,0.0,0.00,0.00
+787627647,Rotberger Dorfstraße,secondary,0.415,0.5,0.0,1.21,0.00
+788169163,Kiekebuscher Dorfstraße,secondary,0.138,0.5,0.0,3.63,0.00
+800637052,Berliner Straße,primary,0.066,3.0,,45.13,
+815565995,Teltower Straße,tertiary,0.057,0.0,0.0,0.00,0.00
+823947541,Kantstraße,secondary,0.103,2.0,,19.35,
+823947549,Kantstraße,secondary,0.178,0.0,,0.00,
+823947552,Neue Kantstraße,secondary,0.066,1.0,,15.11,
+823947553,Neue Kantstraße,secondary,0.077,2.0,,25.94,
+823947554,Neue Kantstraße,secondary,0.124,0.0,,0.00,
+824274185,Mühlenstraße,secondary,0.063,1.0,,15.99,
+824274186,Holzmarktstraße,secondary,0.051,0.0,,0.00,
+824274193,Mühlenstraße,secondary,0.075,2.0,,26.56,
+831658811,Alexanderstraße,secondary,0.087,1.5,,17.18,
+832018628,Dietzgenstraße,primary,0.076,0.5,,6.55,
+832662810,Heinrich-Schlusnus-Straße,residential,0.109,0.5,0.5,4.59,4.59
+832662811,Heinrich-Schlusnus-Straße,residential,0.110,0.0,0.0,0.00,0.00
+834202945,Am Fuchsberg,unclassified,0.123,1.0,0.0,8.13,0.00
+835575550,Kronprinzessinnenweg,secondary,0.085,0.0,,0.00,
+836061564,,tertiary,0.218,0.0,0.5,0.00,2.30
+841291503,Bouchéstraße,residential,0.127,0.0,0.0,0.00,0.00
+842149535,Birkenwerderstraße,primary,0.131,0.0,0.0,0.00,0.00
+851544804,Hermsdorfer Straße,residential,0.087,0.5,0.0,5.73,0.00
+852520251,Mühlenbecker Chaussee,secondary,0.078,0.0,0.5,0.00,6.43
+852522962,Buchhorster Straße,secondary,0.137,0.0,0.0,0.00,0.00
+852522963,Buchhorster Straße,secondary,0.342,0.0,0.0,0.00,0.00
+856554532,Großbeerenstraße,unclassified,0.493,0.0,0.0,0.00,0.00
+857118837,Rudower Chaussee,unclassified,0.107,0.0,0.5,0.00,4.69
+857752725,Kiefholzstraße,tertiary,0.382,1.0,0.0,2.62,0.00
+859353796,Buschallee,secondary,0.053,0.5,,9.45,
+861012419,Berliner Straße,tertiary,0.113,2.0,,17.66,
+862489332,Hauptstraße,secondary,0.079,0.0,0.5,0.00,6.34
+866744035,Werneuchener Chaussee,primary,0.268,0.0,0.0,0.00,0.00
+870918290,An der Mühle,residential,0.239,0.0,0.0,0.00,0.00
+875474697,Schönerlinder Chaussee,secondary,0.272,0.5,0.0,1.84,0.00
+875929571,Wilhelmstraße,secondary,0.101,0.0,0.0,0.00,0.00
+876578972,Müggelheimer Straße,secondary,0.084,0.5,,5.98,
+879144133,Karl-Marx-Allee,primary,0.130,0.0,,0.00,
+886908431,B 2,primary,0.058,0.0,0.0,0.00,0.00
+890535200,Mehrower Chaussee,secondary,0.799,0.0,0.0,0.00,0.00
+890535201,Mehrower Chaussee,secondary,0.448,0.0,0.0,0.00,0.00
+893390204,Am Neuen Garten,tertiary,0.092,0.5,0.0,5.41,0.00
+894363786,Hauptstraße,secondary,0.086,2.0,,23.29,
+895859867,Allee nach Glienicke,tertiary,0.243,0.0,0.0,0.00,0.00
+900453085,Schönerlinder Chaussee,secondary,0.062,0.0,0.5,0.00,8.12
+900453086,Schönerlinder Chaussee,secondary,0.052,0.0,0.0,0.00,0.00
+901849174,Berliner Allee,secondary,0.108,0.0,0.5,0.00,4.62
+902011677,Schönfließer Straße,primary,0.102,0.5,0.5,4.92,4.92
+902030363,Berliner Straße,secondary,0.148,1.0,2.0,6.75,13.50
+907196451,Birkholzer Straße,secondary,0.110,1.0,0.5,9.10,4.55
+908292029,Landsberger Allee,primary,0.165,0.0,,0.00,
+911366645,Straße der Einheit,residential,0.085,0.5,0.5,5.91,5.91
+912473559,Mehrower Straße,secondary,0.139,0.0,0.0,0.00,0.00
+912473560,Hönower Straße,secondary,0.064,0.5,0.0,7.76,0.00
+914038045,Neuenhagener Chaussee,secondary,0.069,0.0,0.0,0.00,0.00
+923098022,Liebenwalder Straße,secondary,0.250,1.0,1.0,4.00,4.00
+925650751,Trappenfelder Straße,residential,0.217,0.5,0.0,2.31,0.00
+928494838,Albert-Einstein-Straße,residential,0.087,0.0,0.0,0.00,0.00
+928653205,Gatower Straße,secondary,0.057,0.5,0.0,8.81,0.00
+928805206,Albert-Einstein-Straße,residential,0.067,0.0,0.0,0.00,0.00
+928805218,Albert-Einstein-Straße,residential,0.113,0.0,0.0,0.00,0.00
+928877897,Alt-Gatow,secondary,0.120,1.0,2.0,8.36,16.72
+930308241,Suermondtstraße,secondary,0.081,0.0,,0.00,
+931271209,Oranienburger Chaussee,primary,0.067,0.5,0.5,7.51,7.51
+932637369,Karl-Marx-Allee,primary,0.081,0.0,,0.00,
+934370752,Birkholzer Dorfstraße,secondary,0.093,0.0,0.5,0.00,5.38
+934405648,Berliner Allee,primary,0.099,0.5,0.5,5.06,5.06
+937010792,Hauptstraße,tertiary,0.216,0.0,0.0,0.00,0.00
+938043964,Dorfstraße,tertiary,0.083,0.0,0.0,0.00,0.00
+938321013,Gehrenseestraße,secondary,0.053,0.5,,9.45,
+949288530,Weinbergstraße,secondary,0.634,0.0,0.0,0.00,0.00
+949605667,Mühlenstraße,primary,0.070,2.0,2.0,28.45,28.45
+958642611,Schöneicher Straße,secondary,0.058,0.0,0.0,0.00,0.00
+965329306,Fürstenwalder Damm,secondary,0.196,0.5,0.0,2.56,0.00
+972736777,,unclassified,0.330,0.0,1.0,0.00,3.03
+978387076,Alte Lanker Straße,secondary,2.299,0.0,0.0,0.00,0.00
+979320607,Norwegerstraße,residential,0.088,0.5,0.5,5.65,5.65
+979320608,Norwegerstraße,residential,0.072,0.0,0.5,0.00,6.90
+979320609,Norwegerstraße,residential,0.103,0.5,0.5,4.84,4.84
+981295179,Gormannstraße,residential,0.065,0.0,0.0,0.00,0.00
+981295181,Choriner Straße,residential,0.122,0.5,0.0,4.10,0.00
+981295182,Choriner Straße,residential,0.100,0.0,0.0,0.00,0.00
+981295184,Choriner Straße,residential,0.088,0.0,0.0,0.00,0.00
+987094047,Schönfelder Straße,secondary,0.153,0.5,0.0,3.27,0.00
+987094050,Dorfstraße,secondary,0.142,0.0,0.0,0.00,0.00
+987094051,Dorfstraße,secondary,0.207,0.0,0.0,0.00,0.00
+987094052,Dorfstraße,secondary,0.222,0.5,0.0,2.25,0.00
+987102854,Weesower Chaussee,secondary,0.247,0.0,0.0,0.00,0.00
+1004875109,Oranienburger Chaussee,primary,0.106,0.5,0.5,4.71,4.71
+1004875111,Oranienburger Chaussee,primary,0.171,0.0,0.5,0.00,2.93
+1004875112,Oranienburger Chaussee,primary,0.164,0.5,0.0,3.05,0.00
+1005535197,Allee nach Glienicke,tertiary,0.114,0.0,0.0,0.00,0.00
+1011723709,Birkholzer Dorfstraße,secondary,0.166,0.0,0.5,0.00,3.01
+1012053035,Breite Straße,residential,0.113,0.5,1.0,4.43,8.85
+1013062670,Trappenfelder Straße,unclassified,1.247,0.0,0.5,0.00,0.40
+1013312399,Mehrower Straße,secondary,0.165,0.0,0.5,0.00,3.03
+1013680943,Mühlenbecker Chaussee,secondary,0.102,0.0,0.0,0.00,0.00
+1013688620,Mühlenbecker Chaussee,secondary,0.104,0.5,0.0,4.83,0.00
+1015838035,Bergfelder Straße,primary,0.162,0.5,0.0,3.09,0.00
+1016847954,Sakrower Landstraße,unclassified,0.158,0.0,0.0,0.00,0.00
+1020479692,Wetzlarer Straße,tertiary,0.088,0.5,0.5,5.68,5.68
+1020479693,Wetzlarer Straße,tertiary,0.080,0.0,0.5,0.00,6.24
+1022323966,Elsenstraße,tertiary,0.059,0.0,0.0,0.00,0.00
+1024034687,Max-Beer-Straße,residential,0.171,0.0,1.0,0.00,5.84
+1035909461,Gehrenseestraße,secondary,0.212,0.0,0.5,0.00,2.36
+1036246986,Hauptstraße,secondary,0.086,0.0,0.5,0.00,5.81
+1036780262,Hans-Thoma-Straße,tertiary,0.110,2.0,,18.21,
+1044464407,Dorfstraße,tertiary,0.126,0.5,0.0,3.95,0.00
+1045086255,Schönhauser Straße,tertiary,0.073,0.0,0.5,0.00,6.84
+1046895009,,secondary,0.104,0.0,,0.00,
+1047220709,Potsdamer Straße,tertiary,0.077,0.0,1.0,0.00,12.95
+1047220710,B 2,primary,0.067,1.0,0.0,14.82,0.00
+1047220711,Potsdamer Straße,tertiary,0.065,0.5,0.0,7.67,0.00
+1050818238,Dietzgenstraße,primary,0.079,0.0,0.0,0.00,0.00
+1052675227,Schwedter Straße,residential,0.094,0.0,0.0,0.00,0.00
+1052706800,Bahnhofstraße,secondary,0.197,0.5,0.0,2.53,0.00
+1053338258,Schwarzer Weg,tertiary,0.054,0.0,0.0,0.00,0.00
+1054776620,Andreasstraße,tertiary,0.061,0.0,0.0,0.00,0.00
+1055040312,Holzmarktstraße,secondary,0.057,0.0,,0.00,
+1057663349,Hönower Chaussee,tertiary,0.189,0.0,0.5,0.00,2.65
+1057923682,Bergfelder Straße,primary,0.128,0.5,0.5,3.90,3.90
+1062022062,An der Mühle,residential,0.119,0.0,0.0,0.00,0.00
+1067561745,Tempelhofer Damm,primary,0.063,1.0,,15.95,
+1067561748,Tempelhofer Damm,primary,0.136,0.5,,3.67,
+1069088216,Eichkampstraße,tertiary,0.060,0.0,0.0,0.00,0.00
+1074113697,Schönhauser Straße,tertiary,0.145,0.5,0.5,3.45,3.45
+1075289898,Oranienburger Straße,primary,0.061,0.0,0.5,0.00,8.24
+1075289899,Oranienburger Straße,primary,0.101,0.5,0.5,4.94,4.94
+1075504988,Hauptstraße,primary,0.106,0.0,0.0,0.00,0.00
+1076055688,Schillingstraße,residential,0.142,0.5,0.5,3.52,3.52
+1076285237,Bahnhofstraße,secondary,0.057,0.5,0.0,8.75,0.00
+1076285241,Buchhorster Straße,secondary,0.081,0.0,0.5,0.00,6.15
+1076317899,Mühlenbecker Chaussee,secondary,0.056,0.0,0.5,0.00,8.98
+1076468030,Mühlenbecker Chaussee,secondary,0.065,0.0,0.5,0.00,7.73
+1077923225,Unter den Linden,primary,0.065,2.0,,30.99,
+1078864317,John-Foster-Dulles-Allee,tertiary,0.130,0.0,0.0,0.00,0.00
+1079495669,Unter den Linden,primary,0.051,0.5,,9.78,
+1079985703,An der Wuhlheide,secondary,0.245,0.0,,0.00,
+1081891426,Heerstraße,residential,0.507,1.0,,1.97,
+1081891750,Heerstraße,residential,0.526,2.0,,3.80,
+1083158438,Krummenseestraße,secondary,0.059,0.0,0.0,0.00,0.00
+1083226574,Lichtenberger Straße,secondary,0.105,0.0,,0.00,
+1083380803,Mehrower Dorfstraße,secondary,0.102,0.0,0.5,0.00,4.92
+1083429192,Eichner Dorfstraße,secondary,0.084,0.0,0.5,0.00,5.96
+1083457461,Mehrower Chaussee,secondary,0.150,0.0,0.5,0.00,3.33
+1084225374,Straße nach Sacrow,unclassified,0.108,0.0,0.0,0.00,0.00
+1084225375,Straße nach Sacrow,unclassified,0.236,0.0,0.0,0.00,0.00
+1084225376,Straße nach Sacrow,unclassified,0.178,0.5,0.0,2.81,0.00
+1086573752,,unclassified,0.182,0.0,0.0,0.00,0.00
+1086573753,,unclassified,0.081,0.0,0.0,0.00,0.00
+1086655023,Berliner Straße,primary,0.227,0.5,1.0,2.20,4.40
+1090233551,Friedrichstraße,residential,0.083,0.5,0.0,6.01,0.00
+1091625975,Senefelderstraße,residential,0.061,0.0,0.0,0.00,0.00
+1091631915,Schönhauser Allee,primary,0.264,2.0,,7.59,
+1092670183,Ahornallee,residential,0.224,2.0,1.5,8.92,6.69
+1092839305,Oranienburger Chaussee,primary,0.061,0.5,0.0,8.25,0.00
+1092916620,An der Wuhlheide,secondary,0.138,0.0,,0.00,
+1094423251,Stargarder Straße,residential,0.080,0.0,0.0,0.00,0.00
+1094529701,Hosemannstraße,tertiary,0.125,0.5,0.0,3.99,0.00
+1095407474,Alte Schönhauser Straße,residential,0.149,0.5,0.5,3.35,3.35
+1096709556,Greifswalder Straße,primary,0.274,0.0,,0.00,
+1097043879,Am Gaisberg,residential,0.157,0.5,0.0,3.19,0.00
+1097787527,Potsdamer Straße,tertiary,0.221,0.5,0.5,2.26,2.26
+1098856743,Weydingerstraße,residential,0.076,0.5,1.0,6.54,13.07
+1099361268,Hosemannstraße,tertiary,0.064,0.0,0.0,0.00,0.00
+1100785383,Kantstraße,secondary,0.188,0.0,,0.00,
+1100785767,Neue Kantstraße,secondary,0.060,0.0,,0.00,
+1100786083,Neue Kantstraße,secondary,0.077,0.0,,0.00,
+1101061003,Alt-Moabit,secondary,0.118,0.0,,0.00,
+1101102608,Kantstraße,secondary,0.055,0.0,,0.00,
+1101180437,Otto-Suhr-Allee,secondary,0.076,0.0,,0.00,
+1101199590,Kaiserdamm,primary,0.126,1.5,,11.90,
+1101803171,Markgrafendamm,secondary,0.066,1.0,2.0,15.22,30.44
+1101961735,Hinter dem Gießhaus,residential,0.057,0.0,0.0,0.00,0.00
+1102154075,Friedrichstraße,secondary,0.050,0.0,,0.00,
+1102154080,Johannisstraße,residential,0.063,0.0,1.0,0.00,15.96
+1102317489,Heerstraße,residential,0.274,1.0,,3.65,
+1104384195,Mittelstraße,primary,0.060,0.0,0.5,0.00,8.34
+1104386299,Bergfelder Chaussee,primary,0.112,0.5,0.0,4.46,0.00
+1104710496,Königsweg,tertiary,0.064,0.0,0.0,0.00,0.00
+1106772005,Mehrower Straße,secondary,0.059,0.5,0.0,8.44,0.00
+1107993370,Tillmannsweg,residential,0.054,1.0,0.0,18.40,0.00
+1108304588,Straße des 17. Juni,primary,0.182,0.0,,0.00,
+1109039493,Müggelseedamm,secondary,0.182,0.0,0.0,0.00,0.00
+1109040037,Müggelseedamm,secondary,0.156,0.5,0.5,3.20,3.20
+1109051854,Müggelseedamm,secondary,0.057,0.0,0.0,0.00,0.00
+1109052039,Josef-Nawrocki-Straße,residential,0.072,0.0,,0.00,
+1110526068,Rochstraße,residential,0.073,0.0,0.0,0.00,0.00
+1111782353,Reichsstraße,secondary,0.077,2.0,,25.83,
+1112708139,Königin-Elisabeth-Straße,primary,0.146,0.5,,3.42,
+1113726463,Unter den Linden,primary,0.061,0.0,,0.00,
+1115122398,Straße zum Müggelturm,unclassified,0.377,0.0,0.5,0.00,1.32
+1115509343,Rosa-Luxemburg-Straße,tertiary,0.116,0.0,0.0,0.00,0.00
+1116360587,Charlottenstraße,residential,0.069,0.5,0.0,7.21,0.00
+1116571910,Bismarckstraße,primary,0.062,0.0,,0.00,
+1116995921,Kaiserdamm,primary,0.108,0.0,,0.00,
+1117262057,Stralauer Allee,primary,0.214,0.0,,0.00,
+1117582589,Am Postfenn,tertiary,0.137,0.5,0.5,3.66,3.66
+1117582590,Am Postfenn,tertiary,0.098,0.5,0.5,5.09,5.09
+1119385764,Rummelsburger Landstraße,secondary,0.253,0.5,,1.98,
+1119425457,Kaiserdamm,primary,0.173,0.0,,0.00,
+1119935327,Unter den Linden,primary,0.062,0.0,,0.00,
+1119935543,Unter den Linden,primary,0.086,2.0,,23.18,
+1119936840,Unter den Linden,primary,0.076,1.0,,13.17,
+1119937599,Unter den Linden,primary,0.200,0.0,,0.00,
+1119940274,Straße des 17. Juni,primary,0.160,0.0,,0.00,
+1120450834,Jesse-Owens-Allee,tertiary,0.082,0.0,0.5,0.00,6.12
+1120450836,Jesse-Owens-Allee,tertiary,0.088,0.5,0.0,5.67,0.00
+1120450837,Jesse-Owens-Allee,tertiary,0.282,0.0,0.0,0.00,0.00
+1120450847,Heerstraße,residential,0.337,0.0,,0.00,
+1120450848,Heerstraße,residential,0.441,2.0,,4.53,
+1121505020,Schönhauser Allee,primary,0.053,0.0,,0.00,
+1121505024,Schönhauser Allee,secondary,0.065,2.0,,30.60,
+1124238229,Russische Kolonie,residential,0.093,0.0,0.5,0.00,5.37
+1125871007,Unter den Linden,primary,0.070,0.0,,0.00,
+1126200763,John-Foster-Dulles-Allee,tertiary,0.063,0.0,0.0,0.00,0.00
+1128460127,Staehleweg,residential,0.057,1.0,0.0,17.64,0.00
+1131128637,Ossietzkystraße,residential,0.094,0.0,0.5,0.00,5.33
+1133396171,Bismarckstraße,primary,0.098,0.0,,0.00,
+1133396172,Bismarckstraße,primary,0.183,0.0,,0.00,
+1133396241,Bismarckstraße,primary,0.062,0.0,,0.00,
+1133396255,Bismarckstraße,primary,0.064,0.0,,0.00,
+1133761502,Kollwitzstraße,residential,0.145,1.0,0.0,6.90,0.00
+1133761619,Schönhauser Allee,secondary,0.055,0.5,,9.10,
+1133761789,Alexanderstraße,secondary,0.065,0.0,,0.00,
+1133992730,Gormannstraße,residential,0.053,0.0,0.0,0.00,0.00
+1133993504,Greifswalder Straße,primary,0.114,0.0,,0.00,
+1133993555,Greifswalder Straße,primary,0.185,0.0,,0.00,
+1134542516,Jötunsteig,residential,0.245,0.5,1.5,2.04,6.12
+1136139948,Grellstraße,tertiary,0.154,0.0,,0.00,
+1137142138,Roelckestraße,tertiary,0.079,0.0,0.0,0.00,0.00
+1137312351,Roelckestraße,tertiary,0.053,1.0,3.0,19.00,57.01
+1138472801,Potsdamer Straße,tertiary,0.072,0.0,0.0,0.00,0.00
+1139102398,Kollwitzstraße,residential,0.141,0.0,0.0,0.00,0.00
+1140251035,Katzbachstraße,secondary,0.062,0.0,0.0,0.00,0.00
+1140251037,Katzbachstraße,secondary,0.118,0.0,0.0,0.00,0.00
+1140251038,Katzbachstraße,secondary,0.051,0.0,0.0,0.00,0.00
+1142744695,Katzbachstraße,secondary,0.102,0.0,0.0,0.00,0.00
+1143844267,Schivelbeiner Straße,tertiary,0.083,0.0,,0.00,
+1144358730,Großbeerenstraße,residential,0.096,0.0,0.0,0.00,0.00
+1144961590,Andreasstraße,tertiary,0.166,0.0,0.0,0.00,0.00
+1145213671,Boxhagener Straße,tertiary,0.098,0.0,0.0,0.00,0.00
+1146408279,Alte Lanker Straße,secondary,0.818,0.0,0.0,0.00,0.00
+1147364047,Britzer Straße,residential,0.096,0.5,1.0,5.19,10.37
+1147413270,Wilhelmstraße,secondary,0.055,1.0,2.0,18.11,36.22
+1147755045,Wilhelmstraße,secondary,0.061,0.0,0.5,0.00,8.23
+1149417521,Unter den Linden,primary,0.089,2.0,,22.58,
+1150892853,Buschallee,secondary,0.110,1.0,,9.10,
+1150954111,Alte Schönhauser Straße,residential,0.094,1.0,0.5,10.64,5.32
+1151333062,Charlottenstraße,residential,0.077,0.0,0.0,0.00,0.00
+1152723807,Zimmerstraße,residential,0.111,0.0,1.0,0.00,9.03
+1152876522,Wilhelmstraße,secondary,0.057,0.0,0.0,0.00,0.00
+1156361406,Havelchaussee,tertiary,0.344,0.0,0.5,0.00,1.45
+1156365821,Havelchaussee,tertiary,0.500,0.0,0.0,0.00,0.00
+1158343670,Rudower Chaussee,unclassified,0.096,0.0,0.5,0.00,5.23
+1160433832,Kohlhasenbrücker Straße,tertiary,0.069,0.0,0.0,0.00,0.00
+1162797188,Schwedter Straße,residential,0.058,0.0,0.0,0.00,0.00
+1163059322,Fürstenwalder Damm,secondary,0.362,0.0,0.5,0.00,1.38
+1165399456,Straße des 17. Juni,primary,0.161,0.0,,0.00,
+1167184534,Lehrter Straße,residential,0.081,0.0,0.0,0.00,0.00
+1167187202,Lehrter Straße,residential,0.088,0.0,0.0,0.00,0.00
+1169809154,Kiefholzstraße,tertiary,0.282,0.5,0.5,1.77,1.77
+1170522567,Unter den Linden,primary,0.078,0.5,,6.39,
+1170522571,Unter den Linden,primary,0.059,0.0,,0.00,
+1170522572,Unter den Linden,primary,0.070,2.0,,28.67,
+1174868976,Voltaireweg,tertiary,0.284,0.0,0.0,0.00,0.00
+1175259245,Grabbeallee,primary,0.134,0.0,,0.00,
+1176584962,Michendorfer Chaussee,primary,0.085,0.0,0.5,0.00,5.91
+1176584963,Michendorfer Chaussee,primary,0.081,0.0,0.0,0.00,0.00
+1178558877,Heerstraße,residential,0.050,0.5,,9.92,
+1178558879,Heerstraße,residential,0.633,0.5,,0.79,
+1179820253,Münzstraße,tertiary,0.061,0.0,0.0,0.00,0.00
+1184375985,Fürstenwalder Damm,secondary,0.077,0.0,1.0,0.00,13.07
+1184375986,Fürstenwalder Damm,secondary,0.169,0.0,0.0,0.00,0.00
+1187918371,Großbeerenstraße,residential,0.095,0.0,0.0,0.00,0.00
+1187982831,,unclassified,0.058,3.0,0.0,51.73,0.00
+1188962546,Dietzgenstraße,primary,0.087,0.5,0.0,5.76,0.00
+1189391672,Pölnitzweg,tertiary,0.054,0.5,0.0,9.29,0.00
+1189391677,Pölnitzweg,tertiary,0.164,0.0,0.5,0.00,3.05
+1189391686,Pölnitzweg,tertiary,0.156,0.0,0.0,0.00,0.00
+1189391687,Pölnitzweg,tertiary,0.102,0.0,0.5,0.00,4.92
+1189391698,Pölnitzweg,tertiary,0.091,0.0,0.0,0.00,0.00
+1189844434,Am Sportplatz,unclassified,0.060,0.0,0.0,0.00,0.00
+1189844436,Am Sportplatz,unclassified,0.137,0.0,0.0,0.00,0.00
+1190153610,Am Sportplatz,unclassified,0.055,0.0,0.0,0.00,0.00
+1192762861,Schönholzer Straße,primary,0.057,0.0,0.5,0.00,8.84
+1193562605,Am Schwielowsee,tertiary,0.186,0.0,0.0,0.00,0.00
+1193562606,Am Schwielowsee,tertiary,0.070,0.0,0.0,0.00,0.00
+1193562611,Fercher Straße,tertiary,0.225,0.0,0.5,0.00,2.22
+1195041843,Berliner Straße,secondary,0.073,0.0,0.0,0.00,0.00
+1195348939,Berliner Allee,secondary,0.145,0.0,0.5,0.00,3.44
+1197181671,Bernauer Damm,secondary,0.091,0.0,0.0,0.00,0.00
+1197275502,Birkholzer Chaussee,secondary,0.067,0.5,0.0,7.46,0.00
+1197275503,Birkholzer Chaussee,secondary,0.071,1.0,3.0,14.00,42.01
+1198409426,Tucholskystraße,tertiary,0.069,0.0,0.0,0.00,0.00
+1198531521,Enkenbacher Weg,living_street,0.067,0.0,0.5,0.00,7.42
+1198531534,Am Müggelberg,living_street,0.066,0.0,0.0,0.00,0.00
+1199531473,Mühlenbecker Straße,secondary,0.313,0.5,0.0,1.60,0.00
+1212070930,Stahnsdorfer Damm,residential,0.174,0.0,1.0,0.00,5.75
+1212758383,Stahnsdorfer Straße,residential,0.091,0.5,0.0,5.47,0.00
+1214584011,Mariendorfer Damm,primary,0.061,2.0,,32.66,
+1216103951,Müggelseedamm,secondary,0.058,0.0,0.5,0.00,8.66
+1218225317,Johannisstraße,residential,0.112,0.0,0.5,0.00,4.45
+1220612017,Leipziger Straße,primary,0.148,0.0,0.5,0.00,3.39
+1224549031,Konrad-Wolf-Straße,secondary,0.114,0.5,0.5,4.37,4.37
+1225893108,Rummelsburger Landstraße,secondary,0.635,0.5,,0.79,
+1226240317,Bahnhofstraße,secondary,0.090,0.0,0.0,0.00,0.00
+1228006689,Summter Chaussee,secondary,0.098,0.0,0.0,0.00,0.00
+1234601497,Bahnhofstraße,tertiary,0.301,0.5,0.5,1.66,1.66
+1239209455,Königstraße,primary,0.072,0.5,,6.95,
+1239209458,Königstraße,primary,0.122,2.5,,20.55,
+1243464122,Allee nach Glienicke,tertiary,0.066,0.0,0.5,0.00,7.56
+1246075329,Drewitzer Straße,tertiary,0.088,1.0,1.5,11.40,17.10
+1257322094,Birkholzer Chaussee,secondary,0.174,0.0,0.0,0.00,0.00
+1257322103,Schwanebecker Straße,secondary,0.189,1.0,0.5,5.29,2.64
+1259402976,Nikolskoer Weg,residential,0.708,0.0,0.5,0.00,0.71
+1259403459,Nikolskoer Weg,residential,0.255,0.0,1.0,0.00,3.93
+1259421921,Dahlewitzer Dorfstraße,tertiary,0.070,0.5,0.5,7.18,7.18
+1267412876,Mehrower Straße,secondary,0.211,0.5,0.0,2.37,0.00
+1270430856,Voltaireweg,tertiary,0.085,0.0,0.0,0.00,0.00
+1272470993,Bismarckstraße,primary,0.111,0.0,,0.00,
+1282013563,Kronprinzessinnenweg,tertiary,0.089,0.0,0.0,0.00,0.00
+1286661390,Teufelsseechaussee,residential,0.229,0.0,0.5,0.00,2.19
+1286662291,Teufelsseechaussee,residential,0.181,0.5,0.0,2.76,0.00
+1286855005,Havelchaussee,tertiary,0.108,0.0,0.5,0.00,4.63
+1286858554,Havelchaussee,tertiary,0.233,0.0,0.0,0.00,0.00
+1288875604,Alte Lanker Straße,secondary,0.076,0.0,0.0,0.00,0.00
+1299716094,Dorfstraße,primary,0.125,0.0,0.0,0.00,0.00
+1301739333,Mühlenbecker Straße,secondary,0.071,0.5,0.5,7.06,7.06
+1302097691,Hauptstraße,secondary,0.145,0.5,0.5,3.46,3.46
+1314874654,,secondary,0.088,0.0,,0.00,
+1316176371,Fürstenwalder Damm,secondary,0.214,0.5,0.0,2.34,0.00
+1324369366,Müggelseedamm,secondary,0.056,0.5,0.0,8.96,0.00
+1324369380,Bölschestraße,tertiary,0.062,0.0,0.0,0.00,0.00
+1329371028,Stralauer Allee,primary,0.143,0.0,,0.00,
+1330282881,Berliner Allee,primary,0.109,0.0,,0.00,
+1330299827,Mühlenbecker Straße,secondary,0.061,0.0,0.0,0.00,0.00
+1333207972,Oranienburger Chaussee,primary,0.059,0.0,0.5,0.00,8.47
+1334858893,Neubeerener Straße,secondary,0.120,0.5,0.0,4.16,0.00
+1334858895,Neubeerener Straße,secondary,0.140,0.0,0.0,0.00,0.00
+1338598836,Landsberger Allee,primary,0.072,0.5,,6.90,
+1338663416,Landsberger Allee,primary,0.114,0.0,,0.00,
+1359775745,Carl-Schmäcke-Straße,tertiary,0.221,0.0,0.0,0.00,0.00
+1359925416,Schendelgasse,residential,0.061,1.0,0.5,16.35,8.18
+1360636726,Rudelsburgstraße,residential,0.354,2.0,2.0,5.65,5.65
+1365468004,Eichenallee,residential,0.311,0.5,1.0,1.61,3.21
+1365468395,Eichenallee,residential,0.154,0.5,0.5,3.25,3.25
+1373533751,Schwedter Straße,residential,0.111,0.0,0.5,0.00,4.49
+1374940376,Potsdamer Straße,tertiary,0.150,0.0,0.0,0.00,0.00
+1374940377,Potsdamer Straße,tertiary,0.115,0.0,0.0,0.00,0.00
+1374943930,Stahnsdorfer Damm,tertiary,0.170,0.5,0.0,2.93,0.00
+1380175050,Schönwalder Chaussee,secondary,0.411,0.0,0.0,0.00,0.00
+1380175051,Schönwalder Chaussee,secondary,0.297,0.0,0.0,0.00,0.00
+1380285503,Birkenwerderstraße,primary,0.259,0.5,0.5,1.93,1.93
+1390900390,Mühlenstraße,secondary,0.064,0.0,,0.00,
+1390900399,Mühlenstraße,secondary,0.075,1.0,,13.39,
+1394768288,Julie-Wolfthorn-Straße,secondary,0.093,0.0,,0.00,
+1394928033,Anna-Louisa-Karsch-Straße,tertiary,0.064,0.0,0.0,0.00,0.00
+1395745150,Bernauer Straße,secondary,0.117,0.0,0.0,0.00,0.00
+1396265336,Almstadtstraße,residential,0.098,0.0,0.5,0.00,5.13
+1408770001,Alexanderstraße,primary,0.078,2.0,,25.65,
+1412776110,Tiergartenstraße,secondary,0.071,0.0,0.0,0.00,0.00
+1412776112,Tiergartenstraße,secondary,0.063,2.0,1.0,31.64,15.82
+1415188465,Otto-Suhr-Allee,secondary,0.077,0.0,,0.00,
+1415675637,Kollwitzstraße,residential,0.085,0.0,0.0,0.00,0.00
+1418971157,Königstraße,primary,0.099,0.0,,0.00,
+1419116808,Berliner Straße,secondary,0.050,0.5,0.5,9.99,9.99
+1419941109,Hosemannstraße,tertiary,0.143,0.0,0.5,0.00,3.49
+1419978283,Hosemannstraße,tertiary,0.069,0.5,0.0,7.24,0.00
+1420723361,Roelckestraße,tertiary,0.088,0.5,0.0,5.68,0.00
+1424054935,Kiefholzstraße,tertiary,0.522,0.5,0.0,0.96,0.00
+1425032659,Fürstenwalder Damm,secondary,0.340,0.0,0.0,0.00,0.00
+1425032660,Fürstenwalder Damm,secondary,0.327,0.0,0.5,0.00,1.53
+1427941277,Suermondtstraße,secondary,0.055,0.0,,0.00,
+1427941278,Suermondtstraße,secondary,0.057,0.0,,0.00,
+1428786238,Sakrower Landstraße,unclassified,0.057,0.0,0.0,0.00,0.00
+1429023352,Sakrower Landstraße,unclassified,0.057,0.0,0.0,0.00,0.00
+1429023353,Sakrower Landstraße,unclassified,0.050,2.0,2.0,39.96,39.96
+1429040558,Sakrower Landstraße,unclassified,0.064,0.0,0.0,0.00,0.00
+1430048499,Havelchaussee,tertiary,0.128,0.0,0.0,0.00,0.00
+1430048500,Havelchaussee,tertiary,0.103,0.0,0.0,0.00,0.00
+1430341534,Kronprinzessinnenweg,tertiary,0.053,0.0,0.0,0.00,0.00
+1430341537,Kronprinzessinnenweg,tertiary,0.092,0.0,0.0,0.00,0.00
+1430341539,Kronprinzessinnenweg,tertiary,0.125,0.0,0.0,0.00,0.00
+1430341540,Kronprinzessinnenweg,tertiary,0.156,0.0,0.0,0.00,0.00
+1430341548,Kronprinzessinnenweg,secondary,0.103,0.5,0.0,4.84,0.00
+1430341550,Kronprinzessinnenweg,secondary,0.061,0.5,0.0,8.18,0.00
+1430350321,Am Postfenn,tertiary,0.057,0.0,0.0,0.00,0.00
+1430469449,Mariendorfer Damm,primary,0.115,0.0,,0.00,
+1430477977,Mariendorfer Damm,primary,0.096,0.0,,0.00,
+1430477979,Mariendorfer Damm,primary,0.065,0.0,,0.00,
+1430486086,Friedrichshagener Straße,secondary,0.275,0.0,0.0,0.00,0.00
+1430524934,Heerstraße,residential,0.072,0.5,,6.96,
+1430524936,Heerstraße,residential,0.059,0.5,,8.51,
+1430524937,Heerstraße,residential,0.224,1.0,,4.46,
+1430524939,Heerstraße,residential,0.124,1.0,,8.07,
+1430563387,Reichsstraße,secondary,0.067,0.0,,0.00,
+1430717549,Friedrichshagener Straße,secondary,0.118,0.0,0.0,0.00,0.00
+1430717550,Friedrichshagener Straße,secondary,0.075,0.0,0.0,0.00,0.00
+1430847472,Olympische Straße,secondary,0.067,0.0,0.0,0.00,0.00
+1430860351,Trakehner Allee,secondary,0.174,0.0,0.0,0.00,0.00
+1431125766,Kohlhasenbrücker Straße,tertiary,0.089,0.0,0.0,0.00,0.00
+1431125767,Kohlhasenbrücker Straße,tertiary,0.051,0.0,0.0,0.00,0.00
+1431945886,Königstraße,primary,0.239,0.0,,0.00,
+1431945889,Königstraße,primary,0.063,1.0,,15.76,
+1431945893,Königstraße,primary,0.082,0.0,,0.00,
+1431945894,Königstraße,primary,0.065,0.0,,0.00,
+1431945899,Königstraße,primary,0.146,0.5,,3.42,
+1431945901,Königstraße,primary,0.121,0.5,,4.14,
+1431945903,Königstraße,primary,0.054,2.0,,36.72,
+1431956165,Am Großen Wannsee,residential,1.111,1.5,,1.35,
+1431956167,Am Großen Wannsee,residential,0.266,0.0,,0.00,
+1432014415,Kronprinzessinnenweg,secondary,0.060,0.0,0.5,0.00,8.35
+1432014421,Kronprinzessinnenweg,secondary,0.118,0.0,0.0,0.00,0.00
+1432014423,Kronprinzessinnenweg,secondary,0.100,0.0,0.0,0.00,0.00
+1432249803,Ossietzkystraße,residential,0.077,0.0,0.0,0.00,0.00
+1432259025,Gatower Straße,secondary,0.090,0.5,0.5,5.55,5.55
+1432259052,Kladower Damm,secondary,0.193,0.0,0.0,0.00,0.00
+1432259053,Kladower Damm,secondary,0.452,0.0,0.0,0.00,0.00
+1432316093,Kladower Damm,secondary,0.472,0.0,0.0,0.00,0.00
+1433329369,Schwedter Straße,residential,0.069,0.0,0.0,0.00,0.00
+1433700798,Straße der Einheit,residential,0.109,0.5,1.0,4.60,9.21
+1434850630,Schönhauser Straße,tertiary,0.087,0.0,0.0,0.00,0.00
+1434871400,Schönhauser Straße,tertiary,0.059,0.0,0.0,0.00,0.00
+1435374411,Schöneicher Straße,secondary,0.055,0.0,0.0,0.00,0.00
+1435523425,Josef-Nawrocki-Straße,residential,0.080,0.0,,0.00,
+1435691654,Ahrensfelder Chaussee,secondary,0.370,0.0,0.0,0.00,0.00
+1435757524,Jötunsteig,residential,0.067,0.5,0.0,7.51,0.00
+1435956830,Schönholzer Straße,primary,0.069,0.5,0.0,7.22,0.00
+1435969910,Grabbeallee,primary,0.079,0.0,,0.00,
+1442119418,Dietzgenstraße,primary,0.062,0.0,0.0,0.00,0.00
+1442119419,Dietzgenstraße,primary,0.115,0.5,0.0,4.34,0.00
+1442174281,Dietzgenstraße,primary,0.135,0.0,,0.00,
+1442174282,Dietzgenstraße,primary,0.204,0.5,,2.46,
+1442174297,Dietzgenstraße,primary,0.071,0.0,0.0,0.00,0.00
+1442174302,Dietzgenstraße,primary,0.103,0.0,0.0,0.00,0.00
+1442174303,Dietzgenstraße,primary,0.114,0.0,0.0,0.00,0.00
+1442972814,Lindenstraße,residential,0.103,0.5,0.0,4.84,0.00
+1443692432,Flaischlenstraße,residential,0.112,0.5,0.5,4.47,4.47
+1443904843,Berliner Straße,secondary,0.072,0.5,,6.91,
+1443945924,Grabbeallee,primary,0.185,0.0,,0.00,
+1444481757,Königsteinstraße,residential,0.111,0.5,0.0,4.51,0.00
+1444481758,Königsteinstraße,residential,0.095,0.0,0.5,0.00,5.29
+1444535313,Rudelsburgstraße,residential,0.366,1.0,1.5,2.73,4.09
+1445401390,Ossietzkystraße,residential,0.104,0.5,0.0,4.82,0.00
+1446033218,Staehleweg,residential,0.073,0.0,0.0,0.00,0.00
+1447255654,Universitätsstraße,tertiary,0.071,0.0,1.0,0.00,14.06
+1447764441,Roelckestraße,tertiary,0.110,0.0,0.0,0.00,0.00
+1447981616,Hauptstraße,secondary,0.054,0.0,0.0,0.00,0.00
+1448039819,Buschallee,secondary,0.272,0.0,,0.00,
+1448039820,Buschallee,secondary,0.051,0.0,,0.00,
+1448166442,Am Müggelberg,residential,0.090,0.0,0.0,0.00,0.00
+1448166444,Am Müggelberg,residential,0.066,0.0,0.5,0.00,7.58
+1448719991,Pfalz-Zweibrücker Weg,residential,0.113,0.0,0.5,0.00,4.42
+1449612370,Vesaliusstraße,residential,0.097,0.0,0.0,0.00,0.00
+1450286567,Bleicheroder Straße,tertiary,0.086,0.0,,0.00,
+1450669192,Neue Schönholzer Straße,residential,0.101,0.0,0.0,0.00,0.00
+1450712559,Heynstraße,residential,0.077,0.0,0.0,0.00,0.00
+1450840505,Berliner Allee,primary,0.082,0.0,,0.00,
+1451354653,Mühlenstraße,primary,0.074,0.5,0.0,6.73,0.00
+1451614873,Kladower Damm,secondary,0.054,0.0,0.0,0.00,0.00
+1451976963,Alt-Kladow,residential,0.070,0.0,0.0,0.00,0.00
+1453895760,Hauptstraße,residential,0.123,0.0,0.0,0.00,0.00
+1454128582,Köpenicker Chaussee,secondary,0.079,0.0,,0.00,
+1454373026,Gatower Straße,secondary,0.190,0.0,0.0,0.00,0.00
+1455143219,An der Wuhlheide,secondary,0.168,0.0,,0.00,
+1455166787,Gatower Straße,secondary,0.078,0.0,0.0,0.00,0.00
+1455166789,Gatower Straße,secondary,0.074,1.0,1.0,13.58,13.58
+1455166790,Gatower Straße,secondary,0.069,0.0,0.0,0.00,0.00
+1455403948,An der Wuhlheide,secondary,0.347,0.0,,0.00,
+1455406227,An der Wuhlheide,secondary,0.103,3.0,,29.12,
+1455406236,An der Wuhlheide,secondary,0.097,0.0,,0.00,
+1455406238,An der Wuhlheide,secondary,0.175,0.0,,0.00,
+1455406240,An der Wuhlheide,secondary,0.118,0.0,,0.00,
+1455426318,An der Wuhlheide,secondary,0.068,0.0,,0.00,
+1455426320,An der Wuhlheide,secondary,0.097,0.5,,5.17,
+1455960386,Heidelberger Straße,residential,0.164,0.0,0.5,0.00,3.04
+1456034628,Elsenstraße,tertiary,0.063,0.0,0.0,0.00,0.00
+1459311534,Schönhauser Allee,primary,0.053,2.0,,37.97,
+1459362231,Cantianstraße,residential,0.058,0.0,0.0,0.00,0.00
+1460514237,Schönhauser Allee,secondary,0.081,0.5,,6.17,
+1461288808,Linienstraße,residential,0.089,0.0,0.5,0.00,5.62
+1462645181,Rosenthaler Straße,tertiary,0.068,0.0,0.0,0.00,0.00
+1462645217,Johannisstraße,residential,0.063,0.5,0.0,7.95,0.00
+1462815762,Hinter dem Gießhaus,residential,0.054,0.0,0.0,0.00,0.00
+1462815781,Am Lustgarten,residential,0.061,0.0,0.0,0.00,0.00
+1462868939,Charlottenstraße,residential,0.061,0.5,0.0,8.15,0.00
+1463209507,Teltower Straße,tertiary,0.109,0.0,0.0,0.00,0.00
+1463209508,Teltower Straße,tertiary,0.058,0.5,,8.67,
+1464358758,Jacobystraße,residential,0.065,0.5,0.5,7.70,7.70
+1465078828,John-Foster-Dulles-Allee,tertiary,0.174,0.5,0.0,2.88,0.00
+1465078829,John-Foster-Dulles-Allee,tertiary,0.054,0.5,0.5,9.31,9.31
+1465078831,John-Foster-Dulles-Allee,tertiary,0.119,0.0,0.5,0.00,4.21
+1465102566,Straße des 17. Juni,primary,0.161,0.0,,0.00,
+1465102567,Straße des 17. Juni,primary,0.370,0.0,,0.00,
+1465102572,Straße des 17. Juni,primary,0.299,0.0,,0.00,
+1465102574,Straße des 17. Juni,primary,0.136,0.0,,0.00,
+1468495434,Tiergartenstraße,secondary,0.055,0.0,0.0,0.00,0.00
+1468495436,Tiergartenstraße,secondary,0.059,0.0,0.0,0.00,0.00
+1468495440,Tiergartenstraße,secondary,0.167,0.0,0.5,0.00,2.99
+1468495441,Tiergartenstraße,secondary,0.054,0.5,0.0,9.33,0.00
+1468501318,Kantstraße,secondary,0.081,0.0,,0.00,
+1468511702,Wilhelmstraße,secondary,0.083,0.0,0.0,0.00,0.00
+1468769528,Paulstraße,tertiary,0.196,1.0,0.0,5.09,0.00
+1470285386,Berliner Allee,secondary,0.066,1.0,0.0,15.22,0.00
+1470370334,Mühlenbecker Straße,secondary,0.107,0.0,0.5,0.00,4.67
+1472747945,Reinhardtstraße,tertiary,0.074,0.0,0.0,0.00,0.00
+1472747947,Reinhardtstraße,tertiary,0.061,0.0,0.0,0.00,0.00
+1472908193,Friedrichstraße,secondary,0.060,2.0,,33.48,
+1475506077,Am Müggelberg,residential,0.097,0.0,0.0,0.00,0.00
+1479993421,Kladower Damm,secondary,0.085,0.5,0.0,5.89,0.00
+1480097854,Otto-Suhr-Allee,secondary,0.064,1.0,,15.58,
+1488824075,An der Wuhlheide,secondary,0.114,0.5,,4.40,
+1489402048,Oranienburger Chaussee,primary,0.157,0.0,0.5,0.00,3.18
+1493982957,Haakonweg,residential,0.057,0.0,0.5,0.00,8.74
+1494458173,Max-Beer-Straße,residential,0.056,0.0,0.0,0.00,0.00
+1495068089,Kladower Damm,secondary,0.227,1.0,1.0,4.40,4.40
+1495068090,Kladower Damm,secondary,0.198,0.0,0.0,0.00,0.00
+1495431397,Elsenstraße,tertiary,0.080,2.0,1.0,24.97,12.49
+1504202934,Charlottenstraße,residential,0.063,0.0,0.0,0.00,0.00
+1511035425,Luisenhof,living_street,0.052,0.0,0.0,0.00,0.00
+1521093614,Mühlenstraße,residential,0.133,0.5,0.0,3.77,0.00
+1537226360,Bussardheck,residential,0.088,0.5,0.5,5.65,5.65
+1540394197,Heidelberger Straße,residential,0.140,0.0,0.0,0.00,0.00
+1559296862,Großbeerenstraße,unclassified,0.944,0.0,0.0,0.00,0.00
+1561338155,Berliner Chaussee,tertiary,0.055,0.0,0.0,0.00,0.00
+1565838323,Potsdamer Straße,tertiary,0.155,0.0,0.5,0.00,3.24

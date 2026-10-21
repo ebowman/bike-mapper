@@ -1,0 +1,192 @@
+{
+  "default_weight_set": "prior",
+  "default_weight_set_note": "prior per docs/research/stop-priors-open-data.md Verdict (emq.11).",
+  "precedence": [
+    "signal",
+    "stop",
+    "give_way",
+    "rb_entry",
+    "xing_signal",
+    "yield_infer",
+    "yield_equal"
+  ],
+  "weight_sets": {
+    "combined": {
+      "signal": {
+        "p": 0.158,
+        "p_lo": 0.134,
+        "p_hi": 0.253,
+        "mean_stop_s": 27.945,
+        "weight_300": 300,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+        "note": "Anchor class (weight 300 by definition)."
+      },
+      "stop": {
+        "p": 0.021,
+        "p_lo": 0.021,
+        "p_hi": 0.044,
+        "mean_stop_s": 41.056,
+        "weight_300": 49,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+      },
+      "give_way": {
+        "p": 0.041,
+        "p_lo": 0.037,
+        "p_hi": 0.067,
+        "mean_stop_s": 28.862,
+        "weight_300": 72,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+      },
+      "rb_entry": {
+        "p": 0.0,
+        "p_lo": 0.0,
+        "p_hi": 0.149,
+        "mean_stop_s": 27.945,
+        "weight_300": 0,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+        "note": "Under-powered: 0 stops in 22 passes, upper CI 0.149. No mean_stop_s in CSV (no stops); signal value used."
+      },
+      "xing_signal": {
+        "p": 0.158,
+        "p_lo": 0.134,
+        "p_hi": 0.253,
+        "mean_stop_s": 34.5,
+        "weight_300": 300,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+        "note": "Treated as signals (class absorbed by signals under proximity classification); p copied from signal. mean_stop_s is the CSV xing_signal value (2 stops only)."
+      },
+      "yield_infer": {
+        "p": 0.016,
+        "p_lo": 0.014,
+        "p_hi": 0.018,
+        "mean_stop_s": 35.971,
+        "weight_300": 29,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+      },
+      "yield_equal": {
+        "p": 0.021,
+        "p_lo": 0.021,
+        "p_hi": 0.041,
+        "mean_stop_s": 13.0,
+        "weight_300": 8,
+        "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+        "note": "Wide CI (0.009-0.048); 5 stops in 238 passes."
+      }
+    },
+    "ireland": {
+      "signal": {
+        "p": 0.1033,
+        "p_lo": 0.0816,
+        "p_hi": 0.13,
+        "mean_stop_s": 34.1476,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,signal (610 passes)"
+      },
+      "stop": {
+        "p": 0.0156,
+        "p_lo": 0.0092,
+        "p_hi": 0.0265,
+        "mean_stop_s": 52.3846,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,stop (832 passes)"
+      },
+      "give_way": {
+        "p": 0.0428,
+        "p_lo": 0.0241,
+        "p_hi": 0.075,
+        "mean_stop_s": 43.8273,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,give_way (257 passes)"
+      },
+      "rb_entry": {
+        "p": 0.0,
+        "p_lo": 0.0,
+        "p_hi": 0.1487,
+        "mean_stop_s": 27.945,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,rb_entry (22 passes)",
+        "note": "Under-powered: 0 stops in 22 passes, upper CI 0.1487. CSV mean_stop_s empty (no stops); combined rb_entry mean_stop_s (signal value 27.945) used."
+      },
+      "xing_signal": {
+        "p": 0.1033,
+        "p_lo": 0.0816,
+        "p_hi": 0.13,
+        "mean_stop_s": 34.5,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,signal (p, CI); data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,xing_signal (mean_stop_s)",
+        "note": "Treated as signals (emq.1 rule for empirical sets): p and CI copied from ireland signal. Raw Ireland xing_signal value is 0.048 (2 stops in 42 passes, CI 0.0132-0.1579); mean_stop_s 34.5 is the raw CSV value (2 stops only)."
+      },
+      "yield_infer": {
+        "p": 0.0166,
+        "p_lo": 0.0113,
+        "p_hi": 0.0244,
+        "mean_stop_s": 35.28,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,yield_infer (1507 passes)"
+      },
+      "yield_equal": {
+        "p": 0.0506,
+        "p_lo": 0.0199,
+        "p_hi": 0.1231,
+        "mean_stop_s": 13.75,
+        "source": "data/samples/stop_model_validation_ireland.csv row ireland,ge5_passes,yield_equal (79 passes)",
+        "note": "Wide CI; 4 stops in 79 passes."
+      }
+    },
+    "prior": {
+      "signal": {
+        "p": 0.4,
+        "p_lo": 0.3,
+        "p_hi": 0.6,
+        "mean_stop_s": 33,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row signal; range from the same row",
+        "note": "Table value 0.40 used; 0.37 by the compliance working, within the 0.30-0.60 range. mean_stop_s 33 from Ashford (2014) via docs/research/stop-priors-open-data.md section 5(a) (33 s per stop)."
+      },
+      "stop": {
+        "p": 0.15,
+        "p_lo": 0.08,
+        "p_hi": 0.3,
+        "mean_stop_s": 41.056,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row stop; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      },
+      "give_way": {
+        "p": 0.12,
+        "p_lo": 0.05,
+        "p_hi": 0.25,
+        "mean_stop_s": 28.862,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row give_way; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      },
+      "rb_entry": {
+        "p": 0.15,
+        "p_lo": 0.05,
+        "p_hi": 0.35,
+        "mean_stop_s": 27.945,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row rb_entry; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      },
+      "xing_signal": {
+        "p": 0.06,
+        "p_lo": 0.02,
+        "p_hi": 0.15,
+        "mean_stop_s": 34.5,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row xing_signal; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      },
+      "yield_infer": {
+        "p": 0.06,
+        "p_lo": 0.03,
+        "p_hi": 0.1,
+        "mean_stop_s": 35.971,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row yield_infer; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      },
+      "yield_equal": {
+        "p": 0.03,
+        "p_lo": 0.01,
+        "p_hi": 0.05,
+        "mean_stop_s": 13.0,
+        "source": "docs/research/stop-priors-open-data.md Structural prior table, row yield_equal; range from the same row",
+        "note": "mean_stop_s copied from combined (note gives no literature value)."
+      }
+    }
+  },
+  "midway_background_p": 0.003,
+  "midway_background_note": "Mid-way background stop probability; documented but unused (not applied per node).",
+  "rules": "p applies PER ARRIVAL EVENT at a node, ignoring the dhy.10 amount column (the 0.5 on yield_equal was a prior, superseded by the measured p). When several events fire at the same arrival (same node_id, way_id, dir), keep only the highest-precedence class: signal > stop > give_way > rb_entry > xing_signal > yield_infer > yield_equal."
+}

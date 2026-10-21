@@ -60,13 +60,18 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 
 ## Build & Test
 
-_Add your build and test commands here_
+Python tooling is managed with `uv` (install with `brew install uv` if missing).
 
 ```bash
-# Example:
-# npm install
-# npm test
+make setup                       # runs `uv sync` (creates .venv, installs deps)
+uv run scripts/<name>.py         # run a script
 ```
+
+Research-note convention: every note in `docs/research/` follows `docs/research/TEMPLATE.md` (see `docs/research/README.md` for the list of planned notes). Large/raw data goes in `data/` (gitignored except `data/.gitkeep` and small files in `data/samples/`); never commit raw ride files (`data/rides/`, `data/gps/`).
+
+### Planner
+
+Flow route planner (details in `docs/planner.md`): `make planner-setup` (once), then in two terminals `make brouter` and `make planner`; open http://localhost:8081. `make planner-check` runs pytest, ruff and the UI syntax check.
 
 ## Architecture Overview
 

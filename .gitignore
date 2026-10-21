@@ -4,3 +4,17 @@
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Data: ignored except placeholders and small samples (< 1 MB)
+data/*
+!data/.gitkeep
+!data/samples/
+!data/model/
+# Raw personal ride files must never be committed
+data/rides/
+data/gps/

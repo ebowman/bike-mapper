@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flow planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Ccircle cx=%278%27 cy=%278%27 r=%277%27 fill=%27%23009e73%27/%3E%3C/svg%3E">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font: 14px/1.4 -apple-system, "Segoe UI", sans-serif; color: #222; }
+#app { display: flex; height: 100%; gap: 16px; padding: 16px; }
+#side { width: 320px; flex: none; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+#map { flex: 1; min-height: 300px; border-radius: 4px; }
+h1 { font-size: 18px; margin: 0; }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.field { position: relative; }
+.field label { font-size: 12px; color: #555; display: block; }
+.field input { width: 100%; padding: 5px 6px; font-size: 14px; }
+.dd { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #aaa; z-index: 2000; max-height: 200px; overflow-y: auto; display: none; }
+.dd div { padding: 5px 6px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #eee; }
+.dd div:hover { background: #eef; }
+.dd .msg { color: #a00; cursor: default; }
+button, select { font-size: 13px; padding: 4px 8px; }
+button.on { background: #cde; font-weight: 600; }
+#go { font-weight: 600; padding: 7px 10px; }
+#status { font-size: 13px; }
+#status.err { color: #b00020; }
+.card { border: 1px solid #ccc; border-left-width: 8px; border-radius: 4px; padding: 6px 8px; cursor: pointer; background: #fff; }
+.card.sel { background: #f3f7ff; box-shadow: 0 0 0 2px #36c inset; }
+.card .t { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.card .d { font-size: 12px; color: #444; }
+.card .delta { font-size: 12px; color: #005; }
+details#settings { border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; background: #fafafa; }
+details#settings summary { cursor: pointer; font-weight: 600; }
+#setBadge { font-weight: 400; font-size: 12px; background: #e6eefc; border-radius: 8px; padding: 1px 7px; margin-left: 6px; }
+#setBadge.custom { background: #fde9c9; }
+#settings h3 { font-size: 13px; margin: 10px 0 4px; }
+#settings .desc { font-size: 11px; color: #555; margin-left: 20px; }
+#settings .opt { margin: 2px 0; }
+.srow { margin: 6px 0; }
+.srow .lab { display: flex; justify-content: space-between; font-size: 12px; align-items: baseline; }
+.srow .lab .ov { color: #a05a00; font-weight: 600; }
+.srow a { font-size: 11px; cursor: pointer; color: #36c; margin-left: 6px; text-decoration: underline; }
+.srow a.hid { visibility: hidden; }
+.track { position: relative; padding-top: 8px; }
+.track input[type=range] { width: 100%; margin: 0; }
+.tick { position: absolute; top: 0; width: 3px; height: 9px; margin-left: -1px; cursor: help; }
+.tick.prior { background: #7b3294; } .tick.ireland { background: #008837; } .tick.combined { background: #e66101; }
+.legend { font-size: 11px; color: #555; }
+.legend b.prior { color: #7b3294; } .legend b.ireland { color: #008837; } .legend b.combined { color: #e66101; }
+.hint { font-size: 11px; color: #8a4b00; }
+.note { font-size: 11px; color: #555; margin-top: 6px; }
+#scales input { width: 60px; }
+#scales input.bad { border: 2px solid #b00020; }
+#scaleErr { color: #b00020; font-size: 11px; }
+.card .irish { font-size: 12px; color: #555; }
+.card .xp { font-size: 11px; padding: 1px 6px; }
+#drawer { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; background: #fafafa; font-size: 12px; }
+#drawer[hidden] { display: none; }
+#drawer h3 { font-size: 13px; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: center; }
+.hwbar { display: flex; height: 12px; border-radius: 3px; overflow: hidden; margin: 4px 0; }
+.hwbar div { height: 100%; }
+.hwleg { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; color: #444; }
+.hwleg i { display: inline-block; width: 9px; height: 9px; margin-right: 3px; border-radius: 2px; }
+.segwrap { max-height: 40vh; overflow: auto; margin-top: 6px; }
+table.seg { border-collapse: collapse; width: 100%; font-size: 11px; }
+table.seg th { position: sticky; top: 0; background: #eee; text-align: left; padding: 2px 3px; }
+table.seg td { padding: 1px 3px; border-top: 1px solid #e4e4e4; white-space: nowrap; }
+table.seg tr.sr { cursor: pointer; }
+table.seg tr.sr:hover { background: #fff3c4; }
+table.seg td.num { text-align: right; }
+table.seg td.big { font-weight: 700; color: #a00; }
+footer { font-size: 11px; color: #555; margin-top: auto; }
+@media (max-width: 899px) {
+  html, body { height: auto; }
+  #app { flex-direction: column; height: auto; }
+  #side { width: auto; order: 2; overflow: visible; }
+  #map { order: 1; min-height: 55vh; flex: none; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="side">
+    <h1>Flow planner</h1>
+    <div class="row">
+      <button id="mStart" class="on" title="Next map click sets the start">Set start</button>
+      <button id="mEnd" title="Next map click sets the end">Set end</button>
+      <button id="swap">Swap</button>
+      <button id="clear">Clear</button>
+    </div>
+    <div class="field"><label for="qStart">Start (search or click map)</label>
+      <input id="qStart" type="search" autocomplete="off" placeholder="e.g. Trinity College Dublin"><div class="dd" id="ddStart"></div></div>
+    <div class="field"><label for="qEnd">End (search or click map)</label>
+      <input id="qEnd" type="search" autocomplete="off" placeholder="e.g. Greystones"><div class="dd" id="ddEnd"></div></div>
+    <div class="row">
+      <label for="nSel">Routes</label>
+      <select id="nSel"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+      <button id="go" disabled>Find routes</button>
+    </div>
+    <details id="settings">
+      <summary>Settings <span id="setBadge">...</span></summary>
+      <h3>Stop weights</h3>
+      <div id="wsets"></div>
+      <div id="blendRow" class="srow">
+        <div class="lab"><span>Blend with my Irish rides</span><span id="blendVal">0%</span></div>
+        <input id="blend" type="range" min="0" max="100" step="1" value="0" style="width:100%">
+      </div>
+      <h3>Stop probability per class <a id="resetAll" style="font-size:11px;cursor:pointer;color:#36c;text-decoration:underline">Reset all</a></h3>
+      <div class="legend">Ticks: <b class="prior">prior</b> <b class="ireland">Irish rides</b> <b class="combined">pooled</b> (hover for details)</div>
+      <div id="sliders"></div>
+      <div id="sigHint" class="hint" hidden>Signals at 0: stops at signals are no longer counted, but the router keeps its signal cost at the anchor (300), so it still avoids them.</div>
+      <h3>Routing</h3>
+      <div class="srow">
+        <div class="lab"><span>Distance guard (max x fastest)</span><span><span id="guardVal">1.30</span> <label><input id="guardOff" type="checkbox"> off</label></span></div>
+        <input id="guard" type="range" min="1" max="2" step="0.05" value="1.3" style="width:100%">
+      </div>
+      <div class="srow">
+        <div class="lab"><span>Rank turns as a fraction of a stop</span><span id="twVal">0.33</span></div>
+        <input id="tw" type="range" min="0" max="1" step="0.01" value="0.33" style="width:100%" aria-label="Rank turns as a fraction of a stop (0 = ignore turns, 1 = a turn counts as a stop)">
+        <div class="note">Ranking only: score = expected stops + this x turns. Re-ranks instantly (no re-route).</div>
+      </div>
+      <div class="srow" id="scales">
+        <div class="lab"><span>Flow-scale variants</span></div>
+        <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 1"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 2"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 3">
+        <div id="scaleErr"></div>
+      </div>
+      <div class="srow"><label><input id="routerTable" type="checkbox"> Router follows sliders (re-routes on every change, 5-8 s)</label></div>
+      <div class="note" id="routerNote"></div>
+      <h3>Straightness</h3>
+      <div class="srow">
+        <button id="presetStraight" type="button">Straight &amp; lanes</button> <button id="presetPlain" type="button">Plain flow</button>
+      </div>
+      <div class="srow">
+        <div class="lab"><span>Penalise turns</span><span id="tcVal">400</span></div>
+        <input id="tc" type="range" min="0" max="1000" step="50" value="400" style="width:100%" aria-label="Penalise turns (turn cost per 90 degree turn, 0 to 1000)">
+        <div class="lab"><span>0</span><span>1000</span></div>
+      </div>
+      <div class="srow">
+        <div class="lab"><span>Stay on lanes</span><span id="leVal">150</span></div>
+        <input id="le" type="range" min="0" max="500" step="25" value="150" style="width:100%" aria-label="Stay on lanes (cost of leaving a cycle lane or path, 0 to 500)">
+        <div class="lab"><span>0</span><span>500</span></div>
+      </div>
+      <div class="srow">
+        <div class="lab"><span>Prefer cycle infrastructure</span><span id="laneVal">x0.70</span></div>
+        <input id="lane" type="range" min="0" max="50" step="5" value="30" style="width:100%" aria-label="Prefer cycle infrastructure (0 = off, 30 = default, 50 = strongest)">
+        <div class="lab"><span>Off</span><span>Strongest</span></div>
+      </div>
+      <div class="srow"><label><input id="lanesVariant" type="checkbox"> Add a lanes-favouring route</label></div>
+      <div class="note">Cycle-infrastructure preference makes cycle paths and roads with tagged lanes/tracks cheaper per metre (default x0.70, strongest x0.50). Turn and lane-exit costs are BRouter profile costs; the router cannot tell left from right turns. Changing these or the lanes route re-routes through BRouter (5-8 s). Only ~8% of Irish lanes are tagged in OSM, so the effect is a lower bound.</div>
+      <div class="note">Changing flow scales re-routes through BRouter (5-8 s). Guard and route count only re-rank cached candidates (instant).</div>
+      <div class="note" id="costs">router costs: ...</div>
+    </details>
+    <div id="status" role="status"></div>
+    <div id="results"></div>
+    <div id="drawer" hidden></div>
+    <footer>
+      <div id="foot">Checking server...</div>
+      <div id="cycleNote">Cycle data: OSM; lanes are tagged on only ~8% of Irish tertiary roads (cycleway* on 8.3% of tertiary, 27% of primary length); absence of a lane here does not mean there is none. See docs/research/osm-road-network.md.</div>
+      <div>Search: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, via <a href="https://nominatim.org/" target="_blank" rel="noopener">Nominatim</a>.</div>
+    </footer>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function () {
+  'use strict';
+  var PALETTE = ['#0072B2', '#D55E00', '#009E73', '#CC79A7', '#E69F00', '#56B4E9'];
+  var LABELS = { fastbike: 'Fastest', flow_lo: 'Flow-light', flow: 'Flow', flow_hi: 'Flow-heavy', flow_lanes: 'Flow+lanes' };
+  var $ = function (id) { return document.getElementById(id); };
+
+  var map = L.map('map').setView([53.35, -6.26], 10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var state = { from: null, to: null, mode: 'from', n: 4, loading: false };
+  var reqSeq = 0;   // bumped by every new request and by clear/swap; stale responses are ignored
+  var markers = { from: null, to: null };
+  var routeLayer = L.layerGroup().addTo(map);
+  var stopLayer = L.layerGroup().addTo(map);
+  var routes = [], lines = [], selected = -1;
+  var dbgOpen = false, dbgDrawn = false;   // Explain drawer open / selected route drawn per segment
+  var dbgLayer = L.layerGroup().addTo(map);
+
+  // ---------- helpers ----------
+  function fmtLL(p) { return p[0].toFixed(5) + ',' + p[1].toFixed(5); }
+  function parseLL(s) {
+    var m = /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/.exec(s || '');
+    return m ? [parseFloat(m[1]), parseFloat(m[2])] : null;
+  }
+  function setStatus(msg, isErr) { var s = $('status'); s.textContent = msg || ''; s.className = isErr ? 'err' : ''; }
+  function mmss(sec) { var t = Math.round(sec); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+  function signed(v, dp) { var t = Math.abs(v).toFixed(dp); return (v < 0 ? '−' : '+') + t; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  // ---------- settings model ----------
+  var CAUSES = [
+    ['signal', 'Traffic signals'], ['xing_signal', 'Signalled crossing'], ['stop', 'Stop sign'],
+    ['give_way', 'Give way'], ['yield_infer', 'Minor-road yield (inferred)'],
+    ['yield_equal', 'Equal-priority junction'], ['rb_entry', 'Roundabout entry']
+  ];
+  var WSETS = [
+    ['prior', 'Prior (literature)', 'Literature-based starting values.'],
+    ['ireland', 'My Irish rides', 'Stop rates measured on your own Irish rides (some classes have few passes).'],
+    ['combined', 'Pooled (Ireland+Berlin)', 'Irish and Berlin rides pooled: more data, less local.']
+  ];
+  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4, router: 'base', lane: 0.7, tc: 400, le: 150, tw: 0.33, lanesVariant: false };
+  var LS_KEY = 'flowplan.settings';
+  var S = JSON.parse(JSON.stringify(DEF));   // guard 0 means off
+  var MODEL = null;                          // /api/model response
+  var lastModelP = null;                     // model echoed by the last /api/route response
+  var sliderEls = {};
+
+  function sameScales(a, b) { return a.length === b.length && a.every(function (v, i) { return v === b[i]; }); }
+  function num(v) { var f = parseFloat(v); return isFinite(f) ? f : null; }
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function settingsFromObj(o) {   // validate a loosely-typed {w,bw,b,p_*,g,s,n} (hash keys or stored)
+    var r = JSON.parse(JSON.stringify(DEF));
+    if (WSETS.some(function (x) { return x[0] === o.w; })) r.w = o.w;
+    var b = num(o.b);
+    if (b !== null && o.bw === 'ireland') r.blend = clamp(b, 0, 1);
+    CAUSES.forEach(function (c) {
+      var v = num(o['p_' + c[0]]);
+      if (v !== null) r.p[c[0]] = clamp(v, 0, 1);
+    });
+    var g = num(o.g);
+    if (g !== null) r.guard = g === 0 ? 0 : clamp(g, 1, 2);
+    if (o.s) {
+      var ss = String(o.s).split(',').map(num);
+      if (ss.length && ss.every(function (v) { return v !== null && v > 0 && v <= 10; })) r.scales = dedupe(ss);
+    }
+    if (o.r === 'table' || o.router === 'table') r.router = 'table';
+    var lb = num(o.lb !== undefined ? o.lb : o.lane);
+    if (lb !== null) r.lane = Math.round(clamp(lb, 0.5, 1) * 20) / 20;
+    var tc = num(o.tc), le = num(o.le);
+    if (tc !== null) r.tc = Math.round(clamp(tc, 0, 1000) / 50) * 50;
+    if (le !== null) r.le = Math.round(clamp(le, 0, 500) / 25) * 25;
+    var tw = num(o.tw);
+    if (tw !== null) r.tw = clamp(tw, 0, 1);
+    if (o.lv === '1' || o.lv === 1 || o.lv === true || o.lanesVariant === true) r.lanesVariant = true;
+    var n = parseInt(o.n, 10);
+    if (n >= 3 && n <= 6) r.n = n;
+    return r;
+  }
+  function dedupe(a) { return a.filter(function (v, i) { return a.indexOf(v) === i; }); }
+  function settingsToObj() {      // only non-default values, short keys
+    var o = {};
+    if (S.w !== DEF.w) o.w = S.w;
+    if (S.blend > 0) { o.bw = 'ireland'; o.b = String(+S.blend.toFixed(3)); }
+    CAUSES.forEach(function (c) { if (S.p[c[0]] != null) o['p_' + c[0]] = String(+S.p[c[0]].toFixed(4)); });
+    if (S.guard !== DEF.guard) o.g = String(S.guard);
+    if (S.router === 'table') o.r = 'table';
+    if (S.lane !== DEF.lane) o.lb = String(S.lane);
+    if (S.tc !== DEF.tc) o.tc = String(S.tc);
+    if (S.le !== DEF.le) o.le = String(S.le);
+    if (S.tw !== DEF.tw) o.tw = String(S.tw);
+    if (S.lanesVariant) o.lv = '1';
+    if (!sameScales(S.scales, DEF.scales)) o.s = S.scales.join(',');
+    return o;
+  }
+  function saveSettings() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ }
+    writeHash();
+  }
+  function loadSettings(h) {
+    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|r|lb|tc|le|tw|lv|p_.*)$/.test(k); });
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { stored = null; }
+    if (hasHash) S = settingsFromObj(h);        // hash wins, whole-settings
+    else if (stored && typeof stored === 'object') {
+      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(','), r: stored.router, lb: stored.tc === undefined ? undefined : stored.lane, tc: stored.tc, le: stored.le, tw: stored.tw, lv: stored.lanesVariant ? '1' : '' };
+      if (stored.blend > 0) { o.bw = 'ireland'; o.b = stored.blend; }
+      Object.keys(stored.p || {}).forEach(function (k) { o['p_' + k] = stored.p[k]; });
+      S = settingsFromObj(o);
+    }
+    var nh = parseInt(h.n, 10);
+    if (nh >= 3 && nh <= 6) S.n = nh;
+    state.n = S.n;
+  }
+
+  // ---------- state <-> hash ----------
+  function writeHash() {
+    var parts = [];
+    if (state.from) parts.push('from=' + fmtLL(state.from));
+    if (state.to) parts.push('to=' + fmtLL(state.to));
+    var so = settingsToObj();
+    var dbgPart = dbgOpen ? ['dbg=1'] : [];
+    Object.keys(so).forEach(function (k) { parts.push(k + '=' + encodeURIComponent(so[k]).replace(/%2C/g, ',')); });
+    if (state.from || state.to || parts.length || S.n !== DEF.n) parts.push('n=' + S.n);
+    parts = parts.concat(dbgPart);
+    history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
+  }
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+      var i = kv.indexOf('='); if (i > 0) out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+    });
+    return out;
+  }
+
+  function setMode(m) {
+    state.mode = m;
+    $('mStart').className = m === 'from' ? 'on' : '';
+    $('mEnd').className = m === 'to' ? 'on' : '';
+  }
+
+  function updateGo() { $('go').disabled = state.loading || !(state.from && state.to); }
+
+  function supersede() { if (state.loading) setStatus(''); reqSeq++; state.loading = false; }
+  function setPoint(which, ll, label) {
+    supersede();
+    state[which] = ll;
+    if (markers[which]) { markers[which].setLatLng(ll); }
+    else {
+      var m = L.marker(ll, { draggable: true, title: which === 'from' ? 'Start' : 'End' }).addTo(map);
+      m.bindTooltip(which === 'from' ? 'Start' : 'End', { permanent: true, direction: 'top', offset: [-15, -8] });
+      m.on('dragend', function () {
+        supersede(); var p = m.getLatLng(); state[which] = [p.lat, p.lng];
+        $(which === 'from' ? 'qStart' : 'qEnd').value = fmtLL(state[which]);
+        writeHash(); updateGo();
+      });
+      markers[which] = m;
+    }
+    $(which === 'from' ? 'qStart' : 'qEnd').value = label || fmtLL(ll);
+    writeHash(); updateGo();
+  }
+  function clearPoint(which) {
+    state[which] = null;
+    if (markers[which]) { map.removeLayer(markers[which]); markers[which] = null; }
+    $(which === 'from' ? 'qStart' : 'qEnd').value = '';
+  }
+
+  map.on('click', function (e) {
+    var which = state.mode;
+    setPoint(which, [e.latlng.lat, e.latlng.lng]);
+    if (which === 'from') setMode('to');
+  });
+  $('mStart').onclick = function () { setMode('from'); };
+  $('mEnd').onclick = function () { setMode('to'); };
+  $('swap').onclick = function () {
+    var a = state.from, b = state.to, la = $('qStart').value, lb = $('qEnd').value;
+    clearPoint('from'); clearPoint('to');
+    if (b) setPoint('from', b, lb);
+    if (a) setPoint('to', a, la);
+    reqSeq++; state.loading = false; clearResults(); setStatus(''); writeHash(); updateGo();
+  };
+  $('clear').onclick = function () {
+    reqSeq++; state.loading = false;
+    clearPoint('from'); clearPoint('to'); clearResults(); setStatus('');
+    setMode('from'); writeHash(); updateGo();
+  };
+  $('nSel').onchange = function () { state.n = S.n = parseInt($('nSel').value, 10); saveSettings(); scheduleRoute(); };
+
+  // ---------- Nominatim search: 600 ms debounce + hard 1 req/s throttle ----------
+  var NOM_GAP_MS = 1000;
+  var nomLastStart = 0;          // time the last Nominatim request began
+  var nomChain = Promise.resolve();
+  var nomLatest = { from: 0, to: 0 };  // per-box sequence; stale queued searches are skipped
+  function nomThrottled(fn) {
+    var run = nomChain.then(function () {
+      var wait = Math.max(0, nomLastStart + NOM_GAP_MS - Date.now());
+      return new Promise(function (r) { setTimeout(r, wait); });
+    }).then(function () { nomLastStart = Date.now(); return fn(); });
+    nomChain = run.catch(function () {});
+    return run;
+  }
+  function wireSearch(which, inputId, ddId) {
+    var input = $(inputId), dd = $(ddId), timer = null;
+    function showMsg(t) { dd.textContent = ''; dd.appendChild(el('div', 'msg', t)); dd.style.display = 'block'; }
+    function hide() { dd.style.display = 'none'; }
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      var q = input.value.trim();
+      if (q.length < 3 || parseLL(q)) { nomLatest[which]++; hide(); return; }
+      timer = setTimeout(function () {
+        var seq = ++nomLatest[which];
+        nomThrottled(function () {
+          if (seq !== nomLatest[which]) return null;   // superseded while queued: skip, no request
+          var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=ie&q=' + encodeURIComponent(q);
+          return fetch(url, { headers: { 'Accept': 'application/json' } }).then(function (r) {
+            if (r.status === 429) throw new Error('Search is rate-limited (429); wait a moment and retry.');
+            if (!r.ok) throw new Error('Search failed (HTTP ' + r.status + ').');
+            return r.json();
+          });
+        }).then(function (res) {
+          if (res === null || seq !== nomLatest[which]) return;
+          dd.textContent = '';
+          if (!res.length) { showMsg('No matches'); return; }
+          res.forEach(function (it) {
+            var d = el('div', null, it.display_name);
+            d.onclick = function () {
+              var ll = [parseFloat(it.lat), parseFloat(it.lon)];
+              setPoint(which, ll, it.display_name.split(',').slice(0, 2).join(','));
+              map.panTo(ll); hide();
+              if (which === 'from' && !state.to) setMode('to');
+            };
+            dd.appendChild(d);
+          });
+          dd.style.display = 'block';
+        }).catch(function (e) {
+          showMsg(e && e.message && e.message.indexOf('Search') === 0 ? e.message : 'Search unavailable (network error).');
+        });
+      }, 600);
+    });
+    document.addEventListener('click', function (e) { if (e.target !== input && !dd.contains(e.target)) hide(); });
+  }
+  wireSearch('from', 'qStart', 'ddStart');
+  wireSearch('to', 'qEnd', 'ddEnd');
+
+  // ---------- routes ----------
+  function clearResults() {
+    routes = []; lines = []; selected = -1;
+    routeLayer.clearLayers(); stopLayer.clearLayers(); dbgLayer.clearLayers(); dbgDrawn = false;
+    $('results').textContent = ''; $('drawer').textContent = ''; $('drawer').hidden = true;
+  }
+
+  function styleLines(hover) {
+    lines.forEach(function (ln, i) {
+      var isSel = i === selected, isHov = i === hover;
+      if (isSel && dbgDrawn) { ln.setStyle({ weight: 6, opacity: 0 }); return; }   // drawn per segment instead
+      ln.setStyle({ weight: isSel ? 6 : (isHov ? 5 : 3), opacity: isSel ? 0.95 : (isHov ? 0.9 : 0.5) });
+      if (isSel) ln.bringToFront();
+    });
+  }
+  function routesToFront() {   // overlays added later sit above the route polylines; keep routes on top
+    lines.forEach(function (ln, i) { if (i !== selected) ln.bringToFront(); });
+    if (lines[selected] && !dbgDrawn) lines[selected].bringToFront();
+    dbgLayer.eachLayer(function (l) { l.bringToFront(); });
+    stopLayer.eachLayer(function (l) { if (l.bringToFront) l.bringToFront(); });
+  }
+  function select(i) {
+    selected = i;
+    styleLines(-1);
+    Array.prototype.forEach.call($('results').children, function (c, k) { c.classList.toggle('sel', k === i); });
+    stopLayer.clearLayers();
+    routes[i].hits.forEach(function (h) {
+      L.circleMarker([h.lat, h.lon], { radius: 3 + 10 * h.p, color: '#222', weight: 1, fillColor: PALETTE[i % PALETTE.length], fillOpacity: 0.6 })
+        .bindTooltip(h.cause + ' p=' + h.p.toFixed(2)).addTo(stopLayer);
+    });
+    if (dbgOpen) showDrawer();
+  }
+
+  // ---------- explain drawer (debug=1) ----------
+  var HW_COLORS = {
+    motorway: '#6a3d9a', motorway_link: '#6a3d9a', trunk: '#8e5bb0', trunk_link: '#8e5bb0',
+    primary: '#e31a1c', primary_link: '#e31a1c', secondary: '#ff7f00', secondary_link: '#ff7f00',
+    tertiary: '#e6b800', tertiary_link: '#e6b800', unclassified: '#8fbf5a', residential: '#4ea3d8',
+    living_street: '#4ea3d8', service: '#999999', cycleway: '#1a9641', track: '#8c6d31',
+    path: '#a0522d', footway: '#a0522d', pedestrian: '#a0522d', steps: '#a0522d', bridleway: '#a0522d',
+    ferry: '#1f78b4', road: '#666666', unknown: '#000000'
+  };
+  function hwColor(c) { return HW_COLORS[c] || '#000000'; }
+  function swatch(c) { var i = el('i'); i.style.background = hwColor(c); return i; }
+  function money(v) { return v ? String(Math.round(v)) : ''; }
+
+  function mergeRows(segs) {   // segments under 20 m fold into the previous row (costs summed)
+    var rows = [];
+    segs.forEach(function (sg) {
+      var prev = rows[rows.length - 1];
+      if (prev && sg.dist_m < 20) {
+        prev.idx.push(sg.i); prev.end_km = sg.end_km; prev.dist_m += sg.dist_m;
+        prev.node_init += sg.node_cost + sg.initial_cost; prev.turn += sg.turn_cost;
+        prev.hits = prev.hits.concat(sg.hits);
+      } else {
+        rows.push({ idx: [sg.i], start_km: sg.start_km, end_km: sg.end_km, dist_m: sg.dist_m, highway: sg.highway,
+          cycleway: sg.cycleway, surface: sg.surface, maxspeed: sg.maxspeed, name: sg.name,
+          node_init: sg.node_cost + sg.initial_cost, turn: sg.turn_cost, hits: sg.hits.slice() });
+      }
+    });
+    return rows;
+  }
+  function segmentPaths(r) {   // per-segment [lat,lon] arrays cut from the route geometry at each segment's end node
+    var g = r.geometry.coordinates, out = [], prev = 0;
+    r.segments.forEach(function (sg, k) {
+      var best = prev, bd = Infinity;
+      for (var j = prev; j < g.length; j++) {
+        var dx = g[j][0] - sg.lon, dy = g[j][1] - sg.lat, d = dx * dx + dy * dy;
+        if (d < bd) { bd = d; best = j; }
+        if (d < 1e-12) break;
+      }
+      if (k === r.segments.length - 1) best = g.length - 1;
+      var end = Math.max(best, Math.min(prev + 1, g.length - 1));
+      out.push(g.slice(prev, end + 1).map(function (c) { return [c[1], c[0]]; }));
+      prev = end;
+    });
+    return out;
+  }
+  function clearDrawer() {
+    dbgLayer.clearLayers(); dbgDrawn = false;
+    $('drawer').textContent = ''; $('drawer').hidden = true;
+    styleLines(-1);
+  }
+  function showDrawer() {
+    dbgLayer.clearLayers(); dbgDrawn = false;
+    var box = $('drawer');
+    box.textContent = ''; box.hidden = !dbgOpen;
+    if (!dbgOpen || selected < 0) return;
+    var r = routes[selected];
+    var head = el('h3'); head.appendChild(el('span', null, 'Explain #' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
+    var x = el('button', 'xp', 'Close'); x.onclick = function () { closeDrawer(); }; head.appendChild(x); box.appendChild(head);
+    if (!r.segments) { box.appendChild(el('div', null, 'Loading...')); return; }
+    var sm = r.summary, total = 0, cls = Object.keys(sm.km_by_highway);
+    cls.sort(function (a, b) { return sm.km_by_highway[b] - sm.km_by_highway[a]; });
+    cls.forEach(function (c) { total += sm.km_by_highway[c]; });
+    var bar = el('div', 'hwbar'), leg = el('div', 'hwleg');
+    cls.forEach(function (c) {
+      var km = sm.km_by_highway[c], seg = el('div'); seg.style.width = (100 * km / (total || 1)) + '%'; seg.style.background = hwColor(c);
+      seg.title = c + ' ' + km.toFixed(2) + ' km'; bar.appendChild(seg);
+      var l = el('span'); l.appendChild(swatch(c)); l.appendChild(document.createTextNode(c + ' ' + km.toFixed(1) + ' km')); leg.appendChild(l);
+    });
+    box.appendChild(bar); box.appendChild(leg);
+    var ck = sm.cycle_km;
+    box.appendChild(el('div', null, 'Cycle infrastructure: ' + ck.path.toFixed(1) + ' km paths, ' + ck.lane.toFixed(1) + ' km lanes, ' +
+      ck.track.toFixed(1) + ' km tracks. BRouter node charges: ' + sm.n_node_charges + '. Route cost ' + Math.round(sm.total_brouter_cost) + '.'));
+
+    // per-segment polylines
+    var paths = segmentPaths(r), polys = [];
+    r.segments.forEach(function (sg, k) {
+      var pl = L.polyline(paths[k], { color: hwColor(sg.highway), weight: 5, opacity: 0.95 }).addTo(dbgLayer);
+      pl.bindTooltip(sg.highway + (sg.name ? ' ' + sg.name : '') + (sg.cycleway ? ' (cycleway ' + sg.cycleway + ')' : ''), { sticky: true });
+      polys.push(pl);
+    });
+    (r.turn_points || []).forEach(function (tp) {
+      L.circleMarker([tp.lat, tp.lon], { radius: 3, color: '#000', weight: 1, fillColor: tp.angle_deg > 60 ? '#d32f2f' : '#ffb300', fillOpacity: 0.9 })
+        .bindTooltip('turn ' + Math.round(tp.angle_deg) + ' deg').addTo(dbgLayer);
+    });
+    dbgDrawn = true; styleLines(-1); routesToFront();
+
+    var tw = el('div', 'segwrap'), tb = el('table', 'seg'), th = el('tr');
+    ['km', 'class', 'cycleway', 'surface', 'node+init', 'turn', 'stops'].forEach(function (c) { th.appendChild(el('th', null, c)); });
+    var thead = el('thead'); thead.appendChild(th); tb.appendChild(thead);
+    var body = el('tbody');
+    mergeRows(r.segments).forEach(function (row) {
+      var tr = el('tr', 'sr'), c0 = el('td', 'num', row.start_km.toFixed(2));
+      tr.appendChild(c0);
+      var c1 = el('td'); c1.appendChild(swatch(row.highway)); c1.appendChild(document.createTextNode(row.highway));
+      c1.title = [row.name, row.maxspeed ? row.maxspeed + ' km/h' : null, Math.round(row.dist_m) + ' m'].filter(Boolean).join(', ');
+      tr.appendChild(c1);
+      tr.appendChild(el('td', null, row.cycleway || ''));
+      tr.appendChild(el('td', null, row.surface || ''));
+      tr.appendChild(el('td', 'num' + (row.node_init > 0 ? ' big' : ''), money(row.node_init)));
+      tr.appendChild(el('td', 'num', money(row.turn)));
+      tr.appendChild(el('td', null, row.hits.map(function (h) { return h.cause + ' ' + h.p.toFixed(2); }).join(', ')));
+      function setW(w) { row.idx.forEach(function (i) { polys[i].setStyle({ weight: w }); if (w > 5) polys[i].bringToFront(); }); }
+      tr.onmouseenter = function () { setW(8); };
+      tr.onmouseleave = function () { setW(5); };
+      tr.onclick = function () {
+        var b = L.latLngBounds([]);
+        row.idx.forEach(function (i) { b.extend(polys[i].getBounds()); });
+        map.fitBounds(b, { padding: [60, 60], maxZoom: 17 });
+      };
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); box.appendChild(tw);
+  }
+  function closeDrawer() {
+    dbgOpen = false; writeHash(); clearDrawer();
+    Array.prototype.forEach.call(document.querySelectorAll('.card .xp'), function (b) { b.classList.remove('on'); });
+  }
+  function openDrawer(i) {
+    dbgOpen = true; writeHash();
+    if (i !== selected) select(i); else showDrawer();
+    if (routes.every(function (r) { return r.segments; })) return;
+    var seq = reqSeq;   // re-request with debug=1: the candidates are cached server-side, so this is instant
+    fetch(routeUrl() + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
+      if (seq !== reqSeq || !j.routes) return;
+      j.routes.forEach(function (nr) {
+        routes.forEach(function (r) { if (r.id === nr.id) { r.segments = nr.segments; r.summary = nr.summary; } });
+      });
+      if (dbgOpen) showDrawer();
+    }).catch(function () { if (dbgOpen) $('drawer').textContent = 'Could not load the route explanation.'; });
+  }
+
+  function xmlEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
+  function gpxFor(r, idx) {
+    var name = xmlEsc('flow rank ' + r.rank + ' ' + (LABELS[r.variant] || r.variant));
+    var pts = r.geometry.coordinates.map(function (c) {
+      return '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"/>';
+    }).join('');
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="bike-mapper flow planner" xmlns="http://www.topografix.com/GPX/1/1">' +
+      '<trk><name>' + name + '</name><trkseg>' + pts + '</trkseg></trk></gpx>\n';
+  }
+  function downloadGpx(r, idx) {
+    var blob = new Blob([gpxFor(r, idx)], { type: 'application/gpx+xml' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'flow-route-' + r.rank + '-' + r.variant + '.gpx';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function render(data, keepView) {
+    clearResults();
+    routes = data.routes;
+    var box = $('results');
+    routes.forEach(function (r, i) {
+      var col = PALETTE[i % PALETTE.length];
+      var ln = L.polyline(r.geometry.coordinates.map(function (c) { return [c[1], c[0]]; }), { color: col, weight: 3, opacity: 0.5 }).addTo(routeLayer);
+      ln.on('click', function () { select(i); });
+      lines.push(ln);
+
+      var s = r.stats, card = el('div', 'card');
+      card.style.borderLeftColor = col;
+      var t = el('div', 't');
+      t.appendChild(el('span', null, '#' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
+      var g = el('button', null, 'GPX'); g.title = 'Download GPX';
+      g.onclick = function (ev) { ev.stopPropagation(); downloadGpx(r, i); };
+      var xp = el('button', 'xp', 'Explain'); xp.title = 'Why this route: road classes, costs, stop events';
+      xp.onclick = function (ev) { ev.stopPropagation(); if (dbgOpen && selected === i) closeDrawer(); else openDrawer(i); };
+      var tools = el('span'); tools.appendChild(xp); tools.appendChild(document.createTextNode(' ')); tools.appendChild(g);
+      t.appendChild(tools); card.appendChild(t);
+      card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
+      card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
+      var ck = s.cycle_km;
+      if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
+        card.appendChild(el('div', 'd', ck.path.toFixed(1) + ' km on cycle paths, ' + (ck.lane + ck.track).toFixed(1) + ' km on roads with lanes/tracks'));
+      }
+      if (s.turns !== undefined) {
+        card.appendChild(el('div', 'd', s.turns + ' turns (' + s.turns_per_km.toFixed(1) + '/km), longest straight ' + s.longest_straight_km.toFixed(1) + ' km'));
+      }
+      var irish = irishStops(r);
+      if (irish !== null) card.appendChild(el('div', 'irish', 'under your Irish rides: ' + irish.toFixed(1) + ' stops'));
+      if (r.delta_vs_fastest) {
+        card.appendChild(el('div', 'delta', 'vs fastest: ' + signed(r.delta_vs_fastest.stops, 1) + ' stops, ' + signed(r.delta_vs_fastest.km, 1) + ' km' +
+          (r.delta_vs_fastest.turns !== undefined ? ', ' + signed(r.delta_vs_fastest.turns, 0) + ' turns' : '')));
+      }
+      card.onmouseenter = function () { styleLines(i); };
+      card.onmouseleave = function () { styleLines(-1); };
+      card.onclick = function () { select(i); };
+      box.appendChild(card);
+    });
+    if (routes.length) {
+      select(0);
+      routesToFront();
+      if (!keepView) map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
+    }
+    setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' +
+      (data.cached ? 'cached' : 're-routed') + ', ' + (data.timings_ms.total / 1000).toFixed(1) + ' s)');
+    afterResponse(data);
+  }
+
+  function routeUrl() { return '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + S.n + settingsQuery(); }
+  function findRoutes(fromSettings) {
+    if (!(state.from && state.to)) return;
+    if (state.loading && fromSettings !== true) return;
+    state.loading = true; updateGo();
+    if (fromSettings !== true || !routes.length) clearResults();
+    var seq = ++reqSeq;
+    setStatus(fromSettings === true ? 'Updating (cached candidates are instant; new probabilities re-route, 5-8 s)' : 'Asking BRouter for candidates, about 5-8 s');
+    var url = routeUrl() + (dbgOpen ? '&debug=1' : '');
+    fetch(url).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
+    }).then(function (res) {
+      if (seq !== reqSeq) return;
+      if (res.ok && res.body && res.body.routes) { render(res.body, fromSettings === true); return; }
+      var d = res.body && res.body.detail;
+      if ((res.status === 400 || res.status === 404 || res.status === 503) && typeof d === 'string') setStatus(d, true);
+      else setStatus('Something went wrong (HTTP ' + res.status + ').', true);
+    }).catch(function () {
+      if (seq === reqSeq) setStatus('Could not reach the planner server.', true);
+    }).then(function () { if (seq === reqSeq) { state.loading = false; updateGo(); } });
+  }
+  $('go').onclick = function () { findRoutes(); };
+
+  // ---------- settings panel ----------
+  var routeTimer = null;
+  function scheduleRoute() {
+    clearTimeout(routeTimer);
+    routeTimer = setTimeout(function () { findRoutes(true); }, 250);
+  }
+  function settingsQuery() {
+    var q = '&weights=' + encodeURIComponent(S.w);
+    if (S.w !== 'ireland' && S.blend > 0) q += '&blend_with=ireland&blend=' + S.blend;
+    CAUSES.forEach(function (c) { if (S.p[c[0]] != null) q += '&p_' + c[0] + '=' + S.p[c[0]]; });
+    if (S.router === 'table') q += '&router=table';
+    q += '&lane_bonus=' + S.lane + '&turn_cost=' + S.tc + '&lane_exit_cost=' + S.le;
+    if (S.lanesVariant) q += '&lanes_variant=1';
+    q += '&turn_weight=' + S.tw;
+    q += '&guard=' + S.guard + '&scales=' + S.scales.join(',');
+    return q;
+  }
+  function setP(name, cause) { return MODEL && MODEL.weight_sets[name] && MODEL.weight_sets[name][cause] ? MODEL.weight_sets[name][cause].p : 0; }
+  function baseP(cause) {   // client-side effective p before overrides
+    var p = setP(S.w, cause);
+    if (S.w !== 'ireland' && S.blend > 0) p = (1 - S.blend) * p + S.blend * setP('ireland', cause);
+    return p;
+  }
+  function irishStops(r) {
+    if (S.w === 'ireland' || !MODEL || !MODEL.weight_sets.ireland) return null;
+    var tot = 0;
+    r.hits.forEach(function (h) { tot += setP('ireland', h.cause); });
+    return tot;
+  }
+  function fmtP(p) { return p.toFixed(3); }
+
+  function refreshPanel() {
+    var anyOv = CAUSES.some(function (c) { return S.p[c[0]] != null; });
+    var name = (WSETS.filter(function (x) { return x[0] === S.w; })[0] || [S.w, S.w])[1].split(' (')[0];
+    if (S.w !== 'ireland' && S.blend > 0) name += ' + ' + Math.round(S.blend * 100) + '% Irish';
+    if (anyOv) name += ', custom';
+    $('setBadge').textContent = name;
+    $('setBadge').className = anyOv ? 'custom' : '';
+    $('blendRow').style.display = S.w === 'ireland' ? 'none' : '';
+    $('blend').value = String(Math.round(S.blend * 100));
+    $('blendVal').textContent = Math.round(S.blend * 100) + '%';
+    Array.prototype.forEach.call(document.getElementsByName('wset'), function (r) { r.checked = r.value === S.w; });
+    CAUSES.forEach(function (c) {
+      var e = sliderEls[c[0]]; if (!e) return;
+      var ov = S.p[c[0]] != null;
+      var v = ov ? S.p[c[0]] : (lastModelP && lastModelP.key === modelKey() && lastModelP.m[c[0]] != null ? lastModelP.m[c[0]] : baseP(c[0]));
+      e.input.value = String(v);
+      e.val.textContent = fmtP(v);
+      e.ov.textContent = ov ? 'override' : '';
+      e.reset.className = ov ? '' : 'hid';
+    });
+    $('sigHint').hidden = !(S.p.signal === 0 || (S.p.signal == null && baseP('signal') === 0));
+    $('guard').disabled = S.guard === 0;
+    $('guardOff').checked = S.guard === 0;
+    var g = S.guard === 0 ? num($('guard').value) || 1.3 : S.guard;
+    if (S.guard !== 0) $('guard').value = String(g);
+    $('guardVal').textContent = S.guard === 0 ? 'off' : g.toFixed(2);
+    $('routerTable').checked = S.router === 'table';
+    $('lane').value = String(Math.round((1 - S.lane) * 100));
+    $('tc').value = String(S.tc); $('tcVal').textContent = String(S.tc);
+    $('le').value = String(S.le); $('leVal').textContent = String(S.le);
+    $('laneVal').textContent = S.lane >= 1 ? 'Off' : 'x' + S.lane.toFixed(2);
+    $('lanesVariant').checked = S.lanesVariant;
+    $('tw').value = String(S.tw); $('twVal').textContent = S.tw.toFixed(2);
+    $('routerNote').textContent = S.router === 'table'
+      ? 'Every probability change re-routes through BRouter (5-8 s); the router uses the costs derived from the sliders.'
+      : "Sliders re-rank the cached candidates instantly; the router searches with the base set's costs.";
+    var inp = $('scales').getElementsByTagName('input');
+    for (var i = 0; i < 3; i++) if (document.activeElement !== inp[i]) inp[i].value = S.scales[i] != null ? String(S.scales[i]) : '';
+  }
+  function modelKey() { return S.w + '|' + S.blend; }
+  function afterResponse(data) {
+    if (data.model) lastModelP = { key: modelKey(), m: data.model };
+    var c = data.settings && data.settings.brouter_costs;
+    if (c) {
+      var short = { cost_signal: 'signal', cost_xing_signal: 'crossing', cost_give_way: 'give way', cost_stop: 'stop', cost_mini_rb: 'mini-rb', cost_rb_entry: 'roundabout' };
+      $('costs').textContent = 'router costs: ' + Object.keys(c).map(function (k) { return (short[k] || k) + ' ' + c[k]; }).join(', ');
+    }
+    refreshPanel();
+  }
+  function changed() { saveSettings(); refreshPanel(); scheduleRoute(); }
+
+  function buildPanel() {
+    var box = $('wsets');
+    WSETS.forEach(function (w) {
+      var d = el('div', 'opt'), lab = el('label'), r = document.createElement('input');
+      r.type = 'radio'; r.name = 'wset'; r.value = w[0];
+      r.onchange = function () { S.w = w[0]; lastModelP = null; changed(); };
+      lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + w[1]));
+      d.appendChild(lab); d.appendChild(el('div', 'desc', w[2])); box.appendChild(d);
+    });
+    $('blend').oninput = function () { S.blend = parseInt($('blend').value, 10) / 100; lastModelP = null; changed(); };
+    var sl = $('sliders');
+    CAUSES.forEach(function (c) {
+      var row = el('div', 'srow'), lab = el('div', 'lab'), left = el('span'), right = el('span');
+      left.appendChild(document.createTextNode(c[1] + ' '));
+      var ov = el('span', 'ov'); left.appendChild(ov);
+      var val = el('span', null, '0'), reset = el('a', 'hid', 'reset'); reset.title = 'Back to the weight set value';
+      right.appendChild(val); right.appendChild(reset);
+      lab.appendChild(left); lab.appendChild(right); row.appendChild(lab);
+      var track = el('div', 'track'), inp = document.createElement('input');
+      inp.type = 'range'; inp.min = '0'; inp.max = '1'; inp.step = '0.005';
+      inp.setAttribute('aria-label', c[1]);
+      [['prior', 'Prior'], ['ireland', 'Irish rides'], ['combined', 'Pooled']].forEach(function (t) {
+        var e = MODEL.weight_sets[t[0]] && MODEL.weight_sets[t[0]][c[0]]; if (!e) return;
+        var tk = el('span', 'tick ' + t[0]); tk.style.left = (e.p * 100) + '%';
+        tk.title = t[1] + ': p=' + e.p + (e.p_lo != null ? ' (' + e.p_lo + '-' + e.p_hi + ')' : '') + (e.note ? '. ' + e.note : '');
+        track.appendChild(tk);
+      });
+      track.appendChild(inp); row.appendChild(track); sl.appendChild(row);
+      inp.oninput = function () { S.p[c[0]] = parseFloat(inp.value); changed(); };
+      reset.onclick = function () { delete S.p[c[0]]; changed(); };
+      sliderEls[c[0]] = { input: inp, val: val, ov: ov, reset: reset };
+    });
+    $('resetAll').onclick = function () {
+      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); S.lane = DEF.lane; S.tc = DEF.tc; S.le = DEF.le; S.tw = DEF.tw; S.lanesVariant = DEF.lanesVariant; lastModelP = null;
+      $('scaleErr').textContent = '';
+      Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) { i.className = ''; });
+      changed();
+    };
+    $('routerTable').onchange = function () { S.router = $('routerTable').checked ? 'table' : 'base'; changed(); };
+    $('lane').oninput = function () { S.lane = Math.round((1 - parseInt($('lane').value, 10) / 100) * 20) / 20; changed(); };
+    $('tc').oninput = function () { S.tc = parseInt($('tc').value, 10); changed(); };
+    $('tw').oninput = function () { S.tw = parseFloat($('tw').value); changed(); };
+    $('le').oninput = function () { S.le = parseInt($('le').value, 10); changed(); };
+    $('presetStraight').onclick = function () { S.tc = DEF.tc; S.le = DEF.le; S.lane = DEF.lane; changed(); };
+    $('presetPlain').onclick = function () { S.tc = 150; S.le = 0; S.lane = 1; changed(); };
+    $('lanesVariant').onchange = function () { S.lanesVariant = $('lanesVariant').checked; changed(); };
+    $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(); };
+    $('guardOff').onchange = function () { S.guard = $('guardOff').checked ? 0 : (num($('guard').value) || DEF.guard); changed(); };
+    Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) {
+      i.oninput = function () {
+        var inps = $('scales').getElementsByTagName('input'), vals = [], bad = false;
+        Array.prototype.forEach.call(inps, function (x) {
+          var f = num(x.value); var ok = f !== null && f > 0 && f <= 10;
+          x.className = ok || x.value === '' ? '' : 'bad';
+          if (x.value === '') return;
+          if (!ok) bad = true; else vals.push(f);
+        });
+        if (bad || !vals.length) { $('scaleErr').textContent = 'Scales must be numbers > 0 and <= 10.'; return; }
+        $('scaleErr').textContent = '';
+        S.scales = dedupe(vals);
+        saveSettings(); scheduleRoute();
+      };
+    });
+    refreshPanel();
+  }
+
+  // ---------- health (once) + hash restore ----------
+  var h = readHash();
+  loadSettings(h);
+  dbgOpen = h.dbg === '1';
+  $('nSel').value = String(S.n);
+  var f = parseLL(h.from), t = parseLL(h.to);
+  if (f) setPoint('from', f);
+  if (t) setPoint('to', t);
+  if (f && !t) setMode('to');
+  if (f && t) { setMode('from'); map.fitBounds([f, t], { padding: [40, 40] }); }
+  saveSettings();
+
+  fetch('/api/health').then(function (r) { return r.json(); }).then(function (j) {
+    var b = j.bbox;
+    if (b && !(f && t)) map.fitBounds([[b.lat_min, b.lon_min], [b.lat_max, b.lon_max]]);
+    $('foot').textContent = 'Routing: BRouter ' + (j.brouter ? 'up' : 'DOWN (start it with make brouter)') + '. Stop weights: ' + j.weight_set + '.';
+  }).catch(function () {
+    $('foot').textContent = 'Planner API unreachable.';
+  });
+
+  fetch('/api/model').then(function (r) { return r.json(); }).then(function (j) {
+    MODEL = j; buildPanel();
+  }).catch(function () {
+    $('setBadge').textContent = 'model unavailable';
+  }).then(function () { if (f && t) findRoutes(); });
+  // ---------- cycle infrastructure overlay (lazy-loaded, off by default) ----------
+  (function () {
+    var CYC_LS = 'flowplanner.cycleLayers';
+    var CYC_URL = 'data/cycle_dublin_wicklow.geojson';
+    var data = null, loading = false, waiting = [];
+    var pathLayer = L.layerGroup(), roadLayer = L.layerGroup();
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function popup(p) {
+      return '<b>' + esc(p.kind) + '</b> (OSM way ' + esc(p.way) + ')<br>' + Object.keys(p).filter(function (k) { return k !== 'way'; })
+        .map(function (k) { return esc(k) + ' = ' + esc(p[k]); }).join('<br>');
+    }
+    function build() {
+      var feats = data.features;
+      function layer(pred, style) {
+        return L.geoJSON({ type: 'FeatureCollection', features: feats.filter(pred) }, {
+          style: style, onEachFeature: function (f, l) { l.bindPopup(popup(f.properties)); }
+        });
+      }
+      pathLayer.addLayer(layer(function (f) { return f.properties.kind === 'path'; }, function () { return { color: '#1a9641', weight: 3, opacity: 0.85 }; }));
+      roadLayer.addLayer(layer(function (f) { return f.properties.kind !== 'path'; }, function (f) {
+        return f.properties.kind === 'track' ? { color: '#2166ac', weight: 3, opacity: 0.85 } : { color: '#2166ac', weight: 3, opacity: 0.85, dashArray: '6 5' };
+      }));
+    }
+    function ensureLoaded(cb) {
+      if (data) { cb(); return; }
+      waiting.push(cb);
+      if (loading) return;
+      loading = true;
+      fetch(CYC_URL).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (j) { data = j; build(); loading = false; var q = waiting; waiting = []; q.forEach(function (f) { f(); }); })
+        .catch(function (e) { loading = false; waiting = []; var n = document.getElementById('cycleNote'); if (n) n.textContent += ' (overlay failed to load: ' + e.message + ')'; });
+    }
+    var ctl = L.control.layers(null, { 'Cycle paths': pathLayer, 'Roads with cycle lanes/tracks': roadLayer }, { position: 'topright', collapsed: true }).addTo(map);
+    var want = { path: false, road: false };
+    try { var st = JSON.parse(localStorage.getItem(CYC_LS) || 'null'); if (st) { want.path = !!st.path; want.road = !!st.road; } } catch (e) { /* ignore */ }
+    function save() { try { localStorage.setItem(CYC_LS, JSON.stringify(want)); } catch (e) { /* storage unavailable */ } }
+    map.on('overlayadd overlayremove', function (e) {
+      var on = e.type === 'overlayadd';
+      if (e.layer === pathLayer) want.path = on; else if (e.layer === roadLayer) want.road = on; else return;
+      save();
+      if (on) ensureLoaded(routesToFront);
+    });
+    // Layer groups are empty until the data arrives; adding them to the map first lets the control show the checkbox state.
+    if (want.path) pathLayer.addTo(map);
+    if (want.road) roadLayer.addTo(map);
+    if (want.path || want.road) ensureLoaded(routesToFront);
+  })();
+})();
+</script>
+</body>
+</html>
