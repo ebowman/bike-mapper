@@ -17,6 +17,7 @@ Notes:
 - routing-engines.md - routing engines compared on node-level stop and turn costs, BRouter 'flow' profile
 - stop-priors-open-data.md - open non-ride sources (See.Sense, SCATS, GTFS-R, Strava Metro) and literature for per-class stop priors; structural prior table vs empirical
 - ride-data-acquisition.md - acquiring Eric's ride history (FIT/GPX) from Garmin Connect / Strava (bead dhy.12)
+- road-cycle-open-data-ireland.md - open road/cycle data beyond OSM: Overture vs OSM counts for Dublin (Overture = OSM mirror, no cycle-lane property), NTA/SDCC/DLR cycle layers, TII, Tailte HVD Ways, MapRoad/PSCI, Mapillary, MS Road Detections, Daylight; verdict table (bead emq.22)
 
 ## Environment
 

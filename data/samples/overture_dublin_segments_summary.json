@@ -1,0 +1,392 @@
+{
+ "total": 148638,
+ "counts": {
+  "road|service": 58329,
+  "road|footway": 37289,
+  "road|service|sub:driveway": 32496,
+  "road|residential": 30383,
+  "road|service|sub:parking_aisle": 6202,
+  "road|footway|sub:crosswalk": 6179,
+  "road|footway|sub:sidewalk": 6123,
+  "road|secondary": 5423,
+  "road|tertiary": 4517,
+  "road|cycleway": 2902,
+  "road|path": 2247,
+  "road|steps": 2119,
+  "road|unclassified": 2061,
+  "road|service|sub:alley": 2052,
+  "road|unknown": 819,
+  "road|track": 728,
+  "road|pedestrian": 403,
+  "rail|standard_gauge": 396,
+  "road|trunk": 367,
+  "road|secondary|sub:link": 295,
+  "road|motorway": 250,
+  "road|cycleway|sub:cycle_crossing": 198,
+  "road|motorway|sub:link": 158,
+  "rail|unknown": 143,
+  "rail|tram": 140,
+  "road|trunk|sub:link": 120,
+  "road|tertiary|sub:link": 97,
+  "road|primary": 84,
+  "road|living_street": 27,
+  "road|primary|sub:link": 15,
+  "water|None": 10,
+  "road|bridleway": 1
+ },
+ "km": {
+  "road|footway": 3667.8,
+  "road|service": 2846.6,
+  "road|residential": 2448.0,
+  "water|None": 1658.4,
+  "road|footway|sub:sidewalk": 1399.4,
+  "road|service|sub:driveway": 651.6,
+  "road|secondary": 611.3,
+  "road|tertiary": 494.5,
+  "road|cycleway": 484.0,
+  "road|service|sub:parking_aisle": 367.4,
+  "road|unclassified": 332.9,
+  "road|path": 315.7,
+  "rail|standard_gauge": 274.4,
+  "road|service|sub:alley": 185.4,
+  "road|motorway": 183.2,
+  "road|track": 167.6,
+  "rail|tram": 97.7,
+  "road|footway|sub:crosswalk": 91.1,
+  "road|trunk": 83.6,
+  "road|motorway|sub:link": 56.5,
+  "road|unknown": 50.8,
+  "rail|unknown": 49.7,
+  "road|pedestrian": 32.7,
+  "road|trunk|sub:link": 22.0,
+  "road|secondary|sub:link": 20.9,
+  "road|steps": 17.6,
+  "road|primary": 15.8,
+  "road|tertiary|sub:link": 4.6,
+  "road|cycleway|sub:cycle_crossing": 3.8,
+  "road|living_street": 1.8,
+  "road|primary|sub:link": 1.2,
+  "road|bridleway": 0.3
+ },
+ "keys": {
+  "connectors[].connector_id": 492788,
+  "connectors[].at": 492788,
+  "sources[].property": 181911,
+  "sources[].dataset": 181911,
+  "sources[].license": 181911,
+  "sources[].record_id": 181911,
+  "sources[].update_time": 181911,
+  "sources[].confidence": 181911,
+  "sources[].provider": 181911,
+  "sources[].resource": 181911,
+  "sources[].version": 181911,
+  "subtype": 148638,
+  "version": 148638,
+  "class": 148628,
+  "sources[].between": 135758,
+  "sources[].between[]": 92306,
+  "names.common[][]": 80916,
+  "road_surface[].value": 71321,
+  "road_surface[].between": 66307,
+  "subclass_rules[].value": 63043,
+  "subclass": 53935,
+  "subclass_rules[].between": 53935,
+  "names.rules[].variant": 48064,
+  "names.rules[].language": 48064,
+  "names.rules[].perspectives": 48064,
+  "names.rules[].value": 48064,
+  "names.rules[].side": 48064,
+  "names.rules[].between": 43923,
+  "speed_limits[].min_speed": 42874,
+  "speed_limits[].max_speed.value": 42874,
+  "speed_limits[].max_speed.unit": 42874,
+  "speed_limits[].is_max_speed_variable": 42874,
+  "speed_limits[].when": 42868,
+  "names.primary": 42033,
+  "speed_limits[].between": 41296,
+  "access_restrictions[].access_type": 38675,
+  "access_restrictions[].when.during": 38269,
+  "access_restrictions[].when.heading": 38269,
+  "access_restrictions[].when.vehicle": 37129,
+  "access_restrictions[].when.using": 36857,
+  "access_restrictions[].between": 33441,
+  "access_restrictions[].when.mode": 28355,
+  "access_restrictions[].when.recognized": 20339,
+  "names.common": 18562,
+  "subclass_rules[].between[]": 18216,
+  "access_restrictions[].when.recognized[]": 17932,
+  "access_restrictions[].when.mode[]": 13616,
+  "access_restrictions[].between[]": 10468,
+  "road_surface[].between[]": 10028,
+  "names.rules[].between[]": 8282,
+  "destinations[].labels[].value": 5465,
+  "destinations[].labels[].type": 5465,
+  "road_flags[].between[]": 4922,
+  "routes[].name": 4412,
+  "routes[].network": 4412,
+  "routes[].ref": 4412,
+  "routes[].symbol": 4412,
+  "routes[].wikidata": 4412,
+  "routes[].between": 4386,
+  "road_flags[].values[]": 3851,
+  "level_rules[].between[]": 3478,
+  "speed_limits[].between[]": 3156,
+  "destinations[].symbols": 2961,
+  "destinations[].from_connector_id": 2961,
+  "destinations[].to_segment_id": 2961,
+  "destinations[].to_connector_id": 2961,
+  "destinations[].when.heading": 2961,
+  "destinations[].final_heading": 2961,
+  "level_rules[].value": 2260,
+  "prohibited_transitions[].sequence[].connector_id": 1832,
+  "prohibited_transitions[].sequence[].segment_id": 1832,
+  "prohibited_transitions[].final_heading": 1756,
+  "prohibited_transitions[].when.heading": 1756,
+  "prohibited_transitions[].when.during": 1756,
+  "prohibited_transitions[].when.using": 1756,
+  "prohibited_transitions[].when.recognized": 1756,
+  "prohibited_transitions[].when.mode": 1756,
+  "prohibited_transitions[].when.vehicle": 1756,
+  "prohibited_transitions[].between": 1756,
+  "access_restrictions[].when.using[]": 1412,
+  "rail_flags[].values[]": 1360,
+  "width_rules[].value": 1346,
+  "road_flags[].between": 1300,
+  "access_restrictions[].when.vehicle[].dimension": 1142,
+  "access_restrictions[].when.vehicle[].comparison": 1142,
+  "access_restrictions[].when.vehicle[].value": 1142,
+  "access_restrictions[].when.vehicle[].unit": 1142,
+  "width_rules[].between": 1081,
+  "rail_flags[].between[]": 980,
+  "width_rules[].between[]": 530,
+  "level_rules[].between": 521,
+  "access_restrictions[].when": 406,
+  "rail_flags[].between": 366,
+  "routes[].between[]": 52,
+  "names.rules": 11,
+  "speed_limits[].when.during": 6,
+  "speed_limits[].when.heading": 6,
+  "speed_limits[].when.using": 6,
+  "speed_limits[].when.recognized": 6,
+  "speed_limits[].when.mode": 6,
+  "speed_limits[].when.vehicle": 6
+ },
+ "cycle_paths": {
+  "access_restrictions[].when.mode[]": 5203,
+  "class": 2902,
+  "subclass_rules[].value": 786,
+  "subclass": 198,
+  "names.rules[].value": 5,
+  "names.primary": 4
+ },
+ "cycle_vals": {
+  "access_restrictions[].when.mode[]|bicycle": 5178,
+  "class|cycleway": 2902,
+  "subclass_rules[].value|cycle_crossing": 786,
+  "subclass|cycle_crossing": 198,
+  "access_restrictions[].when.mode[]|motorcycle": 25,
+  "names.primary|Cycle Link at Drummartin Link Road via Salt Barn to Bracken Road": 1,
+  "names.rules[].value|Cycle Link at Drummartin Link Road via Salt Barn to Bracken Road": 1,
+  "names.primary|Liffey Cycle Route": 1,
+  "names.rules[].value|Liffey Cycle Route": 1,
+  "names.rules[].value|George's Street cycleway:left=no": 1,
+  "names.primary|Dublin Bikes - Q5311025": 1,
+  "names.rules[].value|Dublin Bikes - Q5311025": 1,
+  "names.primary|Clontarf Cycle Route": 1,
+  "names.rules[].value|Clontarf Cycle Route": 1
+ },
+ "road_flags": {
+  "is_bridge": 1522,
+  "is_tunnel": 1063,
+  "is_link": 757,
+  "is_covered": 273,
+  "is_under_construction": 144,
+  "is_indoor": 80,
+  "is_abandoned": 12
+ },
+ "lanes_present_by_class": {},
+ "subclass_rules_vals": {
+  "driveway": 32689,
+  "crosswalk": 10557,
+  "sidewalk": 9535,
+  "parking_aisle": 6653,
+  "alley": 2138,
+  "cycle_crossing": 786,
+  "link": 685
+ },
+ "access_modes": {
+  "allowed|foot": 3814,
+  "designated|foot": 2785,
+  "allowed|bicycle": 2271,
+  "designated|bicycle": 1917,
+  "denied|bicycle": 990,
+  "allowed|motor_vehicle": 739,
+  "denied|foot": 381,
+  "denied|motor_vehicle": 279,
+  "denied|hgv": 126,
+  "allowed|bus": 83,
+  "designated|bus": 57,
+  "allowed|hgv": 39,
+  "denied|car": 31,
+  "allowed|car": 25,
+  "denied|vehicle": 25,
+  "allowed|vehicle": 18,
+  "denied|motorcycle": 16,
+  "denied|bus": 7,
+  "allowed|motorcycle": 6,
+  "designated|motorcycle": 3,
+  "designated|hgv": 3,
+  "designated|motor_vehicle": 1
+ },
+ "surface": {
+  "paved": 66212,
+  "paving_stones": 2923,
+  "unpaved": 1030,
+  "gravel": 801,
+  "dirt": 190,
+  "unknown": 111,
+  "metal": 54
+ },
+ "speed_limits_by_class": {
+  "residential": 26157,
+  "secondary": 5404,
+  "tertiary": 4445,
+  "service": 3913,
+  "unclassified": 1590,
+  "trunk": 351,
+  "motorway": 248,
+  "primary": 84,
+  "pedestrian": 72,
+  "footway": 35,
+  "living_street": 11,
+  "cycleway": 11,
+  "track": 10,
+  "unknown": 5,
+  "path": 2
+ },
+ "routes_top": {
+  "IE:regional|R113": 333,
+  "None|Inner Orbital Route": 217,
+  "IE:regional|R105": 172,
+  "IE:regional|R112": 165,
+  "IE:regional|R118": 162,
+  "IE:regional|R121": 161,
+  "None|Outer Orbital Route": 159,
+  "IE:regional|R132": 152,
+  "IE:regional|R135": 148,
+  "IE:regional|R104": 146,
+  "IE:regional|R114": 142,
+  "IE:regional|R117": 137,
+  "IE:regional|R108": 134,
+  "IE:regional|R137": 127,
+  "IE:regional|R110": 113,
+  "IE:regional|R138": 111,
+  "IE:regional|R107": 109,
+  "IE:regional|R136": 107,
+  "IE:regional|R119": 100,
+  "IE:national|N31": 99,
+  "IE:regional|R131": 89,
+  "IE:regional|R103": 87,
+  "e-road|E-20": 86,
+  "IE:regional|R147": 83,
+  "IE:regional|R111": 80
+ },
+ "level_rules": 2002,
+ "sources": {
+  "OpenStreetMap": 181133,
+  "primary|OpenStreetMap": 176723,
+  "TomTom": 778,
+  "primary|TomTom": 778
+ },
+ "sources_by_class": {
+  "unclassified": {
+   "OpenStreetMap": 2764
+  },
+  "service": {
+   "OpenStreetMap": 64535
+  },
+  "footway": {
+   "OpenStreetMap": 47877
+  },
+  "path": {
+   "OpenStreetMap": 2497
+  },
+  "steps": {
+   "OpenStreetMap": 2152
+  },
+  "cycleway": {
+   "OpenStreetMap": 5095
+  },
+  "track": {
+   "OpenStreetMap": 829
+  },
+  "pedestrian": {
+   "OpenStreetMap": 507
+  },
+  "residential": {
+   "OpenStreetMap": 32622,
+   "TomTom": 1
+  },
+  "standard_gauge": {
+   "OpenStreetMap": 1106
+  },
+  "secondary": {
+   "OpenStreetMap": 12380
+  },
+  "tertiary": {
+   "OpenStreetMap": 6150
+  },
+  "unknown": {
+   "TomTom": 777,
+   "OpenStreetMap": 209
+  },
+  "trunk": {
+   "OpenStreetMap": 922
+  },
+  "primary": {
+   "OpenStreetMap": 214
+  },
+  "tram": {
+   "OpenStreetMap": 361
+  },
+  "living_street": {
+   "OpenStreetMap": 35
+  },
+  "motorway": {
+   "OpenStreetMap": 867
+  },
+  "None": {
+   "OpenStreetMap": 10
+  },
+  "bridleway": {
+   "OpenStreetMap": 1
+  }
+ },
+ "cycle_subclass": {
+  "cycleway|None": 2704,
+  "cycleway|cycle_crossing": 198
+ },
+ "versions": {
+  "1": 112379,
+  "2": 27483,
+  "3": 6290,
+  "4": 1496,
+  "5": 420,
+  "6": 196,
+  "7": 140,
+  "8": 105,
+  "9": 61,
+  "10": 38
+ },
+ "_meta": {
+  "release": "2026-10-21.0",
+  "bbox": [
+   -6.45,
+   53.25,
+   -6.05,
+   53.45
+  ],
+  "command": "uvx overturemaps download --bbox=-6.45,53.25,-6.05,53.45 -f geojson --type=segment",
+  "note": "km = full segment length (not clipped to bbox)"
+ }
+}
