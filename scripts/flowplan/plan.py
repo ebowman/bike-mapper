@@ -9,6 +9,7 @@ explicit end); the same iteration. ONE-WAY: plain candidates.generate.
 """
 from __future__ import annotations
 
+import itertools
 import math
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
@@ -19,6 +20,7 @@ from pyproj import Transformer
 from .brouter import BRouterClient, Candidate, validate_params
 from .candidates import DEFAULT_VARIANTS, DEFAULT_WORKERS, Variant, dedupe, generate
 from .scoring import REGION_CRS
+from .terrain import Dem, climb_via_points, flat_via_points
 
 __all__ = ["DETOUR", "MAX_ITER", "PlanResult", "plan_candidates"]
 
@@ -55,6 +57,9 @@ class _State:
     km: float = 0.0         # measured total length (loop: route; out-and-back: 2 x out leg)
     points: list = field(default_factory=list)
     fixed: bool = False     # explicit turnaround: no iteration, no range enforcement
+    polar: list = field(default_factory=list)   # objective sets: [(bearing_deg, dist_m)] at scale 1 (param == param0)
+    param0: float = 0.0
+    scores: list = field(default_factory=list)  # objective sets: via-point scores
 
 
 def _overlap(a_geom, b_geom, tf, buffer_m=OVERLAP_BUFFER_M) -> float:
@@ -99,14 +104,19 @@ def _free_return(out: Candidate, back: Candidate) -> Candidate:
 def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km=(40.0, 50.0),
                     bearings: int = 8, variants=DEFAULT_VARIANTS, alts=(0,), max_calls: int = 48,
                     profile_params: dict | None = None, region: str = "ireland",
-                    return_mode: str = "same", progress=None) -> PlanResult:
+                    return_mode: str = "same", progress=None, objective: str = "flow",
+                    dem: Dem | None = None) -> PlanResult:
     """mode: 'loop' | 'out-and-back' | 'one-way'. length_km = (min, max) total route length.
     progress(calls, max_calls, message) is called after each BRouter round. BRouterUnavailable propagates.
-    Every BRouter request counts against max_calls; the result carries what was found plus notes."""
+    Every BRouter request counts against max_calls; the result carries what was found plus notes.
+    objective: 'flow' (evenly spaced headings) | 'climb' | 'flat' (loops and out-and-backs: via-points picked
+    from the DEM, see flowplan.terrain; falls back to 'flow' headings with a note when coverage is too thin)."""
     if mode not in ("loop", "out-and-back", "one-way"):
         raise ValueError(f"mode must be loop, out-and-back or one-way, got {mode!r}")
     if return_mode not in ("same", "free"):
         raise ValueError(f"return_mode must be same or free, got {return_mode!r}")
+    if objective not in ("flow", "climb", "flat"):
+        raise ValueError(f"objective must be flow, climb or flat, got {objective!r}")
     lo, hi = float(length_km[0]), float(length_km[1])
     if not (math.isfinite(lo) and math.isfinite(hi) and 0 < lo <= hi):
         raise ValueError(f"length_km must be 0 < min <= max, got {length_km!r}")
@@ -125,6 +135,8 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     target = (lo + hi) / 2
 
     if mode == "one-way":
+        if objective != "flow":
+            res.notes.append(f"objective {objective!r} does not apply to one-way routes")
         return _one_way(client, res, start, end, variants, alts, max_calls, region, lo, hi)
     if bearings < 1:
         raise ValueError("bearings must be >= 1")
@@ -140,7 +152,11 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     def build(s: _State):
         if s.fixed:
             return
-        if mode == "loop":
+        if s.polar:
+            k = s.param / s.param0      # radial scale applied to the chosen via-points about the start
+            vias = [at(t, d * k) for t, d in s.polar[:s.n_via if mode == "loop" else 1]]
+            s.points = [start, *vias, start] if mode == "loop" else [start, vias[0]]
+        elif mode == "loop":
             offs = (0, 120, 240) if s.n_via == 3 else (0, 180)
             vias = [at(s.heading + o, s.param) for o in offs]
             s.points = [start, *vias, start]
@@ -183,7 +199,12 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
             d0 = target * 1000 / 2 * DETOUR
         else:
             d0 = target * 1000 / (2 * math.pi) * DETOUR
-        states = [_State(i * 360.0 / bearings, d0) for i in range(bearings)]
+        states = None
+        if objective != "flow":
+            states = _objective_states(objective, mode, dem, start, d0, bearings, region, res,
+                                       target * 1000)
+        if not states:
+            states = [_State(i * 360.0 / bearings, d0) for i in range(bearings)]
         for s in states:
             build(s)
     total_factor = 2 if mode == "out-and-back" else 1
@@ -203,7 +224,8 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
             if c is None:
                 if mode == "loop" and s.n_via == 3:
                     s.n_via = 2
-                    s.param *= _K3 / _K2
+                    if not s.polar:     # DEM sets keep their radial scale and drop to their first two vias
+                        s.param *= _K3 / _K2
                     build(s)
                     continue
                 s.done, s.error = True, err or "no route"
@@ -285,6 +307,9 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
             plan["turnaround"] = list(s.points[-1])
             plan["distance_m"] = round(s.param, 1)
             plan["return_mode"] = ret
+        plan["objective"] = objective if s.polar else "flow"
+        if s.polar:
+            plan["via_scores"] = [round(x, 1) for x in s.scores]
         c.plan = plan
         cands.append(c)
 
@@ -310,6 +335,70 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     if not kept:
         res.notes.append("no candidate inside the requested length range")
     return res
+
+
+MIN_OBJECTIVE_POINTS = 6   # fewer DEM-covered candidate points than this: fall back to even headings
+MIN_BEARING_SEP = 60.0     # loop via-points of one set are at least this far apart in bearing
+MIN_TURN_SEP = 15.0        # out-and-back turnarounds at least this far apart in bearing
+
+
+def _bsep(a, b):
+    d = abs(a - b) % 360
+    return min(d, 360 - d)
+
+
+def _perimeter(polar):
+    xy = [(d * math.sin(math.radians(t)), d * math.cos(math.radians(t))) for t, d in polar]
+    pts = [(0.0, 0.0), *xy, (0.0, 0.0)]
+    return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in itertools.pairwise(pts))
+
+
+def _objective_states(objective, mode, dem, start, d0, bearings, region, res, target_m):
+    """DEM-driven states for 'climb' / 'flat', or None (with a note) when the DEM cannot support them."""
+    dem = dem if dem is not None else Dem()
+    fn = climb_via_points if objective == "climb" else flat_via_points
+    vp = fn(dem, start, d0, region=region)
+    if vp.coverage_note:
+        res.notes.append(vp.coverage_note)
+    if len(vp) < MIN_OBJECTIVE_POINTS:
+        res.notes.append(f"{objective}: DEM covers only {len(vp)} candidate points (<{MIN_OBJECTIVE_POINTS}); "
+                         "using evenly spaced headings")
+        return None
+    states = []
+    if mode == "out-and-back":
+        chosen = []
+        for p in vp:
+            if all(_bsep(p.heading_deg, q.heading_deg) >= MIN_TURN_SEP for q in chosen):
+                chosen.append(p)
+            if len(chosen) == bearings:
+                break
+        for p in chosen:
+            states.append(_State(p.heading_deg, p.radius_m, polar=[(p.heading_deg, p.radius_m)],
+                                 param0=p.radius_m, scores=[p.score]))
+    else:
+        triples = []
+        for tri in itertools.combinations(vp, 3):
+            if all(_bsep(a.heading_deg, b.heading_deg) >= MIN_BEARING_SEP for a, b in itertools.combinations(tri, 2)):
+                triples.append((sum(p.score for p in tri), tri))
+        triples.sort(key=lambda x: -x[0])
+        picked = []
+        for _, tri in triples:
+            ids = {id(p) for p in tri}
+            if any(len(ids & {id(p) for p in t}) >= 2 for t in picked):
+                continue
+            picked.append(tri)
+            if len(picked) == bearings:
+                break
+        for tri in picked:
+            best = max(tri, key=lambda p: p.score)
+            tri = sorted(tri, key=lambda p: p.heading_deg)
+            polar = [(p.heading_deg, p.radius_m) for p in tri]
+            k0 = target_m / _perimeter(polar)   # initial radial scale: crow-flies perimeter ~ target length
+            states.append(_State(best.heading_deg, d0 * k0, polar=polar, param0=d0, scores=[p.score for p in tri]))
+    if not states:
+        res.notes.append(f"{objective}: no usable via-point set found; using evenly spaced headings")
+        return None
+    return states
 
 
 def _one_way(client, res, start, end, variants, alts, max_calls, region, lo, hi):

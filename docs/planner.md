@@ -212,3 +212,27 @@ loop, out-and-back and one-way candidates aimed at a length range.
 - **One-way** delegates to `candidates.generate`; the length range is only noted, not enforced.
 - **Limits**: 3 iterations may miss a narrow range (reported in `skipped`); vias in water or off-network
   (BRouter "island" errors) lose that heading; headings are crow-flies, not terrain-aware (see 41w.4).
+
+### Climb seeking and flat routes (41w.4)
+
+`plan_candidates(..., objective='flow'|'climb'|'flat', dem=None)`. `flow` is the evenly spaced heading strategy above.
+`climb` and `flat` replace the headings with via-points chosen from a DEM (`scripts/flowplan/terrain.py`).
+
+- **Method.** A polar grid around the start (24 headings x radii 0.5/0.85/1.2 of the nominal ring radius) is
+  sampled. Climb score = `max(0, ele - ele_start) + 0.5 x relief` (relief = max - min of 4 samples 500 m
+  N/E/S/W). Flat score = `-(relief + |ele - ele_start|)`. Higher is better for both. Loops use the best-scoring
+  triples whose bearings from the start are >= 60 degrees apart (at most `bearings` sets, no two sets sharing
+  2 points); out-and-backs use the top points (>= 15 degrees apart) as turnarounds. The length range is still
+  enforced by scaling the chosen via-points radially about the start (same 3-call iteration as `flow`).
+  `Candidate.plan` records `objective` and `via_scores`.
+- **What it is not.** It finds high, rough ground near the start, not catalogued climbs; the route between the
+  via-points is whatever BRouter picks. A climb catalogue is a separate future step (`climbs.md` open questions).
+- **Coverage.** `Dem` reads `data/dem/*.tif` (Copernicus GLO-30) first, then `data/dem/srtm/*.hgt` for cells the
+  GLO-30 tile lacks or has void; nearest-cell sampling. Today that is one GLO-30 tile (lon -7..-6, lat 53..54)
+  plus the matching SRTM N53W007 tile (adds only a sliver to the south, to lat 52.9999). Anything outside returns
+  `None`: those grid points are skipped and counted in a plan note. With fewer than 6 usable points the planner
+  falls back to evenly spaced headings and says so in `PlanResult.notes`. More tiles must be added by hand to
+  `data/dem/`.
+- **Measured** (loop 50-60 km from -6.2825, 53.2990, 8 sets, flow variant): flow mean ascent 474 m (max 736);
+  climb mean ascent 786 m (max 848), a ratio of 1.66. Climb candidates are fewer-but-steadier: ascent is more
+  consistent, but the best single climb score was similar (367 vs 409).
