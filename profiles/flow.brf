@@ -23,6 +23,17 @@ assign validForBikes = true
 # FLOW: global multiplier on all stop-cause node costs (flow_lo = 0.5, flow = 1.0, flow_hi = 2.0); variants are selected per request with the URL override &profile:flow_scale=<x>, not separate files
 assign flow_scale            = 1.0   # %flow_scale% | multiplier on stop-cause node costs | number
 
+# FLOW: stop-cause node costs as overridable variables (&profile:cost_<x>=<n>); the planner server derives them
+# from the active p-table (flowplan.stop_model.StopModel.brouter_costs). Defaults = the values used before emq.16.
+# Each node cost is multiplied by flow_scale, except cost_rb_entry (way-context roundabout entry), which stays
+# unscaled as before (byte-identical default routes).
+assign cost_signal           = 300   # %cost_signal% | traffic_signals node cost | number
+assign cost_xing_signal      = 300   # %cost_xing_signal% | signalled crossing node cost | number
+assign cost_give_way         = 80    # %cost_give_way% | give_way node cost | number
+assign cost_stop             = 60    # %cost_stop% | stop sign node cost | number
+assign cost_mini_rb          = 80    # %cost_mini_rb% | mini_roundabout node cost | number
+assign cost_rb_entry         = 150   # %cost_rb_entry% | roundabout entry cost (way context, not scaled by flow_scale) | number
+
 # Use the following switches to change behaviour
 assign allow_steps           = true   # %allow_steps% | Set to false to disallow steps | boolean
 assign allow_ferries         = true   # %allow_ferries% | set to false to disallow ferries | boolean
@@ -90,7 +101,7 @@ assign initialclassifier =
      else if junction=roundabout|circular then 2
      else 1
 
-assign initialcost switch route=ferry 10000 switch junction=roundabout|circular 150 0
+assign initialcost switch route=ferry 10000 switch junction=roundabout|circular cost_rb_entry 0
 
 #
 # implicit access here just from the motorroad tag
@@ -359,16 +370,16 @@ assign footaccess
 # FLOW: stop-cause node costs (cost units ~ metres of detour); signals priced regardless of access, as stock
 assign initialcost
     # signals: the anchor, 300 (stop-model-validation.md weights table, 'traffic_signals': definition)
-    switch highway=traffic_signals multiply flow_scale 300
+    switch highway=traffic_signals multiply flow_scale cost_signal
     # signalled crossing: treat as signals, 300 (stop-model-validation.md: 'the current halving is not supported'; was 150)
-    switch and highway=crossing crossing=traffic_signals multiply flow_scale 300
+    switch and highway=crossing crossing=traffic_signals multiply flow_scale cost_xing_signal
     switch bikeaccess
        # stop sign: lowered to 60 (stop-model-validation.md: stop signs stop less than give_way; was 150)
-       switch highway=stop multiply flow_scale 60
+       switch highway=stop multiply flow_scale cost_stop
        # give_way: keep 80 (stop-model-validation.md: 68-84 across variants)
-       switch highway=give_way multiply flow_scale 80
+       switch highway=give_way multiply flow_scale cost_give_way
        # mini_roundabout: 80 unchanged (stop-model-validation.md: roundabouts under-powered, 0 stops in 22 passes)
-       switch highway=mini_roundabout multiply flow_scale 80
+       switch highway=mini_roundabout multiply flow_scale cost_mini_rb
        0
        switch footaccess
               300

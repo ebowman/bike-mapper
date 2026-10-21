@@ -112,3 +112,26 @@ def test_blend(model, combined):
     assert stop_model.blend(model, combined, 1).p("signal") == combined.p("signal")
     with pytest.raises(ValueError):
         stop_model.blend(model, combined, 1.1)
+
+
+def test_brouter_costs_prior(model):
+    c = model.brouter_costs()
+    assert set(c) == {"cost_signal", "cost_xing_signal", "cost_give_way", "cost_stop",
+                      "cost_mini_rb", "cost_rb_entry"}
+    assert c["cost_signal"] == 300
+    assert c["cost_mini_rb"] == c["cost_rb_entry"]
+    assert all(isinstance(v, int) and 0 <= v <= 1000 for v in c.values())
+
+
+def test_brouter_costs_p_stop_zero(model):
+    assert model.with_overrides({"stop": 0}).brouter_costs()["cost_stop"] == 0
+
+
+def test_brouter_costs_signal_is_anchor(model):
+    assert model.with_overrides({"signal": 0.5}).brouter_costs()["cost_signal"] == 300
+    assert model.brouter_costs(anchor=200)["cost_signal"] == 200
+
+
+def test_brouter_costs_p_signal_zero_still_anchored(model):
+    c = model.with_overrides({"signal": 0}).brouter_costs()
+    assert c["cost_signal"] == 300 and all(0 <= v <= 1000 for v in c.values())

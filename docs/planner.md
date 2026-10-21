@@ -38,6 +38,10 @@ The default is `prior`; the verdict is in `docs/research/stop-priors-open-data.m
 
 Classes, in precedence order: signal, stop, give_way, rb_entry, xing_signal, yield_infer, yield_equal. When several events fire for the same arrival (same node, way and direction) only the highest-precedence one is kept.
 
+### Router and scorer use the same table
+
+The server derives BRouter's node costs from the active p-table (after weights, blend and per-class overrides) with `StopModel.brouter_costs(anchor=300)`: `cost(class) = 300 x (p x mean_stop_s) / (p_signal x mean_stop_s_signal)`, the weight formula of `docs/research/stop-model-validation.md` (without its mid-way background subtraction), clamped to 0..1000 and rounded. Signals are the anchor (always 300). The six values are sent to every flow variant as `profile:cost_signal`, `cost_xing_signal`, `cost_give_way`, `cost_stop`, `cost_mini_rb` and `cost_rb_entry` (`rb_entry` feeds both roundabout variables); the fastbike baseline is untouched. In `profiles/flow.brf` the defaults (300/300/80/60/80/150) reproduce the pre-emq.16 routes byte for byte; node costs are still multiplied by `flow_scale`, `cost_rb_entry` is not. Cache implication: the costs are part of the candidate cache key, so changing a p-value that moves a cost re-routes through BRouter (slow), while guard, `n` and changes that leave the rounded costs unchanged re-rank from the cache. The applied costs are echoed in `settings.brouter_costs`.
+
 ## What it does not use
 
 - Eric's ride files are not read at run time. They were used once, offline, to derive the `combined` and `ireland` sets; the default `prior` set does not depend on them, and the empirical sets are optional.

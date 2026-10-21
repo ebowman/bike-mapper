@@ -111,10 +111,15 @@ class CandidateCache:
 
 
 def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=None,
-               index=None, model=None) -> FastAPI:
+               index=None, model=None, model_path=None) -> FastAPI:
     app = FastAPI(title="flow planner")
     bbox = BBOX[region]
-    model = model or stop_model.load()
+    model_path = Path(model_path) if model_path else stop_model.DEFAULT_PATH
+    with open(model_path) as f:
+        model_json = json.load(f)
+    # all weight sets loaded once at startup
+    sets = {name: stop_model.load(model_path, name) for name in model_json["weight_sets"]}
+    model = model or stop_model.load(model_path)
     log.info("stop model weight_set=%s", model.weight_set)
     if index is None:
         index = FlowIndex.load(region)
@@ -133,14 +138,12 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "weight_set": model.weight_set, "bbox": bbox}
 
     cache = CandidateCache()
-    with open(stop_model.DEFAULT_PATH) as f:
-        model_json = json.load(f)
 
     def named_model(name: str, param: str):
-        if name not in model_json["weight_sets"]:
+        if name not in sets:
             raise HTTPException(400, f"'{param}' must be one of "
                                      f"{', '.join(model_json['weight_sets'])} (got {name!r})")
-        return model if name == model.weight_set else stop_model.load(weights=name)
+        return sets[name]
 
     @app.get("/api/model")
     def model_info():
@@ -187,8 +190,12 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
             raise HTTPException(400, f"'guard' must be within 0..{MAX_GUARD} (got {guard!r})")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         refresh_b = refresh not in (None, "", "0", "false")
+        costs = m.brouter_costs()
+        for ck, cv in costs.items():
+            if not math.isfinite(cv) or not 0 <= cv <= 1000:
+                raise HTTPException(400, f"derived {ck}={cv} is outside 0..1000")
         key = (round(start[1], 5), round(start[0], 5), round(end[1], 5), round(end[0], 5),
-               scales_t)
+               scales_t, tuple(sorted(costs.items())))
         hit = None if refresh_b else cache.get(key)
         if hit is not None:
             kept, dropped, skipped, brouter_ms = hit
@@ -196,7 +203,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
         else:
             try:
                 kept, dropped, skipped = generate(client, start, end,
-                                                  variants=variants_for(scales_t), region=region)
+                                                  variants=variants_for(scales_t), region=region,
+                                                  profile_params=costs)
             except BRouterUnavailable as e:
                 raise HTTPException(503, str(e)) from None
             brouter_ms = round((time.perf_counter() - t0) * 1000)
@@ -234,7 +242,7 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "weight_set": m.weight_set, "routes": routes,
                 "settings": {"weights": weights or model.weight_set, "blend_with": blend_with,
                              "blend": blend_alpha, "overrides": overrides, "guard": guard_v,
-                             "scales": list(scales_t), "n": n},
+                             "scales": list(scales_t), "n": n, "brouter_costs": costs},
                 "model": {c: m.p(c) for c in m.classes}, "cached": hit is not None,
                 "candidates_total": len(kept) + len(dropped),
                 "candidates_deduped": len(kept), "skipped": skipped,

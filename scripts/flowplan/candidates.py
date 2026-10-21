@@ -59,12 +59,18 @@ def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20
 
 
 def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=(0, 1, 2, 3),
-             max_workers: int = DEFAULT_WORKERS, region: str = "ireland"):
+             max_workers: int = DEFAULT_WORKERS, region: str = "ireland",
+             profile_params: dict | None = None):
     """Return (kept, dropped, skipped). skipped = [{variant, alt, error}] for failed
-    requests; BRouterUnavailable propagates. start == end yields no candidates."""
+    requests; BRouterUnavailable propagates. profile_params (e.g. cost_* from
+    StopModel.brouter_costs) are merged into every non-fastbike variant's params. start == end yields no candidates."""
     start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
     if start == end:
         return [], [], []
+    if profile_params:
+        variants = tuple(v if v.profile == "fastbike" else
+                         Variant(v.name, v.profile, {**v.params, **profile_params})
+                         for v in variants)
     for v in variants:
         validate_params(v.params)
     jobs = [(v, a) for v in variants for a in alts]

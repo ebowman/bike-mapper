@@ -51,6 +51,32 @@ class StopModel:
     def mean_stop_s(self, cause: str) -> float:
         return float(self._cause(cause)["mean_stop_s"])
 
+    def brouter_costs(self, anchor: float = 300) -> dict[str, int]:
+        """BRouter flow.brf node costs (profile:cost_<x>=<n>) derived from this p-table.
+
+        cost(class) = anchor x (p x mean_stop_s)/(p_signal x mean_stop_s_signal), the same formula as
+        the 'weight' column of docs/research/stop-model-validation.md (weight = 300 x (p x mean stop
+        seconds) / (same for signals); this version omits the mid-way background subtraction).
+        Signals are the anchor, so cost_signal == anchor (also if p_signal is overridden to 0:
+        then the reference is the largest class p x mean_stop_s). Clamped to [0, 1000], rounded to int.
+        rb_entry feeds both cost_mini_rb and cost_rb_entry."""
+        ref = self.p("signal") * self.mean_stop_s("signal")
+        if ref <= 0:
+            # p_signal overridden to 0: no signal reference; fall back to the largest class
+            # (p x mean_stop_s), so the costs stay finite and relative to each other.
+            ref = max(float(c["p"]) * float(c["mean_stop_s"]) for c in self.causes.values())
+        if ref <= 0:
+            return {"cost_signal": round(min(1000.0, max(0.0, anchor))), "cost_xing_signal": 0,
+                    "cost_give_way": 0, "cost_stop": 0, "cost_mini_rb": 0, "cost_rb_entry": 0}
+
+        def cost(cause: str) -> int:
+            return round(min(1000.0, max(0.0, anchor * self.p(cause) * self.mean_stop_s(cause) / ref)))
+
+        rb = cost("rb_entry")
+        return {"cost_signal": round(min(1000.0, max(0.0, anchor))), "cost_xing_signal": cost("xing_signal"),
+                "cost_give_way": cost("give_way"), "cost_stop": cost("stop"),
+                "cost_mini_rb": rb, "cost_rb_entry": rb}
+
     def with_overrides(self, p: dict) -> StopModel:
         """Copy with per-cause p replaced. 0 <= p <= 1 (ValueError); unknown cause KeyError.
         weight_set gains a '+custom' suffix (unchanged if p is empty)."""

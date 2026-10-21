@@ -124,3 +124,19 @@ def test_flow_scale_validation(bad):
 def test_default_variants():
     assert [v.name for v in DEFAULT_VARIANTS] == ["fastbike", "flow_lo", "flow", "flow_hi"]
     assert candidates.DEFAULT_VARIANTS[1].params == {"flow_scale": 0.5}
+
+
+def test_generate_profile_params_passthrough():
+    seen = []
+
+    class Rec(FakeClient):
+        def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+            seen.append((profile, dict(params or {})))
+            return super().route(points, profile, alternativeidx, params)
+
+    generate(Rec(), A, B, profile_params={"cost_stop": 0})
+    flow = [p for pr, p in seen if pr == "flow"]
+    assert len(flow) == 12 and all(p["cost_stop"] == 0 and "flow_scale" in p for p in flow)
+    assert [p for pr, p in seen if pr == "fastbike"] == [{}] * 4
+    with pytest.raises(ValueError):
+        generate(Rec(), A, B, profile_params={"cost_stop": 5000})

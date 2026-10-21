@@ -27,7 +27,7 @@ class ScoredCandidate:
 def rank(scored: list[ScoredCandidate], n: int = 4, guard: float = 1.3,
          min_keep: int = 3) -> list[ScoredCandidate]:
     """Sort by expected_stops asc (tie: shorter first). Drop candidates longer than
-    guard x the shortest unless that would leave fewer than min_keep. Return the top n
+    guard x the shortest (guard <= 0 disables the guard) unless that would leave fewer than min_keep. Return the top n
     with rank (1-based) and delta_vs_fastest ({stops, km} vs fastbike/alt0, or None)."""
     if not scored:
         return []

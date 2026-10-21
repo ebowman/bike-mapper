@@ -154,9 +154,34 @@ def test_cache_and_refresh(index):
     base = fc.calls  # startup health check may route
     j1 = c.get(f"/api/route?{Q}").json()
     assert j1["cached"] is False and fc.calls == base + 16
-    j2 = c.get(f"/api/route?{Q}&weights=ireland").json()
+    j2 = c.get(f"/api/route?{Q}&guard=2").json()  # guard does not change costs -> cache hit
     assert j2["cached"] is True and fc.calls == base + 16 and j2["timings_ms"]["brouter"] == 0
     j3 = c.get(f"/api/route?{Q}&refresh=1").json()
     assert j3["cached"] is False and fc.calls == base + 32
     c.get(f"/api/route?{Q}&scales=1")  # different scales -> different key
     assert fc.calls == base + 32 + 8
+
+
+def test_cost_change_misses_cache_and_is_echoed(index):
+    fc = Counting()
+    c = app_client(index, fc)
+    base = fc.calls
+    j1 = c.get(f"/api/route?{Q}").json()
+    assert fc.calls == base + 16 and j1["settings"]["brouter_costs"]["cost_signal"] == 300
+    j2 = c.get(f"/api/route?{Q}&p_stop=0").json()
+    assert j2["cached"] is False and fc.calls == base + 32
+    assert j2["settings"]["brouter_costs"]["cost_stop"] == 0
+    j3 = c.get(f"/api/route?{Q}&p_stop=0&guard=2").json()  # same costs -> hit
+    assert j3["cached"] is True and fc.calls == base + 32
+
+
+def test_model_endpoint_uses_app_model_path(index, tmp_path):
+    import json
+
+    from flowplan import stop_model
+    d = json.loads(stop_model.DEFAULT_PATH.read_text())
+    d["midway_background_p"] = 0.123
+    p = tmp_path / "m.json"
+    p.write_text(json.dumps(d))
+    app = flow_server.create_app(client=FakeClient(), index=index, model_path=p)
+    assert TestClient(app).get("/api/model").json()["midway_background_p"] == 0.123
