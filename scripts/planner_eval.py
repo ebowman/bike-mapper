@@ -3,7 +3,8 @@ Run (BRouter must be up: `make brouter`):
   uv run scripts/planner_eval.py [--pairs data/samples/planner_od_pairs.csv]
       [--out data/samples/planner_eval.csv] [--weights prior] [--n 4]
 fastbike_* is the fastbike alt-0 candidate taken from the KEPT list (dedupe keeps the
-first of any duplicate group and fastbike alt 0 is first in job order, so it is always kept).
+first of any duplicate group and fastbike alt 0 is first in job order, so it is kept whenever
+its BRouter request succeeds; otherwise the row errors with the skip reason).
 delta_*_pct = (top - fastbike) / fastbike * 100; negative stops delta = fewer stops."""
 from __future__ import annotations
 
@@ -18,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from flowplan import stop_model
 from flowplan.brouter import DEFAULT_URL, BRouterClient
-from flowplan.candidates import generate
+from flowplan.candidates import DEFAULT_WORKERS, generate
 from flowplan.ranking import ScoredCandidate, rank
 from flowplan.scoring import FlowIndex, score
 
@@ -34,14 +35,20 @@ def _pct(new: float, ref: float) -> float:
 
 
 def build_row(name: str, scored: list[ScoredCandidate], top: list[ScoredCandidate],
-              total: int, skipped: int, wall_s: float) -> dict:
+              total: int, skipped: int, wall_s: float,
+              skip_errors: list[dict] | None = None) -> dict:
     """One output row from scored kept candidates and the ranked list (top[0] is best)."""
     row = dict.fromkeys(COLUMNS, "")
     row.update(name=name, candidates_total=total, candidates_kept=len(scored),
                skipped=skipped, wall_s=round(wall_s, 2))
     ref = next((s for s in scored if s.cand.variant == "fastbike" and s.cand.alt == 0), None)
     if ref is None or not top:
-        row["error"] = "no fastbike alt0 candidate" if top else "no route"
+        if top:
+            why = next((f'{e["error"]}' for e in (skip_errors or [])
+                        if e["variant"] == "fastbike" and e["alt"] == 0), "")
+            row["error"] = "no fastbike alt0 candidate" + (f": {why}" if why else "")
+        else:
+            row["error"] = "no route"
         return row
     t = top[0]
 
@@ -86,9 +93,9 @@ def main():
     ap.add_argument("--out", default=str(ROOT / "data/samples/planner_eval.csv"))
     ap.add_argument("--weights", default="prior")
     ap.add_argument("--n", type=int, default=4)
-    ap.add_argument("--workers", type=int, default=2,
-                    help="client threads; run_brouter.sh serves with 2 server threads and "
-                         "more concurrent requests get killed by its watchdog")
+    ap.add_argument("--workers", type=int, default=DEFAULT_WORKERS,
+                    help="client threads; must not exceed the BRouter server threads "
+                         "(run_brouter.sh THREADS) or its watchdog kills queued requests")
     ap.add_argument("--brouter", default=DEFAULT_URL)
     ap.add_argument("--region", default="ireland")
     a = ap.parse_args()
@@ -108,7 +115,7 @@ def main():
             scored = [ScoredCandidate(c, score(c.geometry, model, index)) for c in kept]
             top = rank(scored, n=a.n)
             row = build_row(p["name"], scored, top, len(kept) + len(dropped), len(skipped),
-                            time.perf_counter() - t0)
+                            time.perf_counter() - t0, skipped)
         except Exception as e:  # noqa: BLE001 - record and continue
             row = dict.fromkeys(COLUMNS, "")
             row.update(name=p["name"], error=f"{type(e).__name__}: {e}",

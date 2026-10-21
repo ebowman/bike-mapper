@@ -8,7 +8,7 @@
 # Ireland: W10_N50.rd5 (lon -10..-5, lat 50..55: Republic + NI south of 55N), W10_N55.rd5 (NI north coast).
 # Tile dates/sizes at download (2026-10-20): both Last-Modified 2026-10-20 01:03 GMT;
 # W10_N50 43,155,455 B, W10_N55 5,517,791 B. Build time: none (download only, ~10 s). 
-# RAM: the server ran with default JVM heap (<= ~1 GB RSS observed), see docs/research/routing-engines.md.
+# RAM: the server runs with -Xmx1g and 4 threads (~0.65-1.2 GB RSS observed), see docs/research/routing-engines.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 VER=1.7.10
@@ -35,9 +35,16 @@ setup() {
   mkdir -p $B/customprofiles
 }
 
+# Server threads (last RouteServer arg) MUST be >= the client's concurrency: flowplan.candidates.generate()
+# and flow_server default to max_workers=4. With 2 server threads and 4 client workers, BRouter's
+# thread-priority-watchdog killed queued requests on 20-50 km pairs (10-13 of 16 candidates skipped).
+# Measured 4 threads/4 workers: 0 skipped, ~82 s for the 10 eval pairs vs ~144 s for 2/2; RSS 0.65-1.2 GB
+# with -Xmx1g (heap cap unchanged: no OOM observed, RSS includes non-heap/mapped segment memory).
+THREADS=4
+
 serve() {   # foreground; Ctrl-C or kill to stop
   exec java -Xmx1g -cp $DIST/brouter-$VER-all.jar btools.server.RouteServer \
-    $SEG $PROFDIR $PWD/$B/customprofiles $PORT 2
+    $SEG $PROFDIR $PWD/$B/customprofiles $PORT $THREADS
 }
 
 route() {   # needs server running; optional output dir ($1, default data/samples)

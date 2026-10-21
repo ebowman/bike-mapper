@@ -68,3 +68,20 @@ def test_unavailable_503(index):
 
 def test_static_root(index):
     assert app_client(index, FakeClient()).get("/").status_code == 200
+
+
+class OneFails(FakeClient):
+    """Errors on exactly the flow_hi alt 2 request."""
+    def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+        if (params or {}).get("flow_scale") == 2.0 and alternativeidx == 2:
+            return None, "operation killed by thread-priority-watchdog after 0/1 seconds"
+        return super().route(points, profile, alternativeidx, params)
+
+
+def test_skipped_surfaced_and_logged(index, caplog):
+    with caplog.at_level("WARNING", logger="flow_server"):
+        j = app_client(index, OneFails()).get(f"/api/route?{Q}").json()
+    assert j["skipped"] == [{"variant": "flow_hi", "alt": 2,
+                             "error": "operation killed by thread-priority-watchdog after 0/1 seconds"}]
+    msgs = [r.getMessage() for r in caplog.records if r.levelname == "WARNING"]
+    assert any("flow_hi" in m and "alt=2" in m and "thread-priority-watchdog" in m for m in msgs)

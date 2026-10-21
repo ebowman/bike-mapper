@@ -3,9 +3,9 @@ rathfarnham_howth,Rathfarnham,53.2990,-6.2825,Howth,53.3894,-6.0675,Suburban sou
 dundrum_phoenixpark,Dundrum,53.2917,-6.2446,Phoenix Park (Papal Cross),53.3580,-6.3390,Suburban south to large park; crosses canals and the Liffey
 blanchardstown_sandymount,Blanchardstown,53.3913,-6.3764,Sandymount,53.3326,-6.2193,Western fringe to south-east coast; long suburban crossing
 tallaght_malahide,Tallaght,53.2870,-6.3730,Malahide,53.4510,-6.1540,Longest suburban pair; south-west fringe to north-east fringe
-bray_wicklowgap,Bray,53.2010,-6.0980,Wicklow Gap (R756 summit),53.0120,-6.3990,Wicklow rural: town to mountain pass; few signals
+bray_wicklowgap,Bray,53.2010,-6.0980,Wicklow Gap (R756 summit),53.0270,-6.4100,Wicklow rural: town to mountain pass; few signals; end corrected from 53.0120/-6.3990 (~1.8 km off the summit)
 greystones_roundwood,Greystones,53.1440,-6.0640,Roundwood,53.0640,-6.2170,Wicklow rural: coastal town to upland village
-enniskerry_sallygap,Enniskerry,53.1870,-6.1690,Sally Gap crossroads,53.1013,-6.3010,Wicklow rural: climb through Glencree; almost no junction events
+enniskerry_sallygap,Enniskerry,53.1870,-6.1690,Sally Gap crossroads,53.1370,-6.3140,Wicklow rural: climb through Glencree; almost no junction events; end corrected from 53.1013/-6.3010 (~4 km south of the R759/R115 crossroads)
 dunlaoghaire_clontarf,Dun Laoghaire,53.2940,-6.1340,Clontarf,53.3640,-6.2000,Cross-town: south coast to north coast through the centre
 lucan_dalkey,Lucan,53.3570,-6.4480,Dalkey,53.2780,-6.1000,Cross-town: far west to far south-east; longest through-city
 swords_bray,Swords,53.4590,-6.2180,Bray,53.2010,-6.0980,Cross-town: north to south extremes

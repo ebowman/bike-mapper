@@ -73,6 +73,9 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
         except BRouterUnavailable as e:
             raise HTTPException(503, str(e)) from None
         t1 = time.perf_counter()
+        for sk in skipped:
+            log.warning("BRouter request skipped: variant=%s alt=%s error=%s",
+                        sk["variant"], sk["alt"], sk["error"])
         if not kept:
             detail = "no route found"
             if skipped:

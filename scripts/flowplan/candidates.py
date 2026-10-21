@@ -10,7 +10,10 @@ from pyproj import Transformer
 from .brouter import BRouterClient, Candidate, validate_params
 from .scoring import REGION_CRS
 
-__all__ = ["DEFAULT_VARIANTS", "Candidate", "Variant", "dedupe", "generate"]
+__all__ = ["DEFAULT_VARIANTS", "DEFAULT_WORKERS", "Candidate", "Variant", "dedupe", "generate"]
+
+# Client concurrency; keep <= BRouter server threads (THREADS in scripts/run_brouter.sh).
+DEFAULT_WORKERS = 4
 
 
 @dataclass(frozen=True)
@@ -56,7 +59,7 @@ def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20
 
 
 def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=(0, 1, 2, 3),
-             max_workers: int = 4, region: str = "ireland"):
+             max_workers: int = DEFAULT_WORKERS, region: str = "ireland"):
     """Return (kept, dropped, skipped). skipped = [{variant, alt, error}] for failed
     requests; BRouterUnavailable propagates. start == end yields no candidates."""
     start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
