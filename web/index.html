@@ -1,1 +1,338 @@
-<!doctype html><title>Flow planner</title><p>planner UI pending</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flow planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Ccircle cx=%278%27 cy=%278%27 r=%277%27 fill=%27%23009e73%27/%3E%3C/svg%3E">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font: 14px/1.4 -apple-system, "Segoe UI", sans-serif; color: #222; }
+#app { display: flex; height: 100%; gap: 16px; padding: 16px; }
+#side { width: 320px; flex: none; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+#map { flex: 1; min-height: 300px; border-radius: 4px; }
+h1 { font-size: 18px; margin: 0; }
+.row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.field { position: relative; }
+.field label { font-size: 12px; color: #555; display: block; }
+.field input { width: 100%; padding: 5px 6px; font-size: 14px; }
+.dd { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border: 1px solid #aaa; z-index: 2000; max-height: 200px; overflow-y: auto; display: none; }
+.dd div { padding: 5px 6px; cursor: pointer; font-size: 12px; border-bottom: 1px solid #eee; }
+.dd div:hover { background: #eef; }
+.dd .msg { color: #a00; cursor: default; }
+button, select { font-size: 13px; padding: 4px 8px; }
+button.on { background: #cde; font-weight: 600; }
+#go { font-weight: 600; padding: 7px 10px; }
+#status { font-size: 13px; }
+#status.err { color: #b00020; }
+.card { border: 1px solid #ccc; border-left-width: 8px; border-radius: 4px; padding: 6px 8px; cursor: pointer; background: #fff; }
+.card.sel { background: #f3f7ff; box-shadow: 0 0 0 2px #36c inset; }
+.card .t { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+.card .d { font-size: 12px; color: #444; }
+.card .delta { font-size: 12px; color: #005; }
+footer { font-size: 11px; color: #555; margin-top: auto; }
+@media (max-width: 899px) {
+  html, body { height: auto; }
+  #app { flex-direction: column; height: auto; }
+  #side { width: auto; order: 2; overflow: visible; }
+  #map { order: 1; min-height: 55vh; flex: none; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="side">
+    <h1>Flow planner</h1>
+    <div class="row">
+      <button id="mStart" class="on" title="Next map click sets the start">Set start</button>
+      <button id="mEnd" title="Next map click sets the end">Set end</button>
+      <button id="swap">Swap</button>
+      <button id="clear">Clear</button>
+    </div>
+    <div class="field"><label for="qStart">Start (search or click map)</label>
+      <input id="qStart" type="search" autocomplete="off" placeholder="e.g. Trinity College Dublin"><div class="dd" id="ddStart"></div></div>
+    <div class="field"><label for="qEnd">End (search or click map)</label>
+      <input id="qEnd" type="search" autocomplete="off" placeholder="e.g. Greystones"><div class="dd" id="ddEnd"></div></div>
+    <div class="row">
+      <label for="nSel">Routes</label>
+      <select id="nSel"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+      <button id="go" disabled>Find routes</button>
+    </div>
+    <div id="status" role="status"></div>
+    <div id="results"></div>
+    <footer>
+      <div id="foot">Checking server...</div>
+      <div>Search: &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, via <a href="https://nominatim.org/" target="_blank" rel="noopener">Nominatim</a>.</div>
+    </footer>
+  </div>
+  <div id="map"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function () {
+  'use strict';
+  var PALETTE = ['#0072B2', '#D55E00', '#009E73', '#CC79A7', '#E69F00', '#56B4E9'];
+  var LABELS = { fastbike: 'Fastest', flow_lo: 'Flow-light', flow: 'Flow', flow_hi: 'Flow-heavy' };
+  var $ = function (id) { return document.getElementById(id); };
+
+  var map = L.map('map').setView([53.35, -6.26], 10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var state = { from: null, to: null, mode: 'from', n: 4, loading: false };
+  var markers = { from: null, to: null };
+  var routeLayer = L.layerGroup().addTo(map);
+  var stopLayer = L.layerGroup().addTo(map);
+  var routes = [], lines = [], selected = -1;
+
+  // ---------- helpers ----------
+  function fmtLL(p) { return p[0].toFixed(5) + ',' + p[1].toFixed(5); }
+  function parseLL(s) {
+    var m = /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/.exec(s || '');
+    return m ? [parseFloat(m[1]), parseFloat(m[2])] : null;
+  }
+  function setStatus(msg, isErr) { var s = $('status'); s.textContent = msg || ''; s.className = isErr ? 'err' : ''; }
+  function mmss(sec) { var t = Math.round(sec); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+  function signed(v, dp) { var t = Math.abs(v).toFixed(dp); return (v < 0 ? '−' : '+') + t; }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  // ---------- state <-> hash ----------
+  function writeHash() {
+    var parts = [];
+    if (state.from) parts.push('from=' + fmtLL(state.from));
+    if (state.to) parts.push('to=' + fmtLL(state.to));
+    if (parts.length) parts.push('n=' + state.n);
+    history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
+  }
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+      var i = kv.indexOf('='); if (i > 0) out[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+    });
+    return out;
+  }
+
+  function setMode(m) {
+    state.mode = m;
+    $('mStart').className = m === 'from' ? 'on' : '';
+    $('mEnd').className = m === 'to' ? 'on' : '';
+  }
+
+  function updateGo() { $('go').disabled = state.loading || !(state.from && state.to); }
+
+  function setPoint(which, ll, label) {
+    state[which] = ll;
+    if (markers[which]) { markers[which].setLatLng(ll); }
+    else {
+      var m = L.marker(ll, { draggable: true, title: which === 'from' ? 'Start' : 'End' }).addTo(map);
+      m.bindTooltip(which === 'from' ? 'Start' : 'End', { permanent: true, direction: 'top', offset: [-15, -8] });
+      m.on('dragend', function () {
+        var p = m.getLatLng(); state[which] = [p.lat, p.lng];
+        $(which === 'from' ? 'qStart' : 'qEnd').value = fmtLL(state[which]);
+        writeHash(); updateGo();
+      });
+      markers[which] = m;
+    }
+    $(which === 'from' ? 'qStart' : 'qEnd').value = label || fmtLL(ll);
+    writeHash(); updateGo();
+  }
+  function clearPoint(which) {
+    state[which] = null;
+    if (markers[which]) { map.removeLayer(markers[which]); markers[which] = null; }
+    $(which === 'from' ? 'qStart' : 'qEnd').value = '';
+  }
+
+  map.on('click', function (e) {
+    var which = state.mode;
+    setPoint(which, [e.latlng.lat, e.latlng.lng]);
+    if (which === 'from') setMode('to');
+  });
+  $('mStart').onclick = function () { setMode('from'); };
+  $('mEnd').onclick = function () { setMode('to'); };
+  $('swap').onclick = function () {
+    var a = state.from, b = state.to, la = $('qStart').value, lb = $('qEnd').value;
+    clearPoint('from'); clearPoint('to');
+    if (b) setPoint('from', b, lb);
+    if (a) setPoint('to', a, la);
+    clearResults(); writeHash(); updateGo();
+  };
+  $('clear').onclick = function () {
+    clearPoint('from'); clearPoint('to'); clearResults(); setStatus('');
+    setMode('from'); writeHash(); updateGo();
+  };
+  $('nSel').onchange = function () { state.n = parseInt($('nSel').value, 10); writeHash(); };
+
+  // ---------- Nominatim search: 600 ms debounce + hard 1 req/s throttle ----------
+  var NOM_GAP_MS = 1000;
+  var nomLastStart = 0;          // time the last Nominatim request began
+  var nomChain = Promise.resolve();
+  var nomLatest = { from: 0, to: 0 };  // per-box sequence; stale queued searches are skipped
+  function nomThrottled(fn) {
+    var run = nomChain.then(function () {
+      var wait = Math.max(0, nomLastStart + NOM_GAP_MS - Date.now());
+      return new Promise(function (r) { setTimeout(r, wait); });
+    }).then(function () { nomLastStart = Date.now(); return fn(); });
+    nomChain = run.catch(function () {});
+    return run;
+  }
+  function wireSearch(which, inputId, ddId) {
+    var input = $(inputId), dd = $(ddId), timer = null;
+    function showMsg(t) { dd.textContent = ''; dd.appendChild(el('div', 'msg', t)); dd.style.display = 'block'; }
+    function hide() { dd.style.display = 'none'; }
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      var q = input.value.trim();
+      if (q.length < 3 || parseLL(q)) { nomLatest[which]++; hide(); return; }
+      timer = setTimeout(function () {
+        var seq = ++nomLatest[which];
+        nomThrottled(function () {
+          if (seq !== nomLatest[which]) return null;   // superseded while queued: skip, no request
+          var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=ie&q=' + encodeURIComponent(q);
+          return fetch(url, { headers: { 'Accept': 'application/json' } }).then(function (r) {
+            if (r.status === 429) throw new Error('Search is rate-limited (429); wait a moment and retry.');
+            if (!r.ok) throw new Error('Search failed (HTTP ' + r.status + ').');
+            return r.json();
+          });
+        }).then(function (res) {
+          if (res === null || seq !== nomLatest[which]) return;
+          dd.textContent = '';
+          if (!res.length) { showMsg('No matches'); return; }
+          res.forEach(function (it) {
+            var d = el('div', null, it.display_name);
+            d.onclick = function () {
+              var ll = [parseFloat(it.lat), parseFloat(it.lon)];
+              setPoint(which, ll, it.display_name.split(',').slice(0, 2).join(','));
+              map.panTo(ll); hide();
+              if (which === 'from' && !state.to) setMode('to');
+            };
+            dd.appendChild(d);
+          });
+          dd.style.display = 'block';
+        }).catch(function (e) {
+          showMsg(e && e.message && e.message.indexOf('Search') === 0 ? e.message : 'Search unavailable (network error).');
+        });
+      }, 600);
+    });
+    document.addEventListener('click', function (e) { if (e.target !== input && !dd.contains(e.target)) hide(); });
+  }
+  wireSearch('from', 'qStart', 'ddStart');
+  wireSearch('to', 'qEnd', 'ddEnd');
+
+  // ---------- routes ----------
+  function clearResults() {
+    routes = []; lines = []; selected = -1;
+    routeLayer.clearLayers(); stopLayer.clearLayers();
+    $('results').textContent = '';
+  }
+
+  function styleLines(hover) {
+    lines.forEach(function (ln, i) {
+      var isSel = i === selected, isHov = i === hover;
+      ln.setStyle({ weight: isSel ? 6 : (isHov ? 5 : 3), opacity: isSel ? 0.95 : (isHov ? 0.9 : 0.5) });
+      if (isSel) ln.bringToFront();
+    });
+  }
+  function select(i) {
+    selected = i;
+    styleLines(-1);
+    Array.prototype.forEach.call($('results').children, function (c, k) { c.classList.toggle('sel', k === i); });
+    stopLayer.clearLayers();
+    routes[i].hits.forEach(function (h) {
+      L.circleMarker([h.lat, h.lon], { radius: 3 + 10 * h.p, color: '#222', weight: 1, fillColor: PALETTE[i % PALETTE.length], fillOpacity: 0.6 })
+        .bindTooltip(h.cause + ' p=' + h.p.toFixed(2)).addTo(stopLayer);
+    });
+  }
+
+  function gpxFor(r, idx) {
+    var name = 'flow rank ' + r.rank + ' ' + r.variant;
+    var pts = r.geometry.coordinates.map(function (c) {
+      return '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"/>';
+    }).join('');
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="bike-mapper flow planner" xmlns="http://www.topografix.com/GPX/1/1">' +
+      '<trk><name>' + name + '</name><trkseg>' + pts + '</trkseg></trk></gpx>\n';
+  }
+  function downloadGpx(r, idx) {
+    var blob = new Blob([gpxFor(r, idx)], { type: 'application/gpx+xml' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'flow-route-' + r.rank + '-' + r.variant + '.gpx';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function render(data) {
+    clearResults();
+    routes = data.routes;
+    var box = $('results');
+    routes.forEach(function (r, i) {
+      var col = PALETTE[i % PALETTE.length];
+      var ln = L.polyline(r.geometry.coordinates.map(function (c) { return [c[1], c[0]]; }), { color: col, weight: 3, opacity: 0.5 }).addTo(routeLayer);
+      ln.on('click', function () { select(i); });
+      lines.push(ln);
+
+      var s = r.stats, card = el('div', 'card');
+      card.style.borderLeftColor = col;
+      var t = el('div', 't');
+      t.appendChild(el('span', null, '#' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
+      var g = el('button', null, 'GPX'); g.title = 'Download GPX';
+      g.onclick = function (ev) { ev.stopPropagation(); downloadGpx(r, i); };
+      t.appendChild(g); card.appendChild(t);
+      card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
+      card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
+      if (r.delta_vs_fastest) {
+        card.appendChild(el('div', 'delta', 'vs fastest: ' + signed(r.delta_vs_fastest.stops, 1) + ' stops, ' + signed(r.delta_vs_fastest.km, 1) + ' km'));
+      }
+      card.onmouseenter = function () { styleLines(i); };
+      card.onmouseleave = function () { styleLines(-1); };
+      card.onclick = function () { select(i); };
+      box.appendChild(card);
+    });
+    if (routes.length) {
+      select(0);
+      map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
+    }
+    setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' + (data.timings_ms.total / 1000).toFixed(1) + ' s)');
+  }
+
+  function findRoutes() {
+    if (!(state.from && state.to) || state.loading) return;
+    state.loading = true; updateGo(); clearResults();
+    setStatus('Asking BRouter for 16 candidates, about 5 s');
+    var url = '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + state.n;
+    fetch(url).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
+    }).then(function (res) {
+      if (res.ok && res.body && res.body.routes) { render(res.body); return; }
+      var d = res.body && res.body.detail;
+      if ((res.status === 400 || res.status === 404 || res.status === 503) && typeof d === 'string') setStatus(d, true);
+      else setStatus('Something went wrong (HTTP ' + res.status + ').', true);
+    }).catch(function () {
+      setStatus('Could not reach the planner server.', true);
+    }).then(function () { state.loading = false; updateGo(); });
+  }
+  $('go').onclick = findRoutes;
+
+  // ---------- health (once) + hash restore ----------
+  var h = readHash();
+  var f = parseLL(h.from), t = parseLL(h.to);
+  var nh = parseInt(h.n, 10);
+  if (nh >= 3 && nh <= 6) { state.n = nh; $('nSel').value = String(nh); }
+  if (f) setPoint('from', f);
+  if (t) setPoint('to', t);
+  if (f && !t) setMode('to');
+  if (f && t) { setMode('from'); map.fitBounds([f, t], { padding: [40, 40] }); }
+
+  fetch('/api/health').then(function (r) { return r.json(); }).then(function (j) {
+    var b = j.bbox;
+    if (b && !(f && t)) map.fitBounds([[b.lat_min, b.lon_min], [b.lat_max, b.lon_max]]);
+    $('foot').textContent = 'Routing: BRouter ' + (j.brouter ? 'up' : 'DOWN (start scripts/run_brouter.sh serve)') + '. Stop weights: ' + j.weight_set + '.';
+  }).catch(function () {
+    $('foot').textContent = 'Planner API unreachable.';
+  });
+
+  if (f && t) findRoutes();
+})();
+</script>
+</body>
+</html>

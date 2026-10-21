@@ -13,3 +13,11 @@ flow-index:
 	uv run scripts/build_flow_index.py --region $(REGION)
 
 .PHONY: flow-index
+
+ui-check:
+	@mkdir -p /tmp/ui-check
+	@uv run python -c "import re,sys; s=open('web/index.html').read(); m=re.findall(r'<script>(.*?)</script>', s, re.S); assert m, 'no inline script'; open('/tmp/ui-check/inline.js','w').write(m[-1])"
+	node --check /tmp/ui-check/inline.js
+	@echo "ui-check ok"
+
+.PHONY: ui-check
