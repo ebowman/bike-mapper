@@ -1,0 +1,75 @@
+"""Generate candidate routes (variants x alternatives) and drop near-duplicates."""
+from __future__ import annotations
+
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+
+import shapely
+from pyproj import Transformer
+
+from .brouter import BRouterClient, Candidate, validate_params
+from .scoring import REGION_CRS
+
+__all__ = ["DEFAULT_VARIANTS", "Candidate", "Variant", "dedupe", "generate"]
+
+
+@dataclass(frozen=True)
+class Variant:
+    name: str
+    profile: str
+    params: dict = field(default_factory=dict, hash=False)
+
+
+DEFAULT_VARIANTS = (
+    Variant("fastbike", "fastbike"),
+    Variant("flow_lo", "flow", {"flow_scale": 0.5}),
+    Variant("flow", "flow", {"flow_scale": 1.0}),
+    Variant("flow_hi", "flow", {"flow_scale": 2.0}),
+)
+
+
+def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20.0,
+           overlap: float = 0.9) -> tuple[list[Candidate], list[Candidate]]:
+    """Input order = priority. Drop a candidate if >= overlap of its length lies within
+    buffer_m of a kept one; set duplicate_of on dropped ones."""
+    tf = Transformer.from_crs("EPSG:4326", REGION_CRS[region], always_xy=True)
+    kept, dropped, buffers = [], [], []
+    for c in cands:
+        xs, ys = tf.transform([p[0] for p in c.geometry], [p[1] for p in c.geometry])
+        line = shapely.linestrings(list(zip(xs, ys)) if len(xs) > 1 else [])
+        dup = None
+        if len(xs) > 1 and line.length > 0:
+            for k, buf in zip(kept, buffers):
+                if shapely.intersection(line, buf).length / line.length >= overlap:
+                    dup = k
+                    break
+        if dup is not None:
+            c.duplicate_of = dup.key
+            dropped.append(c)
+        else:
+            kept.append(c)
+            buffers.append(shapely.buffer(line, buffer_m) if len(xs) > 1 else shapely.Polygon())
+    return kept, dropped
+
+
+def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=(0, 1, 2, 3),
+             max_workers: int = 4, region: str = "ireland"):
+    """Return (kept, dropped). Failed requests are skipped; BRouterUnavailable propagates.
+    start == end yields no candidates."""
+    start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
+    if start == end:
+        return [], []
+    for v in variants:
+        validate_params(v.params)
+    jobs = [(v, a) for v in variants for a in alts]
+
+    def run(job):
+        v, a = job
+        c = client.route([start, end], v.profile, a, v.params)
+        if c is not None:
+            c.variant = v.name
+        return c
+
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        results = list(ex.map(run, jobs))  # preserves job order
+    return dedupe([c for c in results if c is not None], region)
