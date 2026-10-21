@@ -65,15 +65,14 @@ class BRouterClient:
     def __init__(self, base_url: str = DEFAULT_URL, timeout_s: float = 20):
         self.base_url = base_url.rstrip("/")
         self.timeout_s = timeout_s
-        self.last_error: str | None = None
 
     def route(self, points, profile: str = "fastbike", alternativeidx: int = 0,
-              params: dict | None = None) -> Candidate | None:
-        """Route through points [(lon, lat), ...]. None on failure (see last_error)."""
+              params: dict | None = None) -> tuple[Candidate | None, str | None]:
+        """Route through points [(lon, lat), ...]. Returns (candidate, None) on success or
+        (None, error_text) on failure; the error is per request (thread-safe)."""
         params = validate_params(params)
         if len(points) < 2:
-            self.last_error = "need at least 2 points"
-            return None
+            return None, "need at least 2 points"
         q = {"lonlats": "|".join(f"{p[0]},{p[1]}" for p in points), "profile": profile,
              "alternativeidx": int(alternativeidx), "format": "geojson"}
         for k, v in params.items():
@@ -85,21 +84,18 @@ class BRouterClient:
                 f"BRouter not reachable at {self.base_url}; start it with "
                 f"`scripts/run_brouter.sh serve`") from e
         except requests.Timeout:
-            self.last_error = f"timeout after {self.timeout_s}s"
-            return None
+            return None, f"timeout after {self.timeout_s}s"
         if r.status_code != 200:
-            self.last_error = f"HTTP {r.status_code}: {r.text.strip()[:200]}"
-            return None
+            return None, f"HTTP {r.status_code}: {r.text.strip()[:200]}"
         try:
             data = r.json()
-            self.last_error = None
-            return parse_geojson(data, profile=profile, alt=int(alternativeidx), params=params)
+            return parse_geojson(data, profile=profile, alt=int(alternativeidx),
+                                 params=params), None
         except (ValueError, KeyError, IndexError, TypeError):
-            self.last_error = r.text.strip()[:200] or "empty response"
-            return None
+            return None, r.text.strip()[:200] or "empty response"
 
     def health(self) -> bool:
         try:
-            return self.route(HEALTH_PAIR, "fastbike", 0) is not None
+            return self.route(HEALTH_PAIR, "fastbike", 0)[0] is not None
         except BRouterUnavailable:
             return False

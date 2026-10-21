@@ -23,10 +23,9 @@ class FakeClient(BRouterClient):
         scale = (params or {}).get("flow_scale")
         name = {None: profile, 0.5: "flow_lo", 1.0: "flow", 2.0: "flow_hi"}[scale]
         if profile in self.missing:
-            self.last_error = "operation failed: profile not found"
-            return None
+            return None, "operation failed: profile not found"
         data = json.loads((FIX / f"brouter_dublin_{name}_alt{alternativeidx}.json").read_text())
-        return parse_geojson(data, profile=profile, alt=alternativeidx, params=params)
+        return parse_geojson(data, profile=profile, alt=alternativeidx, params=params), None
 
 
 def test_fixture_count():
@@ -44,7 +43,7 @@ def test_parse_length_matches_track_length():
 
 
 def test_generate_dedupe_bounds():
-    kept, dropped = generate(FakeClient(), A, B)
+    kept, dropped, _ = generate(FakeClient(), A, B)
     assert 3 <= len(kept) <= 16
     assert len(kept) + len(dropped) == 16
     assert kept[0].key == "fastbike/alt0"
@@ -62,12 +61,14 @@ def test_dedupe_identical_dropped():
 
 
 def test_missing_profile_skipped():
-    kept, dropped = generate(FakeClient(missing={"fastbike"}), A, B)
+    kept, dropped, skipped = generate(FakeClient(missing={"fastbike"}), A, B)
     assert kept and all(c.profile != "fastbike" for c in kept + dropped)
+    assert len(skipped) == 4 and skipped[0]["variant"] == "fastbike"
+    assert "profile not found" in skipped[0]["error"]
 
 
 def test_start_equals_end():
-    assert generate(FakeClient(), A, A) == ([], [])
+    assert generate(FakeClient(), A, A) == ([], [], [])
 
 
 class _Resp:
@@ -82,15 +83,15 @@ def test_text_error_body_returns_none(monkeypatch):
     monkeypatch.setattr(brouter.requests, "get",
                         lambda *a, **k: _Resp(200, "no track found"))
     cl = BRouterClient()
-    assert cl.route([A, B], "fastbike") is None
-    assert "no track found" in cl.last_error
+    c, err = cl.route([A, B], "fastbike")
+    assert c is None and "no track found" in err
 
 
 def test_non_200_returns_none(monkeypatch):
     monkeypatch.setattr(brouter.requests, "get", lambda *a, **k: _Resp(500, "boom"))
     cl = BRouterClient()
-    assert cl.route([A, B], "fastbike") is None
-    assert "500" in cl.last_error
+    c, err = cl.route([A, B], "fastbike")
+    assert c is None and "500" in err
 
 
 def test_connection_refused_raises():

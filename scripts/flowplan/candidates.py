@@ -36,7 +36,10 @@ def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20
     kept, dropped, buffers = [], [], []
     for c in cands:
         xs, ys = tf.transform([p[0] for p in c.geometry], [p[1] for p in c.geometry])
-        line = shapely.linestrings(list(zip(xs, ys)) if len(xs) > 1 else [])
+        if len(xs) > 1:
+            line = shapely.linestrings(list(zip(xs, ys)))
+        else:
+            line = shapely.LineString()
         dup = None
         if len(xs) > 1 and line.length > 0:
             for k, buf in zip(kept, buffers):
@@ -54,22 +57,25 @@ def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20
 
 def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=(0, 1, 2, 3),
              max_workers: int = 4, region: str = "ireland"):
-    """Return (kept, dropped). Failed requests are skipped; BRouterUnavailable propagates.
-    start == end yields no candidates."""
+    """Return (kept, dropped, skipped). skipped = [{variant, alt, error}] for failed
+    requests; BRouterUnavailable propagates. start == end yields no candidates."""
     start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
     if start == end:
-        return [], []
+        return [], [], []
     for v in variants:
         validate_params(v.params)
     jobs = [(v, a) for v in variants for a in alts]
 
     def run(job):
         v, a = job
-        c = client.route([start, end], v.profile, a, v.params)
+        c, err = client.route([start, end], v.profile, a, v.params)
         if c is not None:
             c.variant = v.name
-        return c
+        return v, a, c, err
 
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         results = list(ex.map(run, jobs))  # preserves job order
-    return dedupe([c for c in results if c is not None], region)
+    skipped = [{"variant": v.name, "alt": a, "error": err or "no route"}
+               for v, a, c, err in results if c is None]
+    kept, dropped = dedupe([r[2] for r in results if r[2] is not None], region)
+    return kept, dropped, skipped
