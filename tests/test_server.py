@@ -267,3 +267,48 @@ def test_lanes_variant_added_when_requested(index):
 def test_bad_lane_bonus_400(index, v):
     r = app_client(index, FakeClient()).get(f"/api/route?{Q}&lane_bonus={v}")
     assert r.status_code == 400 and "lane_bonus" in r.json()["detail"]
+
+
+def test_debug_adds_segments_default_does_not(index):
+    c = app_client(index, FakeClient())
+    plain = c.get(f"/api/route?{Q}").json()
+    assert all("segments" not in r and "summary" not in r for r in plain["routes"])
+    j = c.get(f"/api/route?{Q}&debug=1").json()
+    assert len(j["routes"]) == len(plain["routes"])
+    for r in j["routes"]:
+        assert r["segments"] and all(sg["highway"] for sg in r["segments"])
+        assert [sg["i"] for sg in r["segments"]] == list(range(len(r["segments"])))
+        sm = r["summary"]
+        assert sum(sm["km_by_highway"].values()) == pytest.approx(r["stats"]["distance_km"], rel=0.02)
+        assert sm["cycle_km"]["total_km"] == pytest.approx(r["stats"]["cycle_km"]["total_km"])
+        assert sm["n_node_charges"] >= 0 and sm["total_brouter_cost"] > 0
+        n_hits = sum(len(sg["hits"]) for sg in r["segments"])
+        assert n_hits == len(r["hits"])
+
+
+def test_debug_does_not_change_ranking(index):
+    c = app_client(index, FakeClient())
+    a = [r["id"] for r in c.get(f"/api/route?{Q}").json()["routes"]]
+    b = [r["id"] for r in c.get(f"/api/route?{Q}&debug=1").json()["routes"]]
+    assert a == b
+
+
+def test_assign_hits_synthetic():
+    from flowplan.explain import assign_hits, cycleway_string, explain
+    segs = [{"lon": -6.2800, "lat": 53.3000, "dist_m": 100, "way_tags": {"highway": "primary"}},
+            {"lon": -6.2790, "lat": 53.3000, "dist_m": 66, "way_tags": {"highway": "cycleway"}},
+            {"lon": -6.2780, "lat": 53.3000, "dist_m": 66,
+             "way_tags": {"highway": "residential", "cycleway:left": "lane", "cycleway:right": "track"},
+             "node_cost": 20.0}]
+    hits = [{"lon": -6.27901, "lat": 53.30001, "cause": "signal", "p": 0.8},   # ~1 m from seg 1 end
+            {"lon": -6.2780, "lat": 53.3000, "cause": "stop", "p": 0.5},
+            {"lon": -6.2700, "lat": 53.3000, "cause": "give_way", "p": 0.2}]   # far: fallback nearest = last
+    assert assign_hits(segs, hits) == [1, 2, 2]
+    assert assign_hits([], hits) == [-1, -1, -1]
+    out = explain(segs, hits, 123.0)
+    assert [len(s["hits"]) for s in out["segments"]] == [0, 1, 2]
+    assert out["segments"][2]["cycleway"] == "left=lane, right=track"
+    assert cycleway_string({"cycleway": "lane"}) == "lane" and cycleway_string({}) is None
+    assert out["summary"]["n_node_charges"] == 1 and out["summary"]["total_brouter_cost"] == 123.0
+    assert out["summary"]["km_by_highway"]["primary"] == pytest.approx(0.1)
+    assert out["segments"][1]["start_km"] == pytest.approx(0.1)

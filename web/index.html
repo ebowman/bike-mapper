@@ -55,6 +55,22 @@ details#settings summary { cursor: pointer; font-weight: 600; }
 #scales input.bad { border: 2px solid #b00020; }
 #scaleErr { color: #b00020; font-size: 11px; }
 .card .irish { font-size: 12px; color: #555; }
+.card .xp { font-size: 11px; padding: 1px 6px; }
+#drawer { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; background: #fafafa; font-size: 12px; }
+#drawer[hidden] { display: none; }
+#drawer h3 { font-size: 13px; margin: 0 0 4px; display: flex; justify-content: space-between; align-items: center; }
+.hwbar { display: flex; height: 12px; border-radius: 3px; overflow: hidden; margin: 4px 0; }
+.hwbar div { height: 100%; }
+.hwleg { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; color: #444; }
+.hwleg i { display: inline-block; width: 9px; height: 9px; margin-right: 3px; border-radius: 2px; }
+.segwrap { max-height: 40vh; overflow: auto; margin-top: 6px; }
+table.seg { border-collapse: collapse; width: 100%; font-size: 11px; }
+table.seg th { position: sticky; top: 0; background: #eee; text-align: left; padding: 2px 3px; }
+table.seg td { padding: 1px 3px; border-top: 1px solid #e4e4e4; white-space: nowrap; }
+table.seg tr.sr { cursor: pointer; }
+table.seg tr.sr:hover { background: #fff3c4; }
+table.seg td.num { text-align: right; }
+table.seg td.big { font-weight: 700; color: #a00; }
 footer { font-size: 11px; color: #555; margin-top: auto; }
 @media (max-width: 899px) {
   html, body { height: auto; }
@@ -119,6 +135,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     </details>
     <div id="status" role="status"></div>
     <div id="results"></div>
+    <div id="drawer" hidden></div>
     <footer>
       <div id="foot">Checking server...</div>
       <div id="cycleNote">Cycle data: OSM; lanes are tagged on only ~8% of Irish tertiary roads (cycleway* on 8.3% of tertiary, 27% of primary length); absence of a lane here does not mean there is none. See docs/research/osm-road-network.md.</div>
@@ -146,6 +163,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   var routeLayer = L.layerGroup().addTo(map);
   var stopLayer = L.layerGroup().addTo(map);
   var routes = [], lines = [], selected = -1;
+  var dbgOpen = false, dbgDrawn = false;   // Explain drawer open / selected route drawn per segment
+  var dbgLayer = L.layerGroup().addTo(map);
 
   // ---------- helpers ----------
   function fmtLL(p) { return p[0].toFixed(5) + ',' + p[1].toFixed(5); }
@@ -242,8 +261,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (state.from) parts.push('from=' + fmtLL(state.from));
     if (state.to) parts.push('to=' + fmtLL(state.to));
     var so = settingsToObj();
+    var dbgPart = dbgOpen ? ['dbg=1'] : [];
     Object.keys(so).forEach(function (k) { parts.push(k + '=' + encodeURIComponent(so[k]).replace(/%2C/g, ',')); });
     if (state.from || state.to || parts.length || S.n !== DEF.n) parts.push('n=' + S.n);
+    parts = parts.concat(dbgPart);
     history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
   }
   function readHash() {
@@ -366,20 +387,22 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   // ---------- routes ----------
   function clearResults() {
     routes = []; lines = []; selected = -1;
-    routeLayer.clearLayers(); stopLayer.clearLayers();
-    $('results').textContent = '';
+    routeLayer.clearLayers(); stopLayer.clearLayers(); dbgLayer.clearLayers(); dbgDrawn = false;
+    $('results').textContent = ''; $('drawer').textContent = ''; $('drawer').hidden = true;
   }
 
   function styleLines(hover) {
     lines.forEach(function (ln, i) {
       var isSel = i === selected, isHov = i === hover;
+      if (isSel && dbgDrawn) { ln.setStyle({ weight: 6, opacity: 0 }); return; }   // drawn per segment instead
       ln.setStyle({ weight: isSel ? 6 : (isHov ? 5 : 3), opacity: isSel ? 0.95 : (isHov ? 0.9 : 0.5) });
       if (isSel) ln.bringToFront();
     });
   }
   function routesToFront() {   // overlays added later sit above the route polylines; keep routes on top
     lines.forEach(function (ln, i) { if (i !== selected) ln.bringToFront(); });
-    if (lines[selected]) lines[selected].bringToFront();
+    if (lines[selected] && !dbgDrawn) lines[selected].bringToFront();
+    dbgLayer.eachLayer(function (l) { l.bringToFront(); });
     stopLayer.eachLayer(function (l) { if (l.bringToFront) l.bringToFront(); });
   }
   function select(i) {
@@ -391,6 +414,134 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       L.circleMarker([h.lat, h.lon], { radius: 3 + 10 * h.p, color: '#222', weight: 1, fillColor: PALETTE[i % PALETTE.length], fillOpacity: 0.6 })
         .bindTooltip(h.cause + ' p=' + h.p.toFixed(2)).addTo(stopLayer);
     });
+    if (dbgOpen) showDrawer();
+  }
+
+  // ---------- explain drawer (debug=1) ----------
+  var HW_COLORS = {
+    motorway: '#6a3d9a', motorway_link: '#6a3d9a', trunk: '#8e5bb0', trunk_link: '#8e5bb0',
+    primary: '#e31a1c', primary_link: '#e31a1c', secondary: '#ff7f00', secondary_link: '#ff7f00',
+    tertiary: '#e6b800', tertiary_link: '#e6b800', unclassified: '#8fbf5a', residential: '#4ea3d8',
+    living_street: '#4ea3d8', service: '#999999', cycleway: '#1a9641', track: '#8c6d31',
+    path: '#a0522d', footway: '#a0522d', pedestrian: '#a0522d', steps: '#a0522d', bridleway: '#a0522d',
+    ferry: '#1f78b4', road: '#666666', unknown: '#000000'
+  };
+  function hwColor(c) { return HW_COLORS[c] || '#000000'; }
+  function swatch(c) { var i = el('i'); i.style.background = hwColor(c); return i; }
+  function money(v) { return v ? String(Math.round(v)) : ''; }
+
+  function mergeRows(segs) {   // segments under 20 m fold into the previous row (costs summed)
+    var rows = [];
+    segs.forEach(function (sg) {
+      var prev = rows[rows.length - 1];
+      if (prev && sg.dist_m < 20) {
+        prev.idx.push(sg.i); prev.end_km = sg.end_km; prev.dist_m += sg.dist_m;
+        prev.node_init += sg.node_cost + sg.initial_cost; prev.turn += sg.turn_cost;
+        prev.hits = prev.hits.concat(sg.hits);
+      } else {
+        rows.push({ idx: [sg.i], start_km: sg.start_km, end_km: sg.end_km, dist_m: sg.dist_m, highway: sg.highway,
+          cycleway: sg.cycleway, surface: sg.surface, maxspeed: sg.maxspeed, name: sg.name,
+          node_init: sg.node_cost + sg.initial_cost, turn: sg.turn_cost, hits: sg.hits.slice() });
+      }
+    });
+    return rows;
+  }
+  function segmentPaths(r) {   // per-segment [lat,lon] arrays cut from the route geometry at each segment's end node
+    var g = r.geometry.coordinates, out = [], prev = 0;
+    r.segments.forEach(function (sg, k) {
+      var best = prev, bd = Infinity;
+      for (var j = prev; j < g.length; j++) {
+        var dx = g[j][0] - sg.lon, dy = g[j][1] - sg.lat, d = dx * dx + dy * dy;
+        if (d < bd) { bd = d; best = j; }
+        if (d < 1e-12) break;
+      }
+      if (k === r.segments.length - 1) best = g.length - 1;
+      var end = Math.max(best, Math.min(prev + 1, g.length - 1));
+      out.push(g.slice(prev, end + 1).map(function (c) { return [c[1], c[0]]; }));
+      prev = end;
+    });
+    return out;
+  }
+  function clearDrawer() {
+    dbgLayer.clearLayers(); dbgDrawn = false;
+    $('drawer').textContent = ''; $('drawer').hidden = true;
+    styleLines(-1);
+  }
+  function showDrawer() {
+    dbgLayer.clearLayers(); dbgDrawn = false;
+    var box = $('drawer');
+    box.textContent = ''; box.hidden = !dbgOpen;
+    if (!dbgOpen || selected < 0) return;
+    var r = routes[selected];
+    var head = el('h3'); head.appendChild(el('span', null, 'Explain #' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
+    var x = el('button', 'xp', 'Close'); x.onclick = function () { closeDrawer(); }; head.appendChild(x); box.appendChild(head);
+    if (!r.segments) { box.appendChild(el('div', null, 'Loading...')); return; }
+    var sm = r.summary, total = 0, cls = Object.keys(sm.km_by_highway);
+    cls.sort(function (a, b) { return sm.km_by_highway[b] - sm.km_by_highway[a]; });
+    cls.forEach(function (c) { total += sm.km_by_highway[c]; });
+    var bar = el('div', 'hwbar'), leg = el('div', 'hwleg');
+    cls.forEach(function (c) {
+      var km = sm.km_by_highway[c], seg = el('div'); seg.style.width = (100 * km / (total || 1)) + '%'; seg.style.background = hwColor(c);
+      seg.title = c + ' ' + km.toFixed(2) + ' km'; bar.appendChild(seg);
+      var l = el('span'); l.appendChild(swatch(c)); l.appendChild(document.createTextNode(c + ' ' + km.toFixed(1) + ' km')); leg.appendChild(l);
+    });
+    box.appendChild(bar); box.appendChild(leg);
+    var ck = sm.cycle_km;
+    box.appendChild(el('div', null, 'Cycle infrastructure: ' + ck.path.toFixed(1) + ' km paths, ' + ck.lane.toFixed(1) + ' km lanes, ' +
+      ck.track.toFixed(1) + ' km tracks. BRouter node charges: ' + sm.n_node_charges + '. Route cost ' + Math.round(sm.total_brouter_cost) + '.'));
+
+    // per-segment polylines
+    var paths = segmentPaths(r), polys = [];
+    r.segments.forEach(function (sg, k) {
+      var pl = L.polyline(paths[k], { color: hwColor(sg.highway), weight: 5, opacity: 0.95 }).addTo(dbgLayer);
+      pl.bindTooltip(sg.highway + (sg.name ? ' ' + sg.name : '') + (sg.cycleway ? ' (cycleway ' + sg.cycleway + ')' : ''), { sticky: true });
+      polys.push(pl);
+    });
+    dbgDrawn = true; styleLines(-1); routesToFront();
+
+    var tw = el('div', 'segwrap'), tb = el('table', 'seg'), th = el('tr');
+    ['km', 'class', 'cycleway', 'surface', 'node+init', 'turn', 'stops'].forEach(function (c) { th.appendChild(el('th', null, c)); });
+    var thead = el('thead'); thead.appendChild(th); tb.appendChild(thead);
+    var body = el('tbody');
+    mergeRows(r.segments).forEach(function (row) {
+      var tr = el('tr', 'sr'), c0 = el('td', 'num', row.start_km.toFixed(2));
+      tr.appendChild(c0);
+      var c1 = el('td'); c1.appendChild(swatch(row.highway)); c1.appendChild(document.createTextNode(row.highway));
+      c1.title = [row.name, row.maxspeed ? row.maxspeed + ' km/h' : null, Math.round(row.dist_m) + ' m'].filter(Boolean).join(', ');
+      tr.appendChild(c1);
+      tr.appendChild(el('td', null, row.cycleway || ''));
+      tr.appendChild(el('td', null, row.surface || ''));
+      tr.appendChild(el('td', 'num' + (row.node_init > 0 ? ' big' : ''), money(row.node_init)));
+      tr.appendChild(el('td', 'num', money(row.turn)));
+      tr.appendChild(el('td', null, row.hits.map(function (h) { return h.cause + ' ' + h.p.toFixed(2); }).join(', ')));
+      function setW(w) { row.idx.forEach(function (i) { polys[i].setStyle({ weight: w }); if (w > 5) polys[i].bringToFront(); }); }
+      tr.onmouseenter = function () { setW(8); };
+      tr.onmouseleave = function () { setW(5); };
+      tr.onclick = function () {
+        var b = L.latLngBounds([]);
+        row.idx.forEach(function (i) { b.extend(polys[i].getBounds()); });
+        map.fitBounds(b, { padding: [60, 60], maxZoom: 17 });
+      };
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); box.appendChild(tw);
+  }
+  function closeDrawer() {
+    dbgOpen = false; writeHash(); clearDrawer();
+    Array.prototype.forEach.call(document.querySelectorAll('.card .xp'), function (b) { b.classList.remove('on'); });
+  }
+  function openDrawer(i) {
+    dbgOpen = true; writeHash();
+    if (i !== selected) select(i); else showDrawer();
+    if (routes.every(function (r) { return r.segments; })) return;
+    var seq = reqSeq;   // re-request with debug=1: the candidates are cached server-side, so this is instant
+    fetch(routeUrl() + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
+      if (seq !== reqSeq || !j.routes) return;
+      j.routes.forEach(function (nr) {
+        routes.forEach(function (r) { if (r.id === nr.id) { r.segments = nr.segments; r.summary = nr.summary; } });
+      });
+      if (dbgOpen) showDrawer();
+    }).catch(function () { if (dbgOpen) $('drawer').textContent = 'Could not load the route explanation.'; });
   }
 
   function xmlEsc(t) {
@@ -428,7 +579,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       t.appendChild(el('span', null, '#' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
       var g = el('button', null, 'GPX'); g.title = 'Download GPX';
       g.onclick = function (ev) { ev.stopPropagation(); downloadGpx(r, i); };
-      t.appendChild(g); card.appendChild(t);
+      var xp = el('button', 'xp', 'Explain'); xp.title = 'Why this route: road classes, costs, stop events';
+      xp.onclick = function (ev) { ev.stopPropagation(); if (dbgOpen && selected === i) closeDrawer(); else openDrawer(i); };
+      var tools = el('span'); tools.appendChild(xp); tools.appendChild(document.createTextNode(' ')); tools.appendChild(g);
+      t.appendChild(tools); card.appendChild(t);
       card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
       card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
       var ck = s.cycle_km;
@@ -455,6 +609,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     afterResponse(data);
   }
 
+  function routeUrl() { return '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + S.n + settingsQuery(); }
   function findRoutes(fromSettings) {
     if (!(state.from && state.to)) return;
     if (state.loading && fromSettings !== true) return;
@@ -462,7 +617,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (fromSettings !== true || !routes.length) clearResults();
     var seq = ++reqSeq;
     setStatus(fromSettings === true ? 'Updating (cached candidates are instant; new probabilities re-route, 5-8 s)' : 'Asking BRouter for candidates, about 5-8 s');
-    var url = '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + S.n + settingsQuery();
+    var url = routeUrl() + (dbgOpen ? '&debug=1' : '');
     fetch(url).then(function (r) {
       return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
     }).then(function (res) {
@@ -619,6 +774,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   // ---------- health (once) + hash restore ----------
   var h = readHash();
   loadSettings(h);
+  dbgOpen = h.dbg === '1';
   $('nSel').value = String(S.n);
   var f = parseLL(h.from), t = parseLL(h.to);
   if (f) setPoint('from', f);
@@ -644,7 +800,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   (function () {
     var CYC_LS = 'flowplanner.cycleLayers';
     var CYC_URL = 'data/cycle_dublin_wicklow.geojson';
-    var data = null, loading = false;
+    var data = null, loading = false, waiting = [];
     var pathLayer = L.layerGroup(), roadLayer = L.layerGroup();
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
     function popup(p) {
@@ -665,11 +821,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     }
     function ensureLoaded(cb) {
       if (data) { cb(); return; }
+      waiting.push(cb);
       if (loading) return;
       loading = true;
       fetch(CYC_URL).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (j) { data = j; build(); loading = false; cb(); })
-        .catch(function (e) { loading = false; var n = document.getElementById('cycleNote'); if (n) n.textContent += ' (overlay failed to load: ' + e.message + ')'; });
+        .then(function (j) { data = j; build(); loading = false; var q = waiting; waiting = []; q.forEach(function (f) { f(); }); })
+        .catch(function (e) { loading = false; waiting = []; var n = document.getElementById('cycleNote'); if (n) n.textContent += ' (overlay failed to load: ' + e.message + ')'; });
     }
     var ctl = L.control.layers(null, { 'Cycle paths': pathLayer, 'Roads with cycle lanes/tracks': roadLayer }, { position: 'topright', collapsed: true }).addTo(map);
     var want = { path: false, road: false };

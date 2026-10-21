@@ -25,6 +25,7 @@ from flowplan.brouter import (
     validate_params,
 )
 from flowplan.candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
+from flowplan.explain import explain
 from flowplan.ranking import ScoredCandidate, rank
 from flowplan.scoring import FlowIndex, score
 
@@ -160,7 +161,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
               weights: str | None = None, blend_with: str | None = None,
               blend: str | None = None, guard: str | None = None, scales: str | None = None,
               refresh: str | None = None, router: str = "base",
-              lane_bonus: str | None = None, lanes_variant_: str | None = Query(None, alias="lanes_variant")):
+              lane_bonus: str | None = None, lanes_variant_: str | None = Query(None, alias="lanes_variant"),
+              debug: str | None = None):
         t0 = time.perf_counter()
         start = parse_latlon(from_, "from", bbox)
         end = parse_latlon(to, "to", bbox)
@@ -238,6 +240,7 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
         scored = [ScoredCandidate(c, score(c.geometry, m, index)) for c in kept]
         t2 = time.perf_counter()
         top = rank(scored, n=n, guard=guard_v)
+        debug_b = debug not in (None, "", "0", "false")
         routes = []
         for s in top:
             c, sc = s.cand, s.score
@@ -254,6 +257,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                 "hits": [{"lat": h["lat"], "lon": h["lon"], "cause": h["cause"], "p": h["p"]}
                          for h in sc.hits],
             })
+            if debug_b:
+                routes[-1].update(explain(c.segments, sc.hits, c.cost))
         return {"query": {"from": {"lat": start[1], "lon": start[0]},
                           "to": {"lat": end[1], "lon": end[0]}, "n": n},
                 "weight_set": m.weight_set, "routes": routes,
