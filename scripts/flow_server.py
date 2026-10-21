@@ -26,8 +26,9 @@ from flowplan.brouter import (
 )
 from flowplan.candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
 from flowplan.explain import explain
-from flowplan.ranking import ScoredCandidate, rank
+from flowplan.ranking import DEFAULT_TURN_WEIGHT, ScoredCandidate, rank
 from flowplan.scoring import FlowIndex, score
+from flowplan.turns import turn_metrics
 
 log = logging.getLogger("flow_server")
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
@@ -52,6 +53,7 @@ def parse_latlon(s: str, name: str, bbox: dict) -> tuple[float, float]:
 
 DEFAULT_SCALES = (0.5, 1.0, 2.0)
 MAX_GUARD = 3.0
+MAX_TURN_WEIGHT = 2.0
 # emq.27 'Straight & lanes' defaults; equal to the profiles/flow.brf globals. Applied to flow variants only.
 STRAIGHT_DEFAULTS = {"lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0, "cycleway_base": 1.0}
 CACHE_SIZE = 32
@@ -166,6 +168,7 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
               lane_bonus: str | None = None, turn_cost: str | None = None,
               lane_exit_cost: str | None = None, cycleway_base: str | None = None,
               lanes_variant_: str | None = Query(None, alias="lanes_variant"),
+              turn_weight: str | None = None,
               debug: str | None = None):
         t0 = time.perf_counter()
         start = parse_latlon(from_, "from", bbox)
@@ -199,6 +202,9 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
         guard_v = 1.3 if guard is None else parse_float(guard, "guard")
         if not 0.0 <= guard_v <= MAX_GUARD:
             raise HTTPException(400, f"'guard' must be within 0..{MAX_GUARD} (got {guard!r})")
+        tw = DEFAULT_TURN_WEIGHT if turn_weight is None else parse_float(turn_weight, "turn_weight")
+        if not 0.0 <= tw <= MAX_TURN_WEIGHT:
+            raise HTTPException(400, f"'turn_weight' must be within 0..{MAX_TURN_WEIGHT:g} (got {turn_weight!r})")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         refresh_b = refresh not in (None, "", "0", "false")
         straight = {}
@@ -247,9 +253,15 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
             if skipped:
                 detail += ": " + "; ".join(sorted({s["error"] for s in skipped}))
             raise HTTPException(404, detail)
-        scored = [ScoredCandidate(c, score(c.geometry, m, index)) for c in kept]
+        scored = []
+        for c in kept:
+            sc = score(c.geometry, m, index)
+            tm = turn_metrics(c.geometry, c.segments, sc.hits, region=region)
+            for k, v in tm.items():
+                setattr(sc, k, v)
+            scored.append(ScoredCandidate(c, sc))
         t2 = time.perf_counter()
-        top = rank(scored, n=n, guard=guard_v)
+        top = rank(scored, n=n, guard=guard_v, turn_weight=tw)
         debug_b = debug not in (None, "", "0", "false")
         routes = []
         for s in top:
@@ -262,13 +274,18 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                           "brouter_time_s": c.time_s, "expected_stops": sc.expected_stops,
                           "stops_per_km": sc.stops_per_km, "expected_stop_s": sc.expected_stop_s,
                           "by_class": sc.by_class,
-                          "cycle_km": cycle_km(c.segments)},
+                          "cycle_km": cycle_km(c.segments),
+                          "turns": sc.turns, "turns_per_km": sc.turns_per_km,
+                          "sharp_turns": sc.sharp_turns,
+                          "longest_straight_km": sc.longest_straight_km,
+                          "mean_straight_km": sc.mean_straight_km},
                 "delta_vs_fastest": s.delta_vs_fastest,
                 "hits": [{"lat": h["lat"], "lon": h["lon"], "cause": h["cause"], "p": h["p"]}
                          for h in sc.hits],
             })
             if debug_b:
                 routes[-1].update(explain(c.segments, sc.hits, c.cost))
+                routes[-1]["turn_points"] = sc.turn_points
         return {"query": {"from": {"lat": start[1], "lon": start[0]},
                           "to": {"lat": end[1], "lon": end[0]}, "n": n},
                 "weight_set": m.weight_set, "routes": routes,
@@ -279,7 +296,7 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
                              "turn_cost": straight["turn_cost"],
                              "lane_exit_cost": straight["lane_exit_cost"],
                              "cycleway_base": straight["cycleway_base"],
-                             "lanes_variant": lanes_b},
+                             "lanes_variant": lanes_b, "turn_weight": tw},
                 "model": {c: m.p(c) for c in m.classes}, "cached": hit is not None,
                 "candidates_total": len(kept) + len(dropped),
                 "candidates_deduped": len(kept), "skipped": skipped,

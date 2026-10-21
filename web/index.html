@@ -116,6 +116,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
         <div class="lab"><span>Distance guard (max x fastest)</span><span><span id="guardVal">1.30</span> <label><input id="guardOff" type="checkbox"> off</label></span></div>
         <input id="guard" type="range" min="1" max="2" step="0.05" value="1.3" style="width:100%">
       </div>
+      <div class="srow">
+        <div class="lab"><span>Rank turns as a fraction of a stop</span><span id="twVal">0.33</span></div>
+        <input id="tw" type="range" min="0" max="1" step="0.01" value="0.33" style="width:100%" aria-label="Rank turns as a fraction of a stop (0 = ignore turns, 1 = a turn counts as a stop)">
+        <div class="note">Ranking only: score = expected stops + this x turns. Re-ranks instantly (no re-route).</div>
+      </div>
       <div class="srow" id="scales">
         <div class="lab"><span>Flow-scale variants</span></div>
         <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 1"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 2"> <input type="number" min="0.01" max="10" step="any" aria-label="Flow scale 3">
@@ -202,7 +207,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     ['ireland', 'My Irish rides', 'Stop rates measured on your own Irish rides (some classes have few passes).'],
     ['combined', 'Pooled (Ireland+Berlin)', 'Irish and Berlin rides pooled: more data, less local.']
   ];
-  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4, router: 'base', lane: 0.7, tc: 400, le: 150, lanesVariant: false };
+  var DEF = { w: 'prior', blend: 0, p: {}, guard: 1.3, scales: [0.5, 1, 2], n: 4, router: 'base', lane: 0.7, tc: 400, le: 150, tw: 0.33, lanesVariant: false };
   var LS_KEY = 'flowplan.settings';
   var S = JSON.parse(JSON.stringify(DEF));   // guard 0 means off
   var MODEL = null;                          // /api/model response
@@ -234,6 +239,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     var tc = num(o.tc), le = num(o.le);
     if (tc !== null) r.tc = Math.round(clamp(tc, 0, 1000) / 50) * 50;
     if (le !== null) r.le = Math.round(clamp(le, 0, 500) / 25) * 25;
+    var tw = num(o.tw);
+    if (tw !== null) r.tw = clamp(tw, 0, 1);
     if (o.lv === '1' || o.lv === 1 || o.lv === true || o.lanesVariant === true) r.lanesVariant = true;
     var n = parseInt(o.n, 10);
     if (n >= 3 && n <= 6) r.n = n;
@@ -250,6 +257,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (S.lane !== DEF.lane) o.lb = String(S.lane);
     if (S.tc !== DEF.tc) o.tc = String(S.tc);
     if (S.le !== DEF.le) o.le = String(S.le);
+    if (S.tw !== DEF.tw) o.tw = String(S.tw);
     if (S.lanesVariant) o.lv = '1';
     if (!sameScales(S.scales, DEF.scales)) o.s = S.scales.join(',');
     return o;
@@ -259,12 +267,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     writeHash();
   }
   function loadSettings(h) {
-    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|r|lb|tc|le|lv|p_.*)$/.test(k); });
+    var hasHash = Object.keys(h).some(function (k) { return /^(w|bw|b|g|s|r|lb|tc|le|tw|lv|p_.*)$/.test(k); });
     var stored = null;
     try { stored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) { stored = null; }
     if (hasHash) S = settingsFromObj(h);        // hash wins, whole-settings
     else if (stored && typeof stored === 'object') {
-      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(','), r: stored.router, lb: stored.tc === undefined ? undefined : stored.lane, tc: stored.tc, le: stored.le, lv: stored.lanesVariant ? '1' : '' };
+      var o = { w: stored.w, n: stored.n, g: stored.guard, s: (stored.scales || []).join(','), r: stored.router, lb: stored.tc === undefined ? undefined : stored.lane, tc: stored.tc, le: stored.le, tw: stored.tw, lv: stored.lanesVariant ? '1' : '' };
       if (stored.blend > 0) { o.bw = 'ireland'; o.b = stored.blend; }
       Object.keys(stored.p || {}).forEach(function (k) { o['p_' + k] = stored.p[k]; });
       S = settingsFromObj(o);
@@ -516,6 +524,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       pl.bindTooltip(sg.highway + (sg.name ? ' ' + sg.name : '') + (sg.cycleway ? ' (cycleway ' + sg.cycleway + ')' : ''), { sticky: true });
       polys.push(pl);
     });
+    (r.turn_points || []).forEach(function (tp) {
+      L.circleMarker([tp.lat, tp.lon], { radius: 3, color: '#000', weight: 1, fillColor: tp.angle_deg > 60 ? '#d32f2f' : '#ffb300', fillOpacity: 0.9 })
+        .bindTooltip('turn ' + Math.round(tp.angle_deg) + ' deg').addTo(dbgLayer);
+    });
     dbgDrawn = true; styleLines(-1); routesToFront();
 
     var tw = el('div', 'segwrap'), tb = el('table', 'seg'), th = el('tr');
@@ -608,10 +620,14 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
         card.appendChild(el('div', 'd', ck.path.toFixed(1) + ' km on cycle paths, ' + (ck.lane + ck.track).toFixed(1) + ' km on roads with lanes/tracks'));
       }
+      if (s.turns !== undefined) {
+        card.appendChild(el('div', 'd', s.turns + ' turns (' + s.turns_per_km.toFixed(1) + '/km), longest straight ' + s.longest_straight_km.toFixed(1) + ' km'));
+      }
       var irish = irishStops(r);
       if (irish !== null) card.appendChild(el('div', 'irish', 'under your Irish rides: ' + irish.toFixed(1) + ' stops'));
       if (r.delta_vs_fastest) {
-        card.appendChild(el('div', 'delta', 'vs fastest: ' + signed(r.delta_vs_fastest.stops, 1) + ' stops, ' + signed(r.delta_vs_fastest.km, 1) + ' km'));
+        card.appendChild(el('div', 'delta', 'vs fastest: ' + signed(r.delta_vs_fastest.stops, 1) + ' stops, ' + signed(r.delta_vs_fastest.km, 1) + ' km' +
+          (r.delta_vs_fastest.turns !== undefined ? ', ' + signed(r.delta_vs_fastest.turns, 0) + ' turns' : '')));
       }
       card.onmouseenter = function () { styleLines(i); };
       card.onmouseleave = function () { styleLines(-1); };
@@ -664,6 +680,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (S.router === 'table') q += '&router=table';
     q += '&lane_bonus=' + S.lane + '&turn_cost=' + S.tc + '&lane_exit_cost=' + S.le;
     if (S.lanesVariant) q += '&lanes_variant=1';
+    q += '&turn_weight=' + S.tw;
     q += '&guard=' + S.guard + '&scales=' + S.scales.join(',');
     return q;
   }
@@ -713,6 +730,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('le').value = String(S.le); $('leVal').textContent = String(S.le);
     $('laneVal').textContent = S.lane >= 1 ? 'Off' : 'x' + S.lane.toFixed(2);
     $('lanesVariant').checked = S.lanesVariant;
+    $('tw').value = String(S.tw); $('twVal').textContent = S.tw.toFixed(2);
     $('routerNote').textContent = S.router === 'table'
       ? 'Every probability change re-routes through BRouter (5-8 s); the router uses the costs derived from the sliders.'
       : "Sliders re-rank the cached candidates instantly; the router searches with the base set's costs.";
@@ -764,7 +782,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       sliderEls[c[0]] = { input: inp, val: val, ov: ov, reset: reset };
     });
     $('resetAll').onclick = function () {
-      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); S.lane = DEF.lane; S.tc = DEF.tc; S.le = DEF.le; S.lanesVariant = DEF.lanesVariant; lastModelP = null;
+      S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); S.lane = DEF.lane; S.tc = DEF.tc; S.le = DEF.le; S.tw = DEF.tw; S.lanesVariant = DEF.lanesVariant; lastModelP = null;
       $('scaleErr').textContent = '';
       Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) { i.className = ''; });
       changed();
@@ -772,6 +790,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('routerTable').onchange = function () { S.router = $('routerTable').checked ? 'table' : 'base'; changed(); };
     $('lane').oninput = function () { S.lane = Math.round((1 - parseInt($('lane').value, 10) / 100) * 20) / 20; changed(); };
     $('tc').oninput = function () { S.tc = parseInt($('tc').value, 10); changed(); };
+    $('tw').oninput = function () { S.tw = parseFloat($('tw').value); changed(); };
     $('le').oninput = function () { S.le = parseInt($('le').value, 10); changed(); };
     $('presetStraight').onclick = function () { S.tc = DEF.tc; S.le = DEF.le; S.lane = DEF.lane; changed(); };
     $('presetPlain').onclick = function () { S.tc = 150; S.le = 0; S.lane = 1; changed(); };

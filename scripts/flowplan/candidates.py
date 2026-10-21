@@ -32,13 +32,14 @@ DEFAULT_VARIANTS = (
 )
 
 # Optional fifth variant (flow_server lanes_variant=1): flow at default stop weights with a cycle-infrastructure bonus.
-DEFAULT_LANES_BONUS = 0.8
+LANES_STEP = 0.2
+LANES_FLOOR = 0.5
 
 
 def lanes_variant(lane_bonus: float = 1.0) -> Variant:
-    """flow_lanes: lane_bonus 0.8, or the requested lane_bonus when that is already lower."""
+    """flow_lanes: lane_bonus max(0.5, lane_bonus - 0.2), always at least as strong as the current setting."""
     return Variant("flow_lanes", "flow", {"flow_scale": 1.0,
-                                          "lane_bonus": min(DEFAULT_LANES_BONUS, float(lane_bonus))})
+                                          "lane_bonus": round(max(LANES_FLOOR, float(lane_bonus) - LANES_STEP), 4)})
 
 
 def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20.0,

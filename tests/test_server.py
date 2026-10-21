@@ -39,8 +39,8 @@ def test_route_dublin(index):
     routes = j["routes"]
     assert len(routes) >= 2
     assert [x["rank"] for x in routes] == list(range(1, len(routes) + 1))
-    stops = [x["stats"]["expected_stops"] for x in routes]
-    assert stops == sorted(stops)
+    obj = [x["stats"]["expected_stops"] + 0.33 * x["stats"]["turns"] for x in routes]
+    assert obj == sorted(obj)
     assert routes[0]["geometry"]["type"] == "LineString"
     assert j["timings_ms"]["total"] >= 0 and j["skipped"] == []
 
@@ -254,13 +254,13 @@ def test_lanes_variant_added_when_requested(index):
     seen.clear()
     j = c.get(f"/api/route?{Q}&lanes_variant=1&refresh=1").json()
     assert j["candidates_total"] == 20 and j["settings"]["lanes_variant"] is True
-    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.7]  # default 0.7 already below 0.8
+    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.5, 0.7]  # base 0.7, lanes variant 0.5
     seen.clear()
     c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.9&refresh=1")
-    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.8, 0.9}  # 0.9 base, lanes variant 0.8
+    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.7, 0.9}  # 0.9 base, lanes variant 0.7
     seen.clear()
     c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.6&refresh=1")
-    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.6}
+    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.5, 0.6}
 
 
 @pytest.mark.parametrize("v", ["0.4", "1.1", "abc", "nan", "inf"])
@@ -346,3 +346,24 @@ def test_straightness_params_flow_only_echo_and_cache(index):
 def test_bad_straightness_400(index, name, v):
     r = app_client(index, FakeClient()).get(f"/api/route?{Q}&{name}={v}")
     assert r.status_code == 400 and name in r.json()["detail"]
+
+
+def test_turn_stats_and_turn_weight(index):
+    c = app_client(index, FakeClient())
+    j = c.get(f"/api/route?{Q}&refresh=1").json()
+    for r in j["routes"]:
+        st = r["stats"]
+        assert {"turns", "turns_per_km", "sharp_turns", "longest_straight_km",
+                "mean_straight_km"} <= set(st)
+        assert "turn_points" not in r
+        assert "turns" in (r["delta_vs_fastest"] or {"turns": 0})
+    assert j["settings"]["turn_weight"] == 0.33
+    jd = c.get(f"/api/route?{Q}&debug=1").json()
+    assert all(isinstance(r["turn_points"], list) for r in jd["routes"])
+    j0 = c.get(f"/api/route?{Q}&turn_weight=0").json()
+    assert j0["settings"]["turn_weight"] == 0.0 and j0["cached"] is True  # not in the cache key
+
+
+@pytest.mark.parametrize("v", ["-0.1", "2.5", "abc", "nan"])
+def test_bad_turn_weight_400(index, v):
+    assert app_client(index, FakeClient()).get(f"/api/route?{Q}&turn_weight={v}").status_code == 400

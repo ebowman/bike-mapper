@@ -191,7 +191,9 @@ def test_cycle_km_synthetic():
 
 def test_lanes_variant_helper():
     assert candidates.lanes_variant(1.0).params == {"flow_scale": 1.0, "lane_bonus": 0.8}
-    assert candidates.lanes_variant(0.7).params["lane_bonus"] == 0.7
+    assert candidates.lanes_variant(0.7).params["lane_bonus"] == 0.5
+    assert candidates.lanes_variant(0.9).params["lane_bonus"] == 0.7
+    assert candidates.lanes_variant(0.6).params["lane_bonus"] == 0.5  # floor
     assert candidates.lanes_variant(0.9).name == "flow_lanes"
 
 

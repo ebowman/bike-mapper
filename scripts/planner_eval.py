@@ -22,10 +22,11 @@ from flowplan.brouter import DEFAULT_URL, BRouterClient
 from flowplan.candidates import DEFAULT_WORKERS, generate
 from flowplan.ranking import ScoredCandidate, rank
 from flowplan.scoring import FlowIndex, score
+from flowplan.turns import turn_metrics
 
 ROOT = Path(__file__).resolve().parent.parent
 COLUMNS = ["name", "fastbike_km", "fastbike_stops", "fastbike_stops_per_km", "top_variant",
-           "top_alt", "top_km", "top_stops", "top_stops_per_km", "delta_stops_pct",
+           "top_alt", "top_km", "top_stops", "top_stops_per_km", "top_turns", "top_longest_straight_km", "delta_stops_pct",
            "delta_km_pct", "candidates_total", "candidates_kept", "skipped", "wall_s",
            "top_is_fastbike", "error"]
 
@@ -60,7 +61,8 @@ def build_row(name: str, scored: list[ScoredCandidate], top: list[ScoredCandidat
                fastbike_stops_per_km=round(spk(ref), 3),
                top_variant=t.cand.variant, top_alt=t.cand.alt,
                top_km=round(t.length_m / 1000, 2), top_stops=round(t.expected_stops, 2),
-               top_stops_per_km=round(spk(t), 3),
+               top_stops_per_km=round(spk(t), 3), top_turns=t.score.turns,
+               top_longest_straight_km=round(t.score.longest_straight_km, 2),
                delta_stops_pct=round(_pct(t.expected_stops, ref.expected_stops), 1),
                delta_km_pct=round(_pct(t.length_m, ref.length_m), 1),
                top_is_fastbike=t is ref)
@@ -112,7 +114,12 @@ def main():
             end = (float(p["to_lon"]), float(p["to_lat"]))
             kept, dropped, skipped = generate(client, start, end, region=a.region,
                                            max_workers=a.workers)
-            scored = [ScoredCandidate(c, score(c.geometry, model, index)) for c in kept]
+            scored = []
+            for c in kept:
+                sc = score(c.geometry, model, index)
+                for k, v in turn_metrics(c.geometry, c.segments, sc.hits, region=a.region).items():
+                    setattr(sc, k, v)
+                scored.append(ScoredCandidate(c, sc))
             top = rank(scored, n=a.n)
             row = build_row(p["name"], scored, top, len(kept) + len(dropped), len(skipped),
                             time.perf_counter() - t0, skipped)

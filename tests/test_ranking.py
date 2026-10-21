@@ -35,7 +35,7 @@ def test_delta_vs_fastest():
     out = rank(items)
     d = out[0].delta_vs_fastest
     assert d["stops"] == -2 and abs(d["km"] - 0.5) < 1e-9
-    assert out[-1].delta_vs_fastest == {"stops": 0, "km": 0}
+    assert out[-1].delta_vs_fastest == {"stops": 0, "km": 0, "turns": 0}
 
 
 def test_no_fastest_gives_none():
@@ -48,3 +48,26 @@ def test_guard_zero_disables_guard():
              sc("flow_lo", 0, 30000, 0)]
     assert rank(list(cands), n=4)[0].cand.variant == "flow_hi"
     assert rank(list(cands), n=4, guard=0)[0].cand.variant == "flow_lo"
+
+
+def sct(variant, length_m, stops, turns, straight=1.0):
+    c = Candidate(variant, variant, 0, [], length_m, 0, 0, 0)
+    return ScoredCandidate(c, RouteScore(expected_stops=stops, turns=turns,
+                                         longest_straight_km=straight))
+
+
+def test_turn_weight_zero_reproduces_stop_order():
+    items = [sct("fastbike", 10000, 5, 3), sct("a", 10200, 3, 40), sct("b", 10100, 4, 2)]
+    assert [s.cand.variant for s in rank(items, turn_weight=0)] == ["a", "b", "fastbike"]
+
+
+def test_turn_weight_drops_turny_candidate():
+    items = [sct("fastbike", 10000, 5, 3), sct("a", 10200, 3, 40), sct("b", 10100, 4, 2)]
+    out = rank(items)  # default 0.33: a = 3 + 13.2, b = 4.66, fastbike = 5.99
+    assert [s.cand.variant for s in out] == ["b", "fastbike", "a"]
+    assert out[0].delta_vs_fastest["turns"] == -1
+
+
+def test_tie_break_longest_straight_then_length():
+    items = [sct("x", 10000, 2, 0, straight=1.0), sct("y", 10500, 2, 0, straight=2.0)]
+    assert rank(items)[0].cand.variant == "y"

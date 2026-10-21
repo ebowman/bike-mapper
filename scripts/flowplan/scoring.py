@@ -89,6 +89,13 @@ class RouteScore:
     by_class: dict = field(default_factory=dict)
     hits: list = field(default_factory=list)
     diagnostics: dict = field(default_factory=dict)
+    # filled by turns.turn_metrics (emq.28)
+    turns: int = 0
+    turns_per_km: float = 0.0
+    sharp_turns: int = 0
+    longest_straight_km: float = 0.0
+    mean_straight_km: float = 0.0
+    turn_points: list = field(default_factory=list)
 
 
 def haversine_m(lon1, lat1, lon2, lat2) -> float:
