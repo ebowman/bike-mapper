@@ -1,0 +1,67 @@
+{
+  "causes": {
+    "signal": {
+      "p": 0.158,
+      "p_lo": 0.134,
+      "p_hi": 0.253,
+      "mean_stop_s": 27.945,
+      "weight_300": 300,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+      "note": "Anchor class (weight 300 by definition)."
+    },
+    "stop": {
+      "p": 0.021,
+      "p_lo": 0.021,
+      "p_hi": 0.044,
+      "mean_stop_s": 41.056,
+      "weight_300": 49,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+    },
+    "give_way": {
+      "p": 0.041,
+      "p_lo": 0.037,
+      "p_hi": 0.067,
+      "mean_stop_s": 28.862,
+      "weight_300": 72,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+    },
+    "rb_entry": {
+      "p": 0.0,
+      "p_lo": 0.0,
+      "p_hi": 0.149,
+      "mean_stop_s": 27.945,
+      "weight_300": 0,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+      "note": "Under-powered: 0 stops in 22 passes, upper CI 0.149. No mean_stop_s in CSV (no stops); signal value used."
+    },
+    "xing_signal": {
+      "p": 0.158,
+      "p_lo": 0.134,
+      "p_hi": 0.253,
+      "mean_stop_s": 34.5,
+      "weight_300": 300,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+      "note": "Treated as signals (class absorbed by signals under proximity classification); p copied from signal. mean_stop_s is the CSV xing_signal value (2 stops only)."
+    },
+    "yield_infer": {
+      "p": 0.016,
+      "p_lo": 0.014,
+      "p_hi": 0.018,
+      "mean_stop_s": 35.971,
+      "weight_300": 29,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv"
+    },
+    "yield_equal": {
+      "p": 0.021,
+      "p_lo": 0.021,
+      "p_hi": 0.041,
+      "mean_stop_s": 13.0,
+      "weight_300": 8,
+      "source": "docs/research/stop-model-validation.md (recommended weights table); data/samples/stop_model_validation_combined.csv",
+      "note": "Wide CI (0.009-0.048); 5 stops in 238 passes."
+    }
+  },
+  "midway_background_p": 0.003,
+  "midway_background_note": "Mid-way background stop probability; documented but unused (not applied per node).",
+  "rules": "p applies PER ARRIVAL EVENT at a node, ignoring the dhy.10 amount column (the 0.5 on yield_equal was a prior, superseded by the measured p). When several events fire at the same arrival (same node_id, way_id, dir), keep only the highest-precedence class: signal > stop > give_way > rb_entry > xing_signal > yield_infer > yield_equal."
+}
