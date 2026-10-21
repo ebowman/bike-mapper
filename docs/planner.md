@@ -84,3 +84,29 @@ make flow-index      # data/osm/events_ireland.csv + ireland.osm.pbf -> data/flo
 - Point outside the BRouter tiles or outside Ireland: 400 from the planner, or a BRouter error such as "datafile ... not found" listed under `skipped` / in a 404 detail.
 - Nominatim 429: the search box shows "rate-limited"; wait a moment. Clicking the map or typing `lat,lon` needs no search.
 - Port in use: `make planner` fails with "address already in use". Stop the old process (`pgrep -fl flow_server`) or run `uv run scripts/flow_server.py --port 8082`. BRouter listens on 17777.
+
+## Planner evaluation (emq.10, 2026-10-21)
+
+Ten fixed OD pairs (`data/samples/planner_od_pairs.csv`: 4 suburban, 3 Wicklow rural, 3 cross-town), each run through generate -> score -> rank (n=4) by `uv run scripts/planner_eval.py` against a local BRouter. Weight set: `prior` (default). Full rows: `data/samples/planner_eval.csv`. "fastbike" is the fastbike alt-0 candidate (always in the kept list); "top" is rank 1. Deltas are top vs fastbike, negative = fewer stops.
+
+| pair | fastbike km | fastbike stops | top (variant/alt) | top km | top stops | d stops % | d km % | cands kept/total | wall s |
+|---|---|---|---|---|---|---|---|---|---|
+| rathfarnham_howth | 21.27 | 36.65 | flow_hi/0 | 24.9 | 6.76 | -81.6 | 17.1 | 16/16 | 16.4 |
+| dundrum_phoenixpark | 12.27 | 15.2 | flow_hi/0 | 15.27 | 6.22 | -59.1 | 24.5 | 15/16 | 12.36 |
+| blanchardstown_sandymount | 14.95 | 21.83 | flow/0 | 15.54 | 3.46 | -84.2 | 3.9 | 14/16 | 11.34 |
+| tallaght_malahide | 27.04 | 40.67 | flow_hi/2 | 32.53 | 15.34 | -62.3 | 20.3 | 14/16 | 22.1 |
+| bray_wicklowgap | 37.07 | 5.55 | flow/0 | 38.19 | 1.75 | -68.5 | 3.0 | 9/16 | 19.14 |
+| greystones_roundwood | 18.75 | 4.84 | fastbike/3 | 21.71 | 1.65 | -65.9 | 15.8 | 11/16 | 1.28 |
+| enniskerry_sallygap | 25.52 | 0.72 | fastbike/2 | 27.41 | 0.33 | -54.2 | 7.4 | 4/16 | 4.94 |
+| dunlaoghaire_clontarf | 14.73 | 17.11 | flow_hi/2 | 16.49 | 4.65 | -72.8 | 11.9 | 13/16 | 6.94 |
+| lucan_dalkey | 29.41 | 38.68 | flow_hi/3 | 34.02 | 8.57 | -77.8 | 15.7 | 16/16 | 23.62 |
+| swords_bray | 35.38 | 41.11 | flow/0 | 42.22 | 19.49 | -52.6 | 19.3 | 15/16 | 24.18 |
+
+- Mean delta stops: -67.9 %, median -67.2 %. Mean delta distance: +13.9 %.
+- Pairs where the top route is the fastbike alt-0 route: 0 of 10. (In greystones_roundwood and enniskerry_sallygap the top is fastbike alt 2/3, a different road than alt 0.)
+- No pair errors, no skipped BRouter requests. All coordinates routed as given; none were nudged.
+- `combined` weights (`data/samples/planner_eval_combined.csv`): mean delta stops -74.8 %, median -73.4 %, mean delta distance +11.8 %; the rank-1 candidate is the same as under `prior` in 9 of 10 pairs (greystones_roundwood differs), so the ranking is not sensitive to the weight set, only the absolute percentages are.
+
+Interpretation: in the suburbs and cross-town the planner finds large cuts (50-85 % fewer expected stops) for 4-24 % more distance, because fastbike goes straight through signalled junctions that the flow profile detours around. In rural Wicklow the absolute gain is small (fastbike already has 0.03-0.26 stops/km, e.g. 0.72 expected stops over 25 km for enniskerry_sallygap), so the large percentage is a small number of stops and the planner adds little in practice there. These are model-predicted stops from the stop model, not measured rides, and the `prior` percentages depend on its signal probability of 0.40.
+
+Caveat found while evaluating: `run_brouter.sh serve` runs BRouter with 2 server threads, but the planner requests candidates with 4 client threads; on 20-50 km pairs many requests were killed by BRouter's "thread-priority-watchdog" (10-13 of 16 skipped in a first run with 4 workers, so fewer candidates and weaker results). `planner_eval.py` therefore defaults to `--workers 2`, which gave 0 skipped. Filed as a follow-up bead for `flow_server.py`.

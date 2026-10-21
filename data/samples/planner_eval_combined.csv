@@ -1,0 +1,11 @@
+name,fastbike_km,fastbike_stops,fastbike_stops_per_km,top_variant,top_alt,top_km,top_stops,top_stops_per_km,delta_stops_pct,delta_km_pct,candidates_total,candidates_kept,skipped,wall_s,top_is_fastbike,error
+rathfarnham_howth,21.27,24.99,1.175,flow_hi,0,24.9,3.44,0.138,-86.2,17.1,16,16,0,15.86,False,
+dundrum_phoenixpark,12.27,10.27,0.837,flow_hi,0,15.27,2.97,0.195,-71.0,24.5,16,15,0,13.33,False,
+blanchardstown_sandymount,14.95,13.86,0.927,flow,0,15.54,2.42,0.156,-82.5,3.9,16,14,0,11.7,False,
+tallaght_malahide,27.04,27.17,1.005,flow_hi,2,32.53,7.26,0.223,-73.3,20.3,16,14,0,23.3,False,
+bray_wicklowgap,37.07,2.77,0.075,flow,0,38.19,0.89,0.023,-68.1,3.0,16,9,0,19.68,False,
+greystones_roundwood,18.75,2.45,0.131,flow_hi,2,17.76,0.65,0.036,-73.5,-5.2,16,11,0,1.32,False,
+enniskerry_sallygap,25.52,0.44,0.017,fastbike,2,27.41,0.14,0.005,-68.7,7.4,16,4,0,4.95,False,
+dunlaoghaire_clontarf,14.73,11.06,0.751,flow_hi,2,16.49,2.62,0.159,-76.3,11.9,16,13,0,7.0,False,
+lucan_dalkey,29.41,23.55,0.801,flow_hi,3,34.02,4.29,0.126,-81.8,15.7,16,16,0,26.01,False,
+swords_bray,35.38,26.93,0.761,flow,0,42.22,8.92,0.211,-66.9,19.3,16,15,0,25.45,False,
