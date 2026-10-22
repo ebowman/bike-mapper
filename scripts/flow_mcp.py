@@ -51,7 +51,7 @@ PRESETS = [
      "description": "Pre-emq.27 behaviour: avoid stops only, no lane preference.",
      "settings": {"turn_cost": 150, "lane_exit_cost": 0, "lane_bonus": 1.0}},
     {"name": "quiet roads", "objective": "flow",
-     "description": "Penalise primary/secondary roads 2.5x; otherwise the default straight & lanes behaviour",
+     "description": "Penalise primary, secondary and trunk roads 2.5x; otherwise the default straight & lanes behaviour",
      "settings": {"main_road_penalty": 2.5, "lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0}},
     {"name": "climb", "objective": "climb",
      "description": "Rank by climb score (points per the climbs spec); pass objective='climb'.",
@@ -235,7 +235,7 @@ def plan_route(mode: str, start: str, end: str | None = None, length_km: float |
     resolved place is echoed). Loops and out-and-backs need length_km (+-10%) or min_km and max_km; one_way
     needs end and ignores length. objective: flow (fewest stops/turns) | climb | flat. return_mode: same | free.
     settings: optional dict from list_presets (e.g. turn_cost, lane_bonus, weights;
-    main_road_penalty 1..5 multiplies the cost of primary/secondary/trunk roads, 2.5 = 'quiet roads' preset). Loops take 30-60 s.
+    main_road_penalty 1..5 multiplies the cost of primary, secondary and trunk roads, 2.5 = 'quiet roads' preset). Loops take 30-60 s.
     Returns a markdown table of ranked routes (use the ids with route_details / export_gpx) plus plan notes."""
     svc = service()
     echo = []
@@ -282,6 +282,8 @@ def route_details(route_id: str) -> str:
              "km by road class: " + ", ".join(f"{k} {v:.1f}" for k, v in d["km_by_highway"].items()),
              (f"km on cycle infrastructure: {_cyc(cyc):.1f} of {cyc['total_km']:.1f} km (track {cyc['track']:.1f}, "
              f"lane {cyc['lane']:.1f}, path {cyc['path']:.1f})"),
+             (f"main-road km: {d['main_road_km']:.1f} of {d['distance_km']:.1f} km "
+              "(primary/secondary/trunk incl. links)"),
              f"expected stops {d['expected_stops']:.2f} from {d['stop_events']} stop events; by cause: "
              + (", ".join(f"{k} {v['events']} ev/{v['expected']:.2f} exp"
                           for k, v in d["expected_stops_by_class"].items() if v["events"]) or "none"),

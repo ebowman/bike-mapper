@@ -494,7 +494,8 @@ class PlannerService:
         return {"id": c.route_id, "distance_km": c.length_m / 1000,
                 "km_by_highway": {k: round(v, 2) for k, v in
                                   sorted(summ["km_by_highway"].items(), key=lambda kv: -kv[1])},
-                "cycle_km": summ["cycle_km"], "expected_stops": sc.expected_stops,
+                "cycle_km": summ["cycle_km"], "main_road_km": main_road_km(c.segments),
+                "expected_stops": sc.expected_stops,
                 "stop_events": len(sc.hits), "stop_events_by_cause": by_cause,
                 "expected_stops_by_class": sc.by_class,
                 "turns": sc.turns, "sharp_turns": sc.sharp_turns,

@@ -155,3 +155,19 @@ def test_plan_route_passes_main_road_penalty_to_brouter():
     assert not out.startswith("Error") and "main-road km" in out
     assert any(p.get("main_road_penalty") == 2.5 for p in seen if p.get("flow_scale"))
     assert all(p.get("main_road_penalty") == 1.0 for p in seen if p.get("flow_scale") == 0)  # baseline fixed
+
+
+def test_route_details_shows_main_road_km(monkeypatch):
+    d = {"id": "x/alt0", "distance_km": 12.0, "ascent_m": 10, "descent_m": 10,
+         "km_by_highway": {"primary": 3.0}, "cycle_km": {"total_km": 12.0, "track": 0, "lane": 0, "path": 0},
+         "main_road_km": 3.04, "expected_stops": 1.0, "stop_events": 2, "expected_stops_by_class": {},
+         "turns": 3, "sharp_turns": 0, "longest_straight_km": 2.0, "climb_score": 0, "climbs": []}
+
+    class Svc:
+        def explain(self, s):
+            return d
+
+    monkeypatch.setattr(flow_mcp, "_lookup", lambda rid: object())
+    monkeypatch.setattr(flow_mcp, "service", lambda: Svc())
+    out = flow_mcp.route_details("x/alt0")
+    assert "main-road km: 3.0 of 12.0 km (primary/secondary/trunk incl. links)" in out

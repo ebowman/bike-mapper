@@ -172,7 +172,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       </div>
       <div class="srow">
         <div class="lab"><span>Avoid main roads</span><span id="mrVal">Off</span></div>
-        <input id="mr" type="range" min="10" max="50" step="5" value="10" style="width:100%" aria-label="Avoid main roads (cost multiplier on primary and secondary roads, 1 = off, 5 = strongest)">
+        <input id="mr" type="range" min="10" max="50" step="5" value="10" style="width:100%" aria-label="Avoid main roads (cost multiplier on primary, secondary and trunk roads, 1 = off, 5 = strongest)">
         <div class="lab"><span>Off</span><span>Strongest</span></div>
       </div>
       <div class="srow"><label><input id="lanesVariant" type="checkbox"> Add a lanes-favouring route</label></div>
@@ -779,6 +779,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
         card.appendChild(el('div', 'd', ck.path.toFixed(1) + ' km on cycle paths, ' + (ck.lane + ck.track).toFixed(1) + ' km on roads with lanes/tracks'));
       }
+      if (s.main_road_km !== undefined) card.appendChild(el('div', 'd', 'main roads ' + s.main_road_km.toFixed(1) + ' km'));
       if (s.turns !== undefined) {
         card.appendChild(el('div', 'd', s.turns + ' turns (' + s.turns_per_km.toFixed(1) + '/km), longest straight ' + s.longest_straight_km.toFixed(1) + ' km'));
       }
@@ -984,8 +985,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('tw').oninput = function () { S.tw = parseFloat($('tw').value); changed(true); }; onRelease($('tw'));
     $('mr').oninput = function () { S.mr = parseInt($('mr').value, 10) / 10; changed(true); }; onRelease($('mr'));
     $('le').oninput = function () { S.le = parseInt($('le').value, 10); changed(true); }; onRelease($('le'));
-    $('presetStraight').onclick = function () { S.tc = DEF.tc; S.le = DEF.le; S.lane = DEF.lane; changed(); };
-    $('presetPlain').onclick = function () { S.tc = 150; S.le = 0; S.lane = 1; changed(); };
+    $('presetStraight').onclick = function () { S.tc = DEF.tc; S.le = DEF.le; S.lane = DEF.lane; S.mr = DEF.mr; changed(); };
+    $('presetPlain').onclick = function () { S.tc = 150; S.le = 0; S.lane = 1; S.mr = DEF.mr; changed(); };
     $('lanesVariant').onchange = function () { S.lanesVariant = $('lanesVariant').checked; changed(); };
     $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(true); }; onRelease($('guard'));
     $('guardOff').onchange = function () { S.guard = $('guardOff').checked ? 0 : (num($('guard').value) || DEF.guard); changed(); };
