@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
 
@@ -191,6 +192,8 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
         if end == start:
             res.notes.append("start == end: no out-and-back")
             return res
+        if objective != "flow":
+            res.notes.append(f"objective {objective!r} does not apply to an out-and-back with an explicit end")
         ex_, ey_ = tf.transform(*end)
         brg = math.degrees(math.atan2(ex_ - sx, ey_ - sy)) % 360
         states = [_State(brg, math.hypot(ex_ - sx, ey_ - sy), points=[start, end], fixed=True)]
@@ -331,6 +334,9 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     kept, dropped = dedupe(cands, region)
     for c in cands:
         c.variant = names[id(c)]
+    for c in dropped:       # strip the temporary '@heading' so duplicate_of matches a kept key
+        if c.duplicate_of:
+            c.duplicate_of = re.sub(r"@[^/]*", "", c.duplicate_of)
     res.kept, res.dropped = kept, res.dropped + dropped
     if not kept:
         res.notes.append("no candidate inside the requested length range")
