@@ -412,7 +412,7 @@ class PlannerService:
             raise ServiceError(400, f"'return' must be same or free (got {return_mode!r})")
         n = int_param(qp, "n", 4, 1, 6)
         bearings = int_param(qp, "bearings", 8, 3, 12)
-        max_calls = int_param(qp, "max_calls", 48, 1, MAX_PLAN_CALLS)
+        max_calls = int_param(qp, "max_calls", 72, 1, MAX_PLAN_CALLS)
         length, kmin, kmax = km_param(qp, "length_km"), km_param(qp, "min_km"), km_param(qp, "max_km")
         if length is not None and (kmin is not None or kmax is not None):
             raise ServiceError(400, "give either 'length_km' or 'min_km'/'max_km', not both")

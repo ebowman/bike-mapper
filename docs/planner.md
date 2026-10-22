@@ -88,10 +88,10 @@ Parameters (400 naming the parameter when invalid):
 - `mode=loop|out_and_back|out-and-back|one_way|one-way` (default `loop`; both spellings are accepted and echoed as `out_and_back` / `one_way`), `from=lat,lon` (required), `to=lat,lon` (required for one-way; for out-and-back it fixes the turnaround, then the length range and `objective` do not apply and a note says so; ignored with a note for loops).
 - `length_km=50` (range +-10%, 45-55) or `min_km=45&max_km=55` (give one form, not both; required for loop and out-and-back without `to`; total route length, for an out-and-back out plus back).
 - `objective=flow|climb|flat` (default `flow`): `flow` ranks by `expected_stops + turn_weight * turns`; `climb` by `climb_score` descending (ties: the flow score); `flat` by `ascent_m` ascending (ties: the flow score). For loops and out-and-backs the length range filter replaces the `guard`; one-way keeps the `guard`. `climb` and `flat` also pick the via-points from the DEM (see `flowplan.terrain`), falling back to evenly spaced headings with a note when coverage is thin.
-- `n` (1..6, default 4), `bearings` (3..12, default 8: headings tried), `return=same|free` (out-and-back: come back the same way, or by a different road when it does not overlap too much), `max_calls` (1..96, default 48: budget of BRouter requests for the whole plan; the plan stops with a note and partial results when it runs out).
+- `n` (1..6, default 4), `bearings` (3..12, default 8: headings tried), `return=same|free` (out-and-back: come back the same way, or by a different road when it does not overlap too much), `max_calls` (1..96, default 72: budget of BRouter requests for the whole plan; the plan stops with a note and partial results when it runs out).
 - All `/api/route` settings: `weights`, `blend_with`, `blend`, `p_<cause>`, `guard`, `scales`, `lane_bonus`, `turn_cost`, `lane_exit_cost`, `cycleway_base`, `turn_weight`, `diversity`, `router`, `lanes_variant`, `debug`, `refresh`.
 
-Latency: a loop plan makes up to `max_calls` (default 48) BRouter requests in several rounds (length targeting iterates the ring radius up to 3 times per heading, then the other variants run at each converged heading), so expect 30-60 s on a cold cache; lower `bearings` or `max_calls` for a quicker, thinner answer. The HTTP request simply blocks until done.
+Latency: a loop plan makes up to `max_calls` (default 72) BRouter requests in several rounds (length targeting iterates the ring radius up to 4 times per heading, then the other variants run at each converged heading), so expect 30-60 s on a cold cache; lower `bearings` or `max_calls` for a quicker, thinner answer. The HTTP request simply blocks until done.
 
 Plan cache (same LRU as above): keyed by mode, start, end, length range, `bearings`, `objective` (it changes the via-points), `return`, `max_calls`, `scales`, the BRouter costs, the straightness values and `lanes_variant`. A repeated plan and any `turn_weight`, weights, blend, `p_*`, `n` or `debug` change re-score and re-rank from the cache with no BRouter call (`cached` true; `plan.calls` is then the call count of the original plan). Changing `objective` re-plans, because the via-points differ.
 
@@ -230,9 +230,19 @@ loop, out-and-back and one-way candidates aimed at a length range.
   leg back with `alternativeidx=1` and falls back to `'same'` when it overlaps the out leg by more than 70%.
 - **Radius iteration**: r0 = target/(2*pi) * 1.15 (circle radius for the mid-range target times a 1.15 road
   detour factor); d0 = target/2 * 1.15. After each route r (or d) is scaled by target/measured (clamped 0.5-2),
-  at most 3 routes per heading, stopping once the length is inside the range. Only the `flow` variant is used
-  for this; the other variants are then routed through the same via-points and kept if their length is also in range.
-- **Budget**: `max_calls` (default 48) is a hard cap on BRouter requests (every call counts, including
+  at most 4 routes per heading, stopping once the length is inside the range; once one measurement was below
+  and another above the range, the next scale is the geometric mean of the bracketing ones. Only the `flow` variant
+  is used for this; the other variants are then routed through the same via-points and kept if their length is also
+  in range.
+- **Loop shapes**: every heading gets a *ring* (3 vias 120 deg apart, as above); in addition bearings//2 *petals*
+  (3 vias fanned around one heading: theta-35 / theta / theta+35 deg at 0.75 / 1 / 0.75 x d, at half-step offsets
+  from the ring headings; d chosen so the crow-flies perimeter is target/ROAD_RATIO, see below). Petals reach hills
+  beyond the ring radius (climb/flat petal centres come from DEM points at 0.5-0.95 x REACH) and close from
+  peninsulas (Howth) where ring vias fall in the sea. A petal may share its stem
+  (disguised out-and-back threshold 80% overlap instead of 60%); `plan.shape` and `plan.overlap_pct` are reported.
+  A petal centred on a DEM point (climb/flat) keeps its centre there and, when the loop is too long, first narrows its spread (35 -> 8 deg at side distance 0.75), then pulls the sides in (0.75 -> 0.3 x centre distance); only then does the centre move closer. Length targeting may use at most 70% of max_calls; the rest is for the variants stage. Petals are bearings//2 per plan, offset half a ring step, and are sized with ROAD_RATIO = 1.6 (measured road / crow-flies perimeter around Dublin, 1.6-1.9 observed) rather than the 1.15 detour of the rings: the initial crow-flies perimeter is target / 1.6 and the initial shape is fitted to the centre distance. DEM centres are searched only within REACH = target / 1.6 / 2.008 (a thin petal's perimeter is at least 2.008 x its centre distance), at 0.5-0.95 x REACH. A loop below 50% of the target length has collapsed onto the coast and is discarded. When no heading lands in the
+  range, up to 3 candidates within 25% of the target of the range are returned as the nearest, with a note.
+- **Budget**: `max_calls` (default 72) is a hard cap on BRouter requests (every call counts, including
   fallbacks and the variants stage); when it bites, results are partial and `notes` says so. Calls within a
   round run on 4 threads. 8 headings x ~2 iterations + variants typically uses 30-40 calls (~10-40 s).
 - **Dedupe**: the 20 m / 90% rule on the full geometry; loops whose out and back halves overlap > 60% are

@@ -59,7 +59,7 @@ def main(argv=None) -> int:
     with open(a.scenarios, newline="") as f:
         scenarios = list(csv.DictReader(f))
     for scn in scenarios:
-        qp = query_params(scn, 4, 8, 48)
+        qp = query_params(scn, 4, 8, 72)
         qp["elevation_source"] = "brouter"
         _resp, top = svc.plan_scored(qp)
         c = top[0].cand

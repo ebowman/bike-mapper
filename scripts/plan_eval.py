@@ -1,7 +1,7 @@
 """Evaluate the planning modes (loop / out-and-back / one-way) on fixed scenarios.
 Run (BRouter must be up: `make brouter`):
   uv run scripts/plan_eval.py [--scenarios data/samples/plan_eval_scenarios.csv]
-      [--out data/samples/plan_eval.csv] [--n 4] [--bearings 8] [--max-calls 48]
+      [--out data/samples/plan_eval.csv] [--n 4] [--bearings 8] [--max-calls 72]
 Scenarios run sequentially through PlannerService.plan with default settings (the same code as /api/plan
 and the MCP); a failing scenario writes its error in the row and the run continues.
 length_hit = top route inside [min_km, max_km] (one-way: n/a). in_range = candidates kept after dedupe."""
@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 ROOT = Path(__file__).resolve().parent.parent
 COLUMNS = ["name", "mode", "objective", "return", "min_km", "max_km", "candidates_total", "in_range", "calls",
-           "wall_s", "top_id", "top_variant", "top_heading", "top_km", "ascent_m", "climb_score",
+           "wall_s", "top_id", "top_variant", "top_heading", "top_shape", "top_km", "ascent_m", "climb_score",
            "hardest_climb", "expected_stops", "turns", "longest_straight_km", "cycle_km", "length_hit",
            "baseline_warned", "notes", "error"]
 
@@ -65,7 +65,7 @@ def build_row(scn: dict, resp: dict | None, wall_s: float, error: str = "", base
     km = s["distance_km"]
     row.update(top_id=r["id"], top_variant=r["variant"],
                top_heading="" if p.get("heading_deg") is None else f"{p['heading_deg']:g}",
-               top_km=round(km, 1),
+               top_shape=p.get("shape") or "", top_km=round(km, 1),
                ascent_m="" if s["ascent_m"] is None else round(s["ascent_m"]),
                climb_score=round(s["climb_score"]), hardest_climb=climb_str(s["hardest_climb"]),
                expected_stops=round(s["expected_stops"], 2), turns=s["turns"],
@@ -113,7 +113,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=str(ROOT / "data/samples/plan_eval.csv"))
     ap.add_argument("--n", type=int, default=4)
     ap.add_argument("--bearings", type=int, default=8)
-    ap.add_argument("--max-calls", type=int, default=48)
+    ap.add_argument("--max-calls", type=int, default=72)
     a = ap.parse_args(argv)
 
     from flow_mcp import build_service

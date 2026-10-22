@@ -146,7 +146,10 @@ def test_max_calls_limits(index):
     c = app(index, cl)
     base = cl.n        # the startup health check goes through route()
     r = c.get(LOOP + "&max_calls=4")
-    assert cl.n - base <= 4 and r.status_code == 404 and "max_calls=4" in r.json()["detail"]
+    # the 4-call budget (2 for length targeting) still yields a partial plan: 200 with both budget notes
+    assert cl.n - base <= 4 and r.status_code == 200
+    notes = " ".join(r.json()["plan"]["notes"])
+    assert "length-targeting budget" in notes and "call budget max_calls=4 reached" in notes
 
 
 def test_route_endpoint_has_climb_stats(index):
@@ -293,8 +296,15 @@ def test_plan_keeps_warned_baseline_candidates_flagged(index):
     assert not any("dropped" in n for n in resp["plan"]["notes"])
     # delta_vs_fastest is filled for every route, including headings whose baseline carries a warning
     assert resp["routes"] and all(r["delta_vs_fastest"] is not None for r in resp["routes"])
-    flagged = [r for r in resp["routes"] if r["variant"] == "fastbike" and r["warnings"]]
-    assert flagged and all(any("path" in w or "footway" in w for w in r["warnings"]) for r in flagged)
+    # the warned baseline candidates are kept (not dropped) and carry the ride warning, the clean ones do not
+    from flowplan.explain import ride_warnings
+    flagged = [c for c in kept if c.variant == "fastbike" and ride_warnings(c.segments)]
+    assert flagged and {id(c) for c in flagged} == {id(c) for c in bad}
+    assert all(any("path" in w or "footway" in w for w in ride_warnings(c.segments)) for c in flagged)
+    # warnings on any baseline route that ranks into the top-n response are the path/footway kind
+    # (which ones rank depends on the stop model, so the response itself cannot be required to hold one)
+    assert all(any("path" in w or "footway" in w for w in r["warnings"])
+               for r in resp["routes"] if r["variant"] == "fastbike" and r["warnings"])
     assert all(not r["warnings"] for r in resp["routes"] if r["variant"] != "fastbike")
 
 
