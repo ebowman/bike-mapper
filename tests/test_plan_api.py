@@ -238,8 +238,8 @@ def test_ride_warnings_flags_unrideable_ways():
 
 
 class Segmented(Hilly):
-    """fastbike candidates on 'dirty' headings (first via-point lon bucket even) run over a path without
-    bicycle=yes; every other candidate is clean."""
+    """Baseline (flow_scale 0) candidates on 'dirty' headings (first via-point lon bucket even) carry a ride
+    warning (path without bicycle=yes); every other candidate is clean."""
     @staticmethod
     def dirty(points):
         return int(abs(points[1][0] * 1000)) % 2 == 0
@@ -247,11 +247,11 @@ class Segmented(Hilly):
     def route(self, points, profile="fastbike", alternativeidx=0, params=None):
         c, err = super().route(points, profile, alternativeidx, params)
         if c is not None:
-            if profile == "fastbike":  # distinct geometry so dedupe does not merge it into the flow candidate
+            base = (params or {}).get("flow_scale") == 0
+            if base:  # distinct geometry so dedupe does not merge it into the flow candidate
                 g = c.geometry
                 c.geometry = [g[0]] + [(x + 0.03, y + 0.03) for x, y in g[1:-1]] + [g[-1]]
-            tags = ({"highway": "path"} if profile == "fastbike" and self.dirty(points)
-                    else {"highway": "tertiary"})
+            tags = {"highway": "path"} if base and self.dirty(points) else {"highway": "tertiary"}
             c.segments = [{"lon": c.geometry[-1][0], "lat": c.geometry[-1][1], "dist_m": c.length_m,
                            "way_tags": tags, "node_cost": 0, "initial_cost": 0, "turn_cost": 0,
                            "cost_per_km": 1000.0, "time_s": c.time_s}]
@@ -259,8 +259,8 @@ class Segmented(Hilly):
 
 
 def _plan_capture(index, client):
-    """Run svc.plan_scored for the loop query and return (response, candidates handed to finish() after the
-    fastbike guard, candidates before it = the cached plan result)."""
+    """Run svc.plan_scored for the loop query and return (response, candidates handed to finish(),
+    candidates in the cached plan result)."""
     from flowplan.service import PlannerService
     svc = PlannerService.create("ireland", client=client, index=index, dem=Dem(paths=[]))
     seen = {}
@@ -281,40 +281,28 @@ def _dirty(c):
     return c.segments[0]["way_tags"]["highway"] == "path"
 
 
-def test_plan_drops_only_warned_fastbike_candidates(index):
+def test_plan_keeps_warned_baseline_candidates_flagged(index):
     resp, kept, before = _plan_capture(index, Segmented())
     assert before is not None
-    bad = [c for c in before if c.profile == "fastbike" and _dirty(c)]
-    clean_fast = [c for c in before if c.profile == "fastbike" and not _dirty(c)]
-    assert bad and clean_fast  # setup: both kinds exist among the planned candidates
-    assert [c for c in kept if c.profile == "fastbike" and _dirty(c)] == []
-    assert {id(c) for c in clean_fast} <= {id(c) for c in kept}  # clean fastbike kept
-    assert {id(c) for c in before if c.profile != "fastbike"} <= {id(c) for c in kept}  # flow untouched
-    assert len(kept) == len(before) - len(bad)
-    assert f"{len(bad)} stock-fastbike candidate(s) dropped" in " ".join(resp["plan"]["notes"])
-    # delta_vs_fastest: null where that heading's fastbike/alt0 was dropped, filled where it was kept
-    kept_fast_h = {c.plan["heading_deg"] for c in kept if c.profile == "fastbike" and c.alt == 0}
-    bad_h = {c.plan["heading_deg"] for c in bad if c.alt == 0} - kept_fast_h
-    assert bad_h
-    seen_null = seen_val = False
-    for r in resp["routes"]:
-        h = r["plan"]["heading_deg"]
-        if h in bad_h:
-            assert r["delta_vs_fastest"] is None
-            seen_null = True
-        elif h in kept_fast_h:
-            assert r["delta_vs_fastest"] is not None
-            seen_val = True
-    assert seen_null and seen_val
+    base = [c for c in before if c.variant == "fastbike"]
+    bad = [c for c in base if _dirty(c)]
+    assert bad and any(not _dirty(c) for c in base)  # setup: both kinds exist among the baseline candidates
+    assert {id(c) for c in before} == {id(c) for c in kept}  # nothing is dropped any more
+    assert not any("dropped" in n for n in resp["plan"]["notes"])
+    # delta_vs_fastest is filled for every route, including headings whose baseline carries a warning
+    assert resp["routes"] and all(r["delta_vs_fastest"] is not None for r in resp["routes"])
+    flagged = [r for r in resp["routes"] if r["variant"] == "fastbike" and r["warnings"]]
+    assert flagged and all(any("path" in w or "footway" in w for w in r["warnings"]) for r in flagged)
+    assert all(not r["warnings"] for r in resp["routes"] if r["variant"] != "fastbike")
 
 
-def test_plan_keeps_clean_fastbike_with_delta(index):
+def test_plan_baseline_delta_never_null(index):
     class AllClean(Segmented):
         @staticmethod
         def dirty(points):
             return False
 
     resp, kept, before = _plan_capture(index, AllClean())
-    assert len(kept) == len(before) and any(c.profile == "fastbike" for c in kept)
-    assert not any("dropped" in n for n in resp["plan"]["notes"])
+    assert len(kept) == len(before) and any(c.variant == "fastbike" for c in kept)
     assert resp["routes"] and all(r["delta_vs_fastest"] is not None for r in resp["routes"])
+    assert not any(r["warnings"] for r in resp["routes"] if r["variant"] == "fastbike")

@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 COLUMNS = ["name", "mode", "objective", "return", "min_km", "max_km", "candidates_total", "in_range", "calls",
            "wall_s", "top_id", "top_variant", "top_heading", "top_km", "ascent_m", "climb_score",
            "hardest_climb", "expected_stops", "turns", "longest_straight_km", "cycle_km", "length_hit",
-           "notes", "error"]
+           "baseline_warned", "notes", "error"]
 
 
 def _num(v):
@@ -42,12 +42,12 @@ def climb_str(c) -> str:
     return "-" if not c else f"{c['length_m'] / 1000:.1f}km/{c['gain_m']:.0f}m/{c['avg_grade_pct']:.1f}%"
 
 
-def build_row(scn: dict, resp: dict | None, wall_s: float, error: str = "") -> dict:
+def build_row(scn: dict, resp: dict | None, wall_s: float, error: str = "", baseline_warned=None) -> dict:
     """One output row from a scenario and the plan response (None on error)."""
     row = dict.fromkeys(COLUMNS, "")
     row.update(name=scn["name"], mode=scn["mode"], objective=scn["objective"], **{"return": scn["return"]},
                min_km=scn.get("min_km", ""), max_km=scn.get("max_km", ""), wall_s=round(wall_s, 1),
-               error=error)
+               error=error, baseline_warned="" if baseline_warned is None else baseline_warned)
     if resp is None:
         row["length_hit"] = "n/a" if scn["mode"] == "one_way" else ""
         return row
@@ -119,19 +119,31 @@ def main(argv=None) -> int:
     from flow_mcp import build_service
     from flowplan.service import ServiceError
     svc = build_service()
+    # 41w.15: the Fastest baseline (variant 'fastbike') is the flow profile and must never carry ride warnings;
+    # spy on finish() to count warned baseline candidates among ALL kept candidates, not just the returned top n
+    from flowplan.explain import ride_warnings
+    warned = {"n": 0}
+    orig_finish = svc.finish
+
+    def spy(st, kept, *args, **kw):
+        warned["n"] += sum(1 for c in kept if c.variant == "fastbike" and ride_warnings(c.segments))
+        return orig_finish(st, kept, *args, **kw)
+
+    svc.finish = spy
     with open(a.scenarios, newline="") as f:
         scenarios = list(csv.DictReader(f))
     rows = []
     for scn in scenarios:
         t0 = time.perf_counter()
         resp, err = None, ""
+        warned["n"] = 0
         try:
             resp = svc.plan(query_params(scn, a.n, a.bearings, a.max_calls))
         except ServiceError as e:
             err = f"{e.status}: {e.detail}"
         except Exception as e:  # noqa: BLE001 - keep going, record the failure
             err = f"{type(e).__name__}: {e}"
-        row = build_row(scn, resp, time.perf_counter() - t0, err)
+        row = build_row(scn, resp, time.perf_counter() - t0, err, warned["n"])
         rows.append(row)
         print(f"{scn['name']}: {row['wall_s']}s {row['top_km'] or '-'} km {err}", file=sys.stderr, flush=True)
     with open(a.out, "w", newline="") as f:
@@ -140,6 +152,11 @@ def main(argv=None) -> int:
         w.writerows(rows)
     print(markdown(rows))
     print("\n" + str(summarize(rows)))
+    total = sum(int(r["baseline_warned"] or 0) for r in rows)
+    print(f"baseline (fastbike) candidates with ride warnings: {total}")
+    if total:
+        print("ASSERTION FAILED: the flow-profile baseline carries ride warnings", file=sys.stderr)
+        return 1
     return 0
 
 

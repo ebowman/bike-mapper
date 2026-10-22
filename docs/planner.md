@@ -19,7 +19,7 @@ Open http://localhost:8081. Stop each server with Ctrl-C. `make planner-check` r
 ## Architecture
 
 1. `web/index.html` (Leaflet, served by the planner at `/`) calls `GET /api/route`.
-2. `scripts/flow_server.py` (FastAPI) asks BRouter for candidates: 4 variants x 4 alternatives = 16 requests. Variants: profile `fastbike`, and profile `flow` (`profiles/flow.brf`) at `profile:flow_scale` 0.5 (flow_lo), 1 (flow) and 2 (flow_hi); `alternativeidx` 0-3 for each.
+2. `scripts/flow_server.py` (FastAPI) asks BRouter for candidates: 4 variants x 4 alternatives = 16 requests. Variants (all profile `flow`, `profiles/flow.brf`): `fastbike` (label 'Fastest', the baseline, since 41w.15) at `profile:flow_scale` 0 with `lane_bonus` 1.0, `lane_exit_cost` 0, `turn_cost` 90 (stock fastbike's turncost), `cycleway_base` 1.0 and the six `cost_*` pinned to the profile defaults; then `flow_scale` 0.5 (flow_lo), 1 (flow) and 2 (flow_hi); `alternativeidx` 0-3 for each. The baseline's params are fixed in `flowplan.candidates.BASELINE_PARAMS` and win over the request's `lane_bonus`/`turn_cost`/`lane_exit_cost`/`cycleway_base`/cost settings, so it stays a stable comparison point, yet it obeys the same rideability rules as every other candidate (it used to be BRouter's stock `fastbike` profile).
 3. Near-duplicates are removed (within 20 m of each other over 90 % of the length).
 4. Each surviving candidate is scored outside BRouter: its geometry is matched to the flow index (`data/flow/ireland.index.csv`, directional stop events) and the stop model gives expected stops, stops per km and expected stopped seconds.
 5. Ranking: fewest expected stops first (ties: shorter first). Candidates longer than 1.3x the shortest candidate are dropped, unless that would leave fewer than 3, in which case the guard is ignored. The top `n` (1-6, default 4) are returned, each with its delta against the fastbike alternative 0.
@@ -71,7 +71,7 @@ By default (`router=base`) the server derives BRouter's node costs from the BASE
 
 Optional model parameters on `/api/route` (all validated; a bad value gives 400 naming the parameter):
 - `weights=prior|ireland|combined` (default: the server's model), `blend_with=<set>&blend=<0..1>` (linear blend of p and mean_stop_s from `weights` toward `blend_with`; the two must be given together), `p_<cause>=<0..1>` for any of the seven causes (applied last, after the blend).
-- `guard` (distance guard factor, 0 = off, max 3.0, default 1.3), `scales` (comma-separated `flow_scale` values for the flow variants, default `0.5,1,2`; each must be > 0 and <= 10; fastbike is always included), `n`, `refresh=1` (bypass the candidate cache), `router=base|table` (default `base`; which p-table the router's node costs derive from, see 'Router and scorer use the same table'; any other value gives 400).
+- `guard` (distance guard factor, 0 = off, max 3.0, default 1.3), `scales` (comma-separated `flow_scale` values for the flow variants, default `0.5,1,2`; each must be > 0 and <= 10; the flow_scale 0 'fastbike' baseline is always included), `n`, `refresh=1` (bypass the candidate cache), `router=base|table` (default `base`; which p-table the router's node costs derive from, see 'Router and scorer use the same table'; any other value gives 400).
 - `diversity` (0..1, default 0.7; 0 = off; ranking only, not in the cache key; 400 otherwise), see 'Ranking diversity' under the ranking notes below.
 - `turn_weight` (0..2, default 0.33; ranking only, not in the cache key; 400 otherwise), see 'Turns and straightness'.
 - `lane_bonus` (0.5..1.0, default 0.7; 1.0 = no lane preference), `turn_cost` (0..2000, default 400), `lane_exit_cost` (0..1000, default 150), `cycleway_base` (0.5..2.0, default 1.0) and `lanes_variant=1`, see 'Straightness' and 'Preferring cycle infrastructure'.
@@ -114,7 +114,7 @@ Eric's complaint: routes turn far too much (flow variants dodge signals through 
 - `cycleway_base` = 1.0 (was 1.3 for `highway=cycleway`, inherited from fastbike): paths are at parity with tertiary roads before `lane_bonus`.
 - `lane_bonus` = 0.7 (range 0.5..1.0).
 
-'Plain flow' preset (the pre-emq.27 behaviour apart from the cycleway base): `turn_cost` 150, `lane_exit_cost` 0, `lane_bonus` 1.0. The server applies all four to flow variants only (fastbike is untouched so the baseline stays comparable), always sends them explicitly, includes them in the cache key and echoes them in `settings`. UI: Settings 'Straightness' group (Penalise turns 0..1000, Stay on lanes 0..500, Prefer cycle infrastructure Off..x0.50), presets 'Straight & lanes' and 'Plain flow', hash keys `tc=`, `le=`, `lb=`, Reset all restores the defaults.
+'Plain flow' preset (the pre-emq.27 behaviour apart from the cycleway base): `turn_cost` 150, `lane_exit_cost` 0, `lane_bonus` 1.0. The server applies all four to the flow variants only (the Fastest baseline keeps its own fixed values, so it stays comparable), always sends them explicitly, includes them in the cache key and echoes them in `settings`. UI: Settings 'Straightness' group (Penalise turns 0..1000, Stay on lanes 0..500, Prefer cycle infrastructure Off..x0.50), presets 'Straight & lanes' and 'Plain flow', hash keys `tc=`, `le=`, `lb=`, Reset all restores the defaults.
 
 Verified live (InitialCost column of the geojson messages, Dublin and city pairs plus Wicklow): 7 of 7 lane/path -> ordinary-road transitions carried InitialCost 150, no lane entry or continuation carried any.
 
@@ -137,7 +137,7 @@ Limitation: BRouter cannot distinguish left from right turns, so `turn_cost` pen
 costfactor >= 1: BRouter neither rejects nor clamps a costfactor below 1 (verified live with a constant 0.5: `CostPerKm` 500 in the response, route cost halved), so the bonus is applied directly and tertiary roads with a lane really drop to 0.8. The theoretical downside is that a costfactor below 1 makes BRouter's air-distance heuristic optimistic, so a result can in principle be marginally non-optimal; the validated band is 0.5..1.0 and the UI offers 0.7..1.0.
 Per-metre caution: the bonus scales with distance, not per crossing. 0.8 over 10 km of eligible road saves about 2000 cost units, roughly 7 traffic signals at the 300 anchor, so a Strong setting (0.7) can trade a few signals for a noticeably longer, lane-following route. The distance guard still applies in the ranking.
 Tagging caveat: OSM lanes are tagged on only ~8% of Irish tertiary roads (`docs/research/osm-road-network.md`), so the preference only sees tagged infrastructure and `cycle_km` is a lower bound.
-API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not fastbike, which is the only variant without the lane preference; part of the cache key; echoed in `settings.lane_bonus`), `lanes_variant=1` adds a fifth variant `flow_lanes` (flow_scale 1.0, lane_bonus = max(0.5, requested lane_bonus - 0.2), so it is always stronger than the current setting; label "Flow+lanes"). UI: Settings 'Prefer cycle infrastructure' slider (Off .. Strongest = 0.5, default 0.7, step 0.05, re-routes) and 'Add a lanes-favouring route'; hash keys `lb=`, `lv=1`. Cards show km on cycle paths and on roads with lanes/tracks when non-zero.
+API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not the Fastest baseline, which is fixed at 1.0 (no lane preference); part of the cache key; echoed in `settings.lane_bonus`), `lanes_variant=1` adds a fifth variant `flow_lanes` (flow_scale 1.0, lane_bonus = max(0.5, requested lane_bonus - 0.2), so it is always stronger than the current setting; label "Flow+lanes"). UI: Settings 'Prefer cycle infrastructure' slider (Off .. Strongest = 0.5, default 0.7, step 0.05, re-routes) and 'Add a lanes-favouring route'; hash keys `lb=`, `lv=1`. Cards show km on cycle paths and on roads with lanes/tracks when non-zero.
 
 ## Rideability rules (41w.13)
 
@@ -150,7 +150,7 @@ API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not 
 
 Penalised, not forbidden: loose surfaces (`gravel|fine_gravel|compacted|unpaved`) on ordinary roads get costfactor x 3 on top of the existing unpaved penalties. `highway=cycleway` is also subject to the bike-access rule and to the any-way surface/smoothness rules (a cycleway tagged `surface=ground` is forbidden), and a gravel/compacted cycleway gets the same x3 loose-surface factor as a road.
 
-The stock `fastbike` comparison variant is not changed. In `/api/plan` and the MCP a fastbike candidate with any ride warning (`bicycle=no`, `highway=path|footway` without `bicycle=yes|designated`, or smoothness impassable/very_horrible/horrible) is dropped from the result (a plan note says how many); `delta_vs_fastest` is then null for that heading. As a guard against profile gaps every route carries `warnings` (`routes over unrideable ways: N km ...`) when any segment has `bicycle=no`, `smoothness` impassable/very_horrible/horrible, or `highway=path|footway` without `bicycle=yes|designated`; the UI card shows it in red and the MCP route table has a `warnings` column. Footways explicitly tagged `bicycle=yes` on a paved surface remain allowed (and are not warned).
+Since 41w.15 the `fastbike` comparison variant is the flow profile with flow_scale 0 (see the variants above), so it obeys these rules too and nothing is dropped from `/api/plan` or the MCP results any more (the interim 41w.13 rule that dropped warned stock-fastbike candidates is gone); `delta_vs_fastest` is non-null for every route. `scripts/plan_eval.py` asserts that no baseline candidate carries a ride warning on the 12 scenarios (0 of them did). As a guard against profile gaps every route carries `warnings` (`routes over unrideable ways: N km ...`) when any segment has `bicycle=no`, `smoothness` impassable/very_horrible/horrible, or `highway=path|footway` without `bicycle=yes|designated`; the UI card shows it in red and the MCP route table has a `warnings` column. Footways explicitly tagged `bicycle=yes` on a paved surface remain allowed (and are not warned).
 
 ## Regenerating the data
 
@@ -171,27 +171,27 @@ make flow-index      # data/osm/events_ireland.csv + ireland.osm.pbf -> data/flo
 
 ## Planner evaluation (emq.10, 2026-10-21)
 
-Ten fixed OD pairs (`data/samples/planner_od_pairs.csv`: 4 suburban, 3 Wicklow rural, 3 cross-town), each run through generate -> score -> rank (n=4) by `uv run scripts/planner_eval.py` against a local BRouter. Weight set: `prior` (default). Full rows: `data/samples/planner_eval.csv`. "fastbike" is the fastbike alt-0 candidate (kept whenever its request succeeds; it did for all pairs); "top" is rank 1. Deltas are top vs fastbike, negative = fewer stops.
+Ten fixed OD pairs (`data/samples/planner_od_pairs.csv`: 4 suburban, 3 Wicklow rural, 3 cross-town), each run through generate -> score -> rank (n=4) by `uv run scripts/planner_eval.py` against a local BRouter. Weight set: `prior` (default). Full rows: `data/samples/planner_eval.csv`. "fastbike" is the Fastest baseline alt-0 candidate (since 41w.15 the flow profile with flow_scale 0, lane_bonus 1, lane_exit_cost 0, turn_cost 90; kept whenever its request succeeds; it did for all pairs); "top" is rank 1. Deltas are top vs fastbike, negative = fewer stops.
 
 | pair | fastbike km | fastbike stops | top (variant/alt) | top km | top stops | d stops % | d km % | cands kept/total | wall s |
 |---|---|---|---|---|---|---|---|---|---|
-| rathfarnham_howth | 21.27 | 36.65 | flow_hi/0 | 24.9 | 6.76 | -81.6 | 17.1 | 16/16 | 11.69 |
-| dundrum_phoenixpark | 12.27 | 15.2 | flow_hi/0 | 15.27 | 6.22 | -59.1 | 24.5 | 15/16 | 9.04 |
-| blanchardstown_sandymount | 14.95 | 21.83 | flow/0 | 15.54 | 3.46 | -84.2 | 3.9 | 14/16 | 6.98 |
-| tallaght_malahide | 27.04 | 40.67 | flow_hi/2 | 32.53 | 15.34 | -62.3 | 20.3 | 14/16 | 14.35 |
-| bray_wicklowgap | 41.43 | 5.55 | flow/0 | 42.54 | 1.75 | -68.5 | 2.7 | 9/16 | 4.91 |
-| greystones_roundwood | 18.75 | 4.84 | fastbike/3 | 21.71 | 1.65 | -65.9 | 15.8 | 11/16 | 0.8 |
-| enniskerry_sallygap | 18.39 | 0.72 | fastbike/2 | 20.28 | 0.33 | -54.2 | 10.3 | 4/16 | 0.98 |
-| dunlaoghaire_clontarf | 14.73 | 17.11 | flow_hi/2 | 16.49 | 4.65 | -72.8 | 11.9 | 13/16 | 3.91 |
-| lucan_dalkey | 29.41 | 38.68 | flow_hi/3 | 34.02 | 8.57 | -77.8 | 15.7 | 16/16 | 13.28 |
-| swords_bray | 35.38 | 41.11 | flow/0 | 42.22 | 19.49 | -52.6 | 19.3 | 15/16 | 14.58 |
+| rathfarnham_howth | 21.99 | 19.4 | flow_lo/0 | 22.71 | 14.34 | -26.1 | 3.3 | 13/16 | 5.19 |
+| dundrum_phoenixpark | 12.1 | 15.2 | flow/0 | 12.94 | 11.77 | -22.6 | 6.9 | 15/16 | 3.15 |
+| blanchardstown_sandymount | 15.02 | 20.59 | flow_lo/1 | 16.99 | 10.27 | -50.1 | 13.1 | 13/16 | 4.32 |
+| tallaght_malahide | 26.47 | 38.99 | flow_hi/1 | 34.02 | 16.76 | -57.0 | 28.5 | 14/16 | 7.11 |
+| bray_wicklowgap | 41.34 | 5.61 | flow/0 | 42.51 | 1.69 | -69.9 | 2.8 | 10/16 | 3.19 |
+| greystones_roundwood | 18.71 | 0.91 | fastbike/0 | 18.71 | 0.91 | 0.0 | 0.0 | 10/16 | 0.71 |
+| enniskerry_sallygap | 18.39 | 0.72 | fastbike/1 | 21.26 | 0.39 | -45.8 | 15.6 | 4/16 | 0.89 |
+| dunlaoghaire_clontarf | 14.96 | 13.28 | flow_lo/0 | 15.44 | 11.66 | -12.2 | 3.2 | 11/16 | 2.83 |
+| lucan_dalkey | 29.09 | 39.89 | flow/0 | 30.65 | 18.45 | -53.7 | 5.4 | 16/16 | 8.46 |
+| swords_bray | 35.48 | 50.29 | flow/0 | 39.02 | 28.95 | -42.4 | 10.0 | 16/16 | 8.93 |
 
-- Mean delta stops: -67.9 %, median -67.2 %. Mean delta distance: +14.2 %.
-- Pairs where the top route is the fastbike alt-0 route: 0 of 10. (In greystones_roundwood and enniskerry_sallygap the top is fastbike alt 2/3, a different road than alt 0.)
-- No pair errors, no skipped BRouter requests. Re-run in tv5 with the final defaults (4 server threads, 4 client workers) after correcting the end points of bray_wicklowgap (now 53.0270,-6.4100, was 53.0120,-6.3990, ~1.8 km off the R756 summit) and enniskerry_sallygap (now 53.1370,-6.3140, was 53.1013,-6.3010, ~4 km south of the R759/R115 crossroads); other coordinates routed as given.
-- `combined` weights (`data/samples/planner_eval_combined.csv`): mean delta stops -74.8 %, median -73.4 %, mean delta distance +12.1 %; the rank-1 candidate is the same as under `prior` in 9 of 10 pairs (greystones_roundwood differs), so the ranking is not sensitive to the weight set, only the absolute percentages are.
+- Mean delta stops: -38.0 %, median -44.1 %. Mean delta distance: +8.9 %.
+- Pairs where the top route is the fastbike alt-0 route: 1 of 10 (greystones_roundwood: the baseline wins, delta 0). In enniskerry_sallygap the top is fastbike alt 1, a different road than alt 0.
+- No pair errors, no skipped BRouter requests. Re-run in 41w.15 (previous run: tv5, 2026-10-21, mean -67.9 % / median -67.2 % / +14.2 %). The shift has two causes. (1) The Fastest baseline is now the rideable flow profile with node costs off: its expected stops barely moved on most pairs (bray_wicklowgap 5.55 -> 5.61, enniskerry_sallygap 0.72 -> 0.72, dundrum 15.2 -> 15.2) but fell on pairs where stock fastbike used non-bike ways (rathfarnham_howth 36.65 -> 19.4, greystones_roundwood 4.84 -> 0.91, dunlaoghaire_clontarf 17.11 -> 13.28), and rose on swords_bray (41.11 -> 50.29). (2) The flow variants themselves changed since the previous run (emq.27 straightness defaults turn_cost 400 / lane_bonus 0.7, 41w.13 rideability rules), so the top routes are longer-straighter and not as stop-minimal (e.g. rathfarnham_howth top 6.76 -> 14.34 stops, dunlaoghaire_clontarf 4.65 -> 11.66). This run does not separate the two; the previous percentages are not comparable.
+- `combined` weights (`data/samples/planner_eval_combined.csv`): mean delta stops -37.8 %, median -45.9 %, mean delta distance +8.1 %; the rank-1 candidate is the same as under `prior` in 7 of 10 pairs (different: tallaght_malahide, dunlaoghaire_clontarf, lucan_dalkey), so the ranking is moderately sensitive to the weight set on the pairs where candidates are close.
 
-Interpretation: in the suburbs and cross-town the planner finds large cuts (50-85 % fewer expected stops) for 4-24 % more distance, because fastbike goes straight through signalled junctions that the flow profile detours around. In rural Wicklow the absolute gain is small (fastbike already has 0.03-0.26 stops/km, e.g. 0.72 expected stops over 25 km for enniskerry_sallygap), so the large percentage is a small number of stops and the planner adds little in practice there. These are model-predicted stops from the stop model, not measured rides, and the `prior` percentages depend on its signal probability of 0.40.
+Interpretation: in the suburbs and cross-town the planner finds cuts of 0-70 % in expected stops for 0-28 % more distance (2026-10-22 run with the rideability-compliant baseline; the earlier 50-85 % figures used the stock fastbike baseline), because the baseline goes straight through signalled junctions that the flow profile detours around. In rural Wicklow the absolute gain is small (fastbike already has 0.03-0.26 stops/km, e.g. 0.72 expected stops over 25 km for enniskerry_sallygap), so the large percentage is a small number of stops and the planner adds little in practice there. These are model-predicted stops from the stop model, not measured rides, and the `prior` percentages depend on its signal probability of 0.40.
 
 Caveat found while evaluating (fixed in tv5): `run_brouter.sh serve` used 2 server threads while the planner requests candidates with 4 client threads; on 20-50 km pairs BRouter's "thread-priority-watchdog" killed queued requests (10-13 of 16 skipped in a first run with 4 workers). The server now runs 4 threads (`THREADS` in `run_brouter.sh`), matching `DEFAULT_WORKERS = 4` in `flowplan/candidates.py` (used by `flow_server.py` and `planner_eval.py`). Keep client workers <= server threads. `flow_server` logs a WARNING for every skipped request.
 

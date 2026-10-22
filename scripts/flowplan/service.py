@@ -89,6 +89,8 @@ def parse_scales(s: str) -> tuple:
         try:
             f = float(part)
             validate_params({"flow_scale": f})
+            if f <= 0:  # 0 is reserved for the fixed Fastest baseline variant
+                raise ValueError(f"flow_scale must be > 0 for 'scales', got {part!r}")
         except ValueError as e:
             raise ServiceError(400, f"'scales': {e}") from None
         if f not in out:
@@ -280,7 +282,7 @@ class PlannerService:
             straight[name] = v
         costs = (base_model if router == "base" else m).brouter_costs()
         profile_params = dict(costs)
-        # emq.27: always sent explicitly (flow variants only; generate() leaves fastbike untouched), so the
+        # emq.27: always sent explicitly (the baseline variant overrides them with its own fixed params), so the
         # server defaults and the profile defaults cannot drift apart silently
         profile_params.update(straight)
         for ck, cv in costs.items():
@@ -444,13 +446,6 @@ class PlannerService:
         if hit is None:
             self.log_skipped(skipped)
         notes = list(notes)
-        # 41w.13: the stock fastbike baseline knows nothing about road-bike rideability; never offer it as a plan
-        # result when it runs over paths/footways/bicycle=no ways (flow routes are guarded by the profile and only warned)
-        bad_fast = [c for c in kept if c.profile == "fastbike" and ride_warnings(c.segments)]
-        if bad_fast:
-            kept = [c for c in kept if c not in bad_fast]
-            notes.append(f"{len(bad_fast)} stock-fastbike candidate(s) dropped: they ran over paths/footways or "
-                         "bicycle=no ways")
         if mode == "loop" and end is not None:
             notes.append("'to' is ignored for loops")
         if not kept:

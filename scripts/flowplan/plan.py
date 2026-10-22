@@ -128,8 +128,7 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     if not variants or not alts:
         raise ValueError("need at least one variant and one alt")
     if profile_params:
-        variants = tuple(v if v.profile == "fastbike" else Variant(v.name, v.profile, {**profile_params, **v.params})
-                         for v in variants)
+        variants = tuple(Variant(v.name, v.profile, {**profile_params, **v.params}) for v in variants)
     for v in variants:
         validate_params(v.params)
     res = PlanResult()

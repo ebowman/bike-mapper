@@ -25,8 +25,16 @@ class Variant:
     params: dict = field(default_factory=dict, hash=False)
 
 
+# 41w.15: the "Fastest" baseline is the flow profile with node costs off (flow_scale 0), so it obeys the same
+# rideability rules as every other candidate. Every key the server sends per request is fixed here explicitly
+# (a variant's own params win over profile_params), so request lane_bonus/turn_cost/costs never leak into it.
+# cycleway_base stays at the profile default 1.0 (parity rules); turn_cost 90 = stock fastbike's turncost.
+BASELINE_PARAMS = {"flow_scale": 0, "lane_bonus": 1.0, "lane_exit_cost": 0, "turn_cost": 90, "cycleway_base": 1.0,
+                   "cost_signal": 300, "cost_xing_signal": 300, "cost_give_way": 80, "cost_stop": 60,
+                   "cost_mini_rb": 80, "cost_rb_entry": 150}
+
 DEFAULT_VARIANTS = (
-    Variant("fastbike", "fastbike"),
+    Variant("fastbike", "flow", dict(BASELINE_PARAMS)),
     Variant("flow_lo", "flow", {"flow_scale": 0.5}),
     Variant("flow", "flow", {"flow_scale": 1.0}),
     Variant("flow_hi", "flow", {"flow_scale": 2.0}),
@@ -88,14 +96,12 @@ def generate(client: BRouterClient, start, end, variants=DEFAULT_VARIANTS, alts=
              profile_params: dict | None = None):
     """Return (kept, dropped, skipped). skipped = [{variant, alt, error}] for failed
     requests; BRouterUnavailable propagates. profile_params (e.g. cost_* from
-    StopModel.brouter_costs) are merged into every non-fastbike variant's params (a variant's own params win). start == end yields no candidates."""
+    StopModel.brouter_costs) are merged into every variant's params (a variant's own params win, so the baseline keeps its fixed ones). start == end yields no candidates."""
     start, end = (float(start[0]), float(start[1])), (float(end[0]), float(end[1]))
     if start == end:
         return [], [], []
     if profile_params:
-        variants = tuple(v if v.profile == "fastbike" else
-                         Variant(v.name, v.profile, {**profile_params, **v.params})
-                         for v in variants)
+        variants = tuple(Variant(v.name, v.profile, {**profile_params, **v.params}) for v in variants)
     for v in variants:
         validate_params(v.params)
     jobs = [(v, a) for v in variants for a in alts]

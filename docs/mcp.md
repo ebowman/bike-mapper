@@ -58,19 +58,20 @@ Tests: `uv run pytest tests/test_mcp.py` (tools called in-process with a fake BR
 
 | name | candidates_total | in_range | calls | wall_s | top_id | top_km | ascent_m | climb_score | hardest_climb | expected_stops | turns | longest_straight_km | cycle_km | length_hit |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| loop_rath_40_50_flow | 19 | 19 | 39 | 12.8 | flow_hi@180.4/alt0 | 47.9 | 406 | 198 | 2.5km/193m/7.8% | 29.69 | 65 | 4.5 | 17.0 | yes |
-| loop_rath_40_50_climb | 23 | 19 | 41 | 10.6 | flow@150.0/alt0 | 45.5 | 769 | 478 | 2.0km/138m/6.8% | 25.85 | 50 | 5.9 | 16.8 | yes |
-| loop_rath_40_50_flat | 23 | 23 | 40 | 11.2 | fastbike@15.5/alt0 | 42.3 | 155 | 0 | - | 74.89 | 38 | 1.4 | 18.7 | yes |
-| loop_rath_70_85_flow | 20 | 20 | 43 | 17.0 | flow_hi@315.7/alt0 | 83.8 | 862 | 300 | 2.4km/151m/6.2% | 38.83 | 92 | 10.2 | 29.4 | yes |
-| loop_rath_70_85_climb | 14 | 14 | 38 | 10.8 | flow_hi@195.4/alt0 | 80.7 | 1298 | 553 | 2.6km/183m/7.1% | 25.6 | 56 | 7.4 | 15.2 | yes |
-| loop_rath_70_85_flat | 18 | 18 | 36 | 14.8 | fastbike@15.4/alt0 | 75.3 | 266 | 0 | - | 119.21 | 48 | 1.7 | 28.7 | yes |
-| oab_rath_sallygap_flow | 4 | 4 | 4 | 0.8 | flow@185.294.0/alt0 | 46.0 | 792 | 432 | 5.6km/312m/5.6% | 7.34 | 19 | 13.8 | 4.7 | no |
-| oab_rath_sallygap_climb | 4 | 4 | 4 | 0.8 | flow_lo@185.294.0/alt0 | 43.8 | 802 | 454 | 4.7km/288m/6.2% | 10.1 | 19 | 13.8 | 4.0 | no |
-| oab_clontarf_30_40_flat | 19 | 19 | 48 | 13.3 | flow_lo@105.2/alt0 | 36.0 | 19 | 0 | - | 10.83 | 28 | 10.8 | 5.6 | yes |
-| oneway_lucan_dalkey_flow | 3 | 2 | 4 | 1.3 | flow/alt0 | 30.5 | 95 | 0 | - | 18.97 | 39 | 7.0 | 10.3 | n/a |
-| oneway_lucan_dalkey_flat | 3 | 2 | 4 | 1.6 | flow/alt0 | 30.5 | 95 | 0 | - | 18.97 | 39 | 7.0 | 10.3 | n/a |
-| loop_enniskerry_50_60_climb | 16 | 8 | 38 | 14.3 | flow@240.7/alt0 | 56.2 | 1166 | 734 | 3.5km/244m/6.9% | 1.99 | 19 | 13.8 | 0.0 | yes |
+| loop_rath_40_50_flow | 26 | 26 | 39 | 13.5 | flow_hi@180.4/alt0 | 47.9 | 406 | 198 | 2.5km/193m/7.8% | 29.69 | 65 | 4.5 | 17.0 | yes |
+| loop_rath_40_50_climb | 31 | 27 | 41 | 12.0 | fastbike@150.0/alt0 | 45.2 | 778 | 479 | 2.0km/139m/6.8% | 29.81 | 35 | 7.5 | 16.1 | yes |
+| loop_rath_40_50_flat | 30 | 30 | 40 | 12.9 | fastbike@15.1/alt0 | 41.1 | 156 | 0 | - | 77.09 | 27 | 1.1 | 25.0 | yes |
+| loop_rath_70_85_flow | 24 | 24 | 43 | 16.9 | flow_hi@315.7/alt0 | 83.8 | 862 | 300 | 2.4km/151m/6.2% | 38.83 | 92 | 10.2 | 29.4 | yes |
+| loop_rath_70_85_climb | 16 | 15 | 38 | 10.2 | flow_hi@195.4/alt0 | 80.7 | 1298 | 553 | 2.6km/183m/7.1% | 25.6 | 56 | 7.4 | 15.2 | yes |
+| loop_rath_70_85_flat | 21 | 21 | 36 | 13.6 | fastbike@15.4/alt0 | 75.2 | 264 | 0 | - | 113.69 | 45 | 1.9 | 35.3 | yes |
+| oab_rath_sallygap_flow | 4 | 4 | 4 | 0.6 | flow@185.294.0/alt0 | 46.0 | 792 | 432 | 5.6km/312m/5.6% | 7.34 | 19 | 13.8 | 4.7 | no |
+| oab_rath_sallygap_climb | 4 | 4 | 4 | 0.6 | flow_lo@185.294.0/alt0 | 43.8 | 802 | 454 | 4.7km/288m/6.2% | 10.1 | 19 | 13.8 | 4.0 | no |
+| oab_clontarf_30_40_flat | 22 | 22 | 48 | 5.9 | flow_lo@105.2/alt0 | 36.0 | 19 | 0 | - | 10.83 | 28 | 10.8 | 5.6 | yes |
+| oneway_lucan_dalkey_flow | 4 | 3 | 4 | 0.8 | flow/alt0 | 30.5 | 95 | 0 | - | 18.97 | 39 | 7.0 | 10.3 | n/a |
+| oneway_lucan_dalkey_flat | 4 | 3 | 4 | 0.8 | flow/alt0 | 30.5 | 95 | 0 | - | 18.97 | 39 | 7.0 | 10.3 | n/a |
+| loop_enniskerry_50_60_climb | 20 | 10 | 38 | 3.6 | flow@240.7/alt0 | 56.2 | 1166 | 734 | 3.5km/244m/6.9% | 1.99 | 19 | 13.8 | 0.0 | yes |
 
+- Re-run for 41w.15 (the Fastest baseline is now the flow profile with flow_scale 0 instead of stock fastbike; the old table is the 41w.13 run). Length hit unchanged at 8/10 judged scenarios (loops 6/6, Clontarf 1/1, Sally Gap out-and-back 0/2). Top routes: 9 of 12 identical; changed: loop_rath_40_50_climb (flow 45.5 km / 769 m / 25.85 stops -> fastbike baseline 45.2 km / 778 m / 29.81 stops), loop_rath_40_50_flat (42.3 -> 41.1 km, 74.9 -> 77.1 stops) and loop_rath_70_85_flat (75.3 -> 75.2 km, 119.2 -> 113.7 stops). Candidate counts rose (e.g. 40-50 flat 23 -> 30 total) because the baseline now yields more usable routes. Baseline candidates with ride warnings across all kept candidates: 0 (asserted by the script, column `baseline_warned`). The 'dropped stock-fastbike' note and null `delta_vs_fastest` no longer occur.
 - Re-run after the rideability fix (41w.13; the first run of this table, before it, had a 55.6 km / 1728 m Enniskerry row). 11 of 12 top routes changed (only the Sally Gap climb out-and-back is identical), because the profile now forbids a lot of off-road and `bicycle=no` ways and the stock fastbike candidates that used them are dropped from plan results; the length-hit rate is unchanged at 8/10 judged scenarios (loops 6/6, Clontarf out-and-back 1/1, Sally Gap out-and-back 0/2; one-way n/a). Mean wall time per mode: loop 13.1 s, out-and-back 5.0 s (Clontarf 13.3 s, Sally Gap 0.8 s), one-way 1.5 s. No scenario errored or returned zero routes.
 - Loops still close and land in range every time, but only after BRouter rescaling: fewer candidates survive than before (e.g. Enniskerry 16 total / 8 kept, was 28 / 17; Rathfarnham 70-85 climb 14 / 14, was 23 / 23) and the loops use 36-43 of the 48 calls.
 - Climb mode still finds more ascent than flow for the same range: 769 vs 406 m (40-50 km) and 1298 vs 862 m (70-85 km), climb scores 478/553 vs 198/300, with fewer expected stops than before on the short loop (25.9 vs 29.7). Flat mode gives near-zero ascent (155 and 266 m) but the most stops (74.9 and 119.2), because the winners are fastbike urban routes. The Enniskerry climb loop is now on rideable ways: 56.2 km, 1166 m ascent, climb score 734 (was 1574), hardest climb 3.5 km / 244 m / 6.9 % (was 2.6 km / 416 m / 16.2 %, on `highway=path` ways with `surface=ground`, `bicycle=no`, `smoothness=impassable`), 19 turns, 1.99 expected stops, no km on cycle infrastructure. Debug segments of every top route in the 12 scenarios show no `bicycle=no|dismount|private|use_sidepath`, no impassable/very_horrible/horrible/very_bad smoothness, no ground/mud/sand/grass/dirt/earth surfaces and no `highway=track`; the only path/footway segments left are footways explicitly tagged `bicycle=yes` on a paved surface (at most 0.1 km per route). BRouter's whole-route ascent and the DEM's still disagree on that kind of route (follow-up bead bike-mapper-41w.14), so climb scores computed on BRouter elevations are indicative only.

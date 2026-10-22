@@ -50,9 +50,12 @@ serve() {   # foreground; Ctrl-C or kill to stop
 route() {   # needs server running; optional output dir ($1, default data/samples)
   local out=${1:-data/samples}; mkdir -p "$out"
   local url="http://localhost:$PORT/brouter?alternativeidx=0&format=gpx"
-  curl -sf "$url&profile=fastbike&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-baseline.gpx
+  # 41w.15: the "Fastest" baseline is the flow profile with node costs off (same definition as the planner's
+  # fastbike variant: flow_scale 0, lane_bonus 1, lane_exit_cost 0, turn_cost 90), so it obeys the rideability rules
+  local base="profile=flow&profile:flow_scale=0&profile:lane_bonus=1&profile:lane_exit_cost=0&profile:turn_cost=90"
+  curl -sf "$url&$base&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-baseline.gpx
   curl -sf "$url&profile=flow&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-flow.gpx
-  curl -sf "$url&profile=fastbike&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-baseline.gpx
+  curl -sf "$url&$base&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-baseline.gpx
   curl -sf "$url&profile=flow&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-flow.gpx
   # flow_lo / flow_hi: same flow profile with flow_scale overridden per request (0.5 / 2.0; default 1.0)
   local w="lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" d="lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560"

@@ -69,8 +69,8 @@ def validate_params(params: dict | None) -> dict:
                 f = float(v)
             except (TypeError, ValueError):
                 raise ValueError(f"flow_scale must be numeric, got {v!r}") from None
-            if not math.isfinite(f) or f <= 0 or f > MAX_FLOW_SCALE:
-                raise ValueError(f"flow_scale must be finite, > 0 and <= {MAX_FLOW_SCALE}, got {v!r}")
+            if not math.isfinite(f) or f < 0 or f > MAX_FLOW_SCALE:
+                raise ValueError(f"flow_scale must be finite, >= 0 and <= {MAX_FLOW_SCALE}, got {v!r}")
         elif k == "lane_bonus":
             try:
                 f = float(v)

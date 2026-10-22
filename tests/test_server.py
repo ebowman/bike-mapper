@@ -235,8 +235,8 @@ def test_lane_bonus_applied_to_flow_variants_only(index):
             return super().route(points, profile, alternativeidx, params)
 
     app_client(index, Rec()).get(f"/api/route?{Q}&lane_bonus=0.7")
-    assert all(p.get("lane_bonus") == 0.7 for prof, p in seen if prof == "flow")
-    assert all("lane_bonus" not in p for prof, p in seen if prof == "fastbike")
+    assert all(p.get("lane_bonus") == 0.7 for prof, p in seen if p.get("flow_scale", 0) != 0)
+    assert all(p.get("lane_bonus") == 1.0 for prof, p in seen if p.get("flow_scale") == 0)  # baseline fixed
 
 
 def test_lanes_variant_added_when_requested(index):
@@ -254,13 +254,13 @@ def test_lanes_variant_added_when_requested(index):
     seen.clear()
     j = c.get(f"/api/route?{Q}&lanes_variant=1&refresh=1").json()
     assert j["candidates_total"] == 20 and j["settings"]["lanes_variant"] is True
-    assert sorted({p["lane_bonus"] for _, p in seen if "lane_bonus" in p}) == [0.5, 0.7]  # base 0.7, lanes variant 0.5
+    assert sorted({p["lane_bonus"] for _, p in seen if p["flow_scale"] != 0}) == [0.5, 0.7]  # base 0.7, lanes variant 0.5
     seen.clear()
     c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.9&refresh=1")
-    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.7, 0.9}  # 0.9 base, lanes variant 0.7
+    assert {p["lane_bonus"] for _, p in seen if p["flow_scale"] != 0} == {0.7, 0.9}  # 0.9 base, lanes variant 0.7
     seen.clear()
     c.get(f"/api/route?{Q}&lanes_variant=1&lane_bonus=0.6&refresh=1")
-    assert {p["lane_bonus"] for _, p in seen if "lane_bonus" in p} == {0.5, 0.6}
+    assert {p["lane_bonus"] for _, p in seen if p["flow_scale"] != 0} == {0.5, 0.6}
 
 
 @pytest.mark.parametrize("v", ["0.4", "1.1", "abc", "nan", "inf"])
@@ -328,14 +328,15 @@ def test_straightness_params_flow_only_echo_and_cache(index):
     st = j["settings"]
     assert (st["turn_cost"], st["lane_exit_cost"], st["cycleway_base"], st["lane_bonus"]) == (400, 150, 1.0, 0.7)
     for prof, p in seen:
-        if prof == "flow":
+        if p["flow_scale"] != 0:
             assert (p["turn_cost"], p["lane_exit_cost"], p["cycleway_base"]) == (400, 150, 1.0)
-        else:
-            assert not {"turn_cost", "lane_exit_cost", "cycleway_base", "lane_bonus"} & set(p)
+        else:  # Fastest baseline keeps its own fixed params
+            assert (p["turn_cost"], p["lane_exit_cost"], p["cycleway_base"], p["lane_bonus"]) == (90, 0, 1.0, 1.0)
     seen.clear()
     j2 = c.get(f"/api/route?{Q}&turn_cost=150&lane_exit_cost=0&lane_bonus=1.0").json()
     assert j2["cached"] is False and j2["settings"]["turn_cost"] == 150
-    assert {p["turn_cost"] for prof, p in seen if prof == "flow"} == {150}
+    assert {p["turn_cost"] for prof, p in seen if p["flow_scale"] != 0} == {150}
+    assert {p["turn_cost"] for prof, p in seen if p["flow_scale"] == 0} == {90}
     assert c.get(f"/api/route?{Q}&turn_cost=150&lane_exit_cost=0&lane_bonus=1.0").json()["cached"] is True
     assert c.get(f"/api/route?{Q}&turn_cost=151&lane_exit_cost=0&lane_bonus=1.0").json()["cached"] is False
 
