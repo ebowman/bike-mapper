@@ -30,6 +30,9 @@ planner-setup:
 brouter:
 	scripts/run_brouter.sh serve
 
+planner-profiles:
+	scripts/run_brouter.sh profiles
+
 planner:
 	@echo "Planner: http://localhost:8081"
 	uv run scripts/flow_server.py --port 8081
@@ -39,7 +42,7 @@ planner-check:
 	uvx ruff check scripts/ tests/
 	$(MAKE) ui-check
 
-.PHONY: planner-setup brouter planner planner-check
+.PHONY: planner-setup brouter planner planner-check planner-profiles
 
 # Cycle infrastructure overlay for the planner map (needs data/osm/ireland.osm.pbf; ~40 s). See docs/planner.md.
 cycle-overlay:

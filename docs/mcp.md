@@ -5,7 +5,7 @@
 ## Setup
 
 1. `make setup` (`uv sync`; installs `mcp<2`, the FastMCP API of the 1.x line) and, once, `make planner-setup` (BRouter tiles + flow index).
-2. BRouter must be running: `make brouter` in a terminal, or call the `start_brouter` tool (spawns `scripts/run_brouter.sh serve`, log in `$TMPDIR/flow-brouter.log`, waits up to 60 s).
+2. BRouter must be running: `make brouter` in a terminal, or call the `start_brouter` tool (spawns `scripts/run_brouter.sh serve`, log in `$TMPDIR/flow-brouter.log`, waits up to 60 s). Serve first syncs `profiles/flow*.brf` into BRouter's profiles2 dir; a running server picks up later profile edits after `make planner-profiles`, no restart needed.
 3. Registration is the project-scoped `.mcp.json` at the repo root:
 
 ```json

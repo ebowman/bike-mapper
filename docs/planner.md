@@ -14,6 +14,8 @@ make brouter         # terminal 1, foreground: BRouter on http://localhost:17777
 make planner         # terminal 2, foreground: planner on http://localhost:8081
 ```
 
+BRouter serves profiles from a copy in `data/brouter/dist/brouter-1.7.10/profiles2/`, not from `profiles/`. `make brouter` (at start) and `make planner-profiles` (any time) sync `profiles/flow*.brf` into it. BRouter 1.7.10 re-reads a changed profile file without a restart (verified: editing the copy's `flow_scale` default to 0 changed the next request's cost 26752 -> 19090 and length 13467 -> 13035 m, matching `&profile:flow_scale=0`), so after editing `profiles/flow.brf` run `make planner-profiles`; cached planner candidates still need `refresh=1`.
+
 Open http://localhost:8081. Stop each server with Ctrl-C. `make planner-check` runs pytest, ruff and the UI syntax check (`make ui-check`).
 
 ## Architecture

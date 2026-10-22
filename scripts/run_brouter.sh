@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reproduce the BRouter hands-on (dhy.8). Usage: scripts/run_brouter.sh [setup|serve|route]
+# Reproduce the BRouter hands-on (dhy.8). Usage: scripts/run_brouter.sh [setup|serve|route|profiles]
 # All downloads go under data/brouter/ (gitignored).
 #
 # Segments: PRE-BUILT rd5 tiles from brouter.de are used instead of a local build from
@@ -18,6 +18,11 @@ SEG=$B/segments
 PORT=17777
 PROFDIR=$PWD/$DIST/profiles2
 
+profiles() {   # sync profiles/flow*.brf into the dir the running BRouter reads (PROFDIR)
+  [ -d $DIST/profiles2 ] || { echo "run setup first" >&2; exit 1; }
+  cp profiles/flow*.brf $DIST/profiles2/
+}
+
 setup() {
   mkdir -p $SEG $B/dl $B/dist data/samples
   for t in W10_N50 W10_N55; do
@@ -31,7 +36,7 @@ setup() {
   # flow_lo / flow_hi are NOT separate files: RouteServer 1.7.10 accepts per-request overrides of profile
   # variables as '&profile:<var>=<value>' (verified: &profile=flow&profile:flow_scale=0.5 / 2.0 change the route),
   # so one profile + the flow_scale multiplier gives all three variants. Copy every flow*.brf anyway.
-  cp profiles/flow*.brf $DIST/profiles2/
+  profiles
   mkdir -p $B/customprofiles
 }
 
@@ -43,6 +48,7 @@ setup() {
 THREADS=4
 
 serve() {   # foreground; Ctrl-C or kill to stop
+  profiles
   exec java -Xmx1g -cp $DIST/brouter-$VER-all.jar btools.server.RouteServer \
     $SEG $PROFDIR $PWD/$B/customprofiles $PORT $THREADS
 }
