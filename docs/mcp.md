@@ -51,3 +51,28 @@ Garmin Connect (web): Training & Planning > Courses > Import, choose the `.gpx`,
 - Nominatim usage: one request per second, descriptive User-Agent; only used when a place name is given.
 
 Tests: `uv run pytest tests/test_mcp.py` (tools called in-process with a fake BRouter; a stdio smoke test starts the server with the mcp client; `RUN_NETWORK_TESTS=1` enables the geocode test).
+
+## Planning modes evaluation (41w.9, 2026-10-22)
+
+`uv run scripts/plan_eval.py` runs 12 scenarios from `data/samples/plan_eval_scenarios.csv` sequentially through `PlannerService.plan` (n=4, bearings=8, max_calls=48, default settings, real BRouter and the DEM tile) and writes `data/samples/plan_eval.csv`. `in_range` = candidates kept after dedupe/length filtering; the table shows the top-ranked route. The Clontarf scenario asks for `return=free`; the rest use `same`. The Sandymount flat loop was not included (the Rathfarnham flat loops cover flat loops).
+
+| name | candidates_total | in_range | calls | wall_s | top_id | top_km | ascent_m | climb_score | hardest_climb | expected_stops | turns | longest_straight_km | cycle_km | length_hit |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| loop_rath_40_50_flow | 23 | 23 | 36 | 14.9 | flow_hi@270.6/alt0 | 48.0 | 505 | 257 | 2.0km/140m/6.8% | 27.43 | 61 | 2.6 | 22.9 | yes |
+| loop_rath_40_50_climb | 31 | 30 | 41 | 11.9 | fastbike@210.6/alt0 | 48.2 | 755 | 424 | 2.0km/140m/6.8% | 36.74 | 52 | 2.1 | 7.0 | yes |
+| loop_rath_40_50_flat | 26 | 26 | 39 | 17.0 | fastbike@15.1/alt0 | 40.6 | 146 | 0 | - | 69.56 | 35 | 1.4 | 18.3 | yes |
+| loop_rath_70_85_flow | 28 | 28 | 41 | 31.6 | flow_hi@180.4/alt0 | 80.0 | 625 | 284 | 5.6km/314m/5.6% | 30.09 | 81 | 7.6 | 34.9 | yes |
+| loop_rath_70_85_climb | 23 | 23 | 43 | 23.4 | flow@165.0/alt0 | 78.7 | 1344 | 856 | 2.8km/297m/10.7% | 29.42 | 76 | 5.1 | 18.4 | yes |
+| loop_rath_70_85_flat | 31 | 31 | 40 | 29.7 | fastbike@15.4/alt0 | 73.8 | 291 | 0 | - | 117.28 | 54 | 1.7 | 26.9 | yes |
+| oab_rath_sallygap_flow | 4 | 4 | 4 | 0.8 | flow_hi@185.294.0/alt0 | 46.0 | 792 | 437 | 5.6km/314m/5.6% | 6.7 | 19 | 13.8 | 4.7 | no |
+| oab_rath_sallygap_climb | 4 | 4 | 4 | 0.8 | flow_lo@185.294.0/alt0 | 43.8 | 802 | 454 | 4.7km/288m/6.2% | 10.1 | 19 | 13.8 | 4.0 | no |
+| oab_clontarf_30_40_flat | 21 | 21 | 48 | 10.1 | fastbike@90.1/alt0 | 32.5 | 14 | 0 | - | 15.77 | 7 | 6.4 | 5.7 | yes |
+| oneway_lucan_dalkey_flow | 4 | 3 | 4 | 1.6 | flow/alt0 | 31.6 | 91 | 0 | - | 13.47 | 39 | 5.5 | 19.7 | n/a |
+| oneway_lucan_dalkey_flat | 4 | 3 | 4 | 1.7 | flow/alt0 | 31.6 | 91 | 0 | - | 13.47 | 39 | 5.5 | 19.7 | n/a |
+| loop_enniskerry_50_60_climb | 28 | 17 | 40 | 7.5 | flow_hi@240.3/alt0 | 55.6 | 1728 | 1574 | 2.6km/416m/16.2% | 2.39 | 31 | 6.4 | 1.1 | yes |
+
+- Length-hit rate: 8/10 judged scenarios (loops 6/6, Clontarf out-and-back 1/1, Sally Gap out-and-back 0/2; one-way n/a). Mean wall time per mode: loop 19.4 s, out-and-back 3.9 s (Clontarf 10.1 s, Sally Gap 0.8 s), one-way 1.6 s. No scenario errored or returned zero routes.
+- Loops close and land in range every time, but only after BRouter rescaling: many candidates are dropped ("length X km outside range", or "after 3 iterations" for the 50-60 km Enniskerry climb loop: 28 total, 17 kept), and the loops use 36-43 of the 48 calls. The longest loops (70-85 km) are slowest (23-32 s).
+- Climb mode does find more ascent than flow for the same range: 755 vs 505 m (40-50 km) and 1344 vs 625 m (70-85 km), climb scores 424/856 vs 257/284, at the price of more expected stops (36.7 vs 27.4 on the short loop). Flat mode gives near-zero ascent (146 and 291 m) but the most stops (69.6 and 117.3), because the winners are fastbike urban routes. The Enniskerry climb loop reports 1728 m in 55.6 km, including a 16 % climb (km 20.6-23.2, 2.6 km / 416 m), but that result is not trustworthy as a road-bike route: the climb is real terrain per the DEM (420 m gain; 27-29 % sustained over 500 m) but runs on highway=path ways tagged surface=ground, foot=yes, some bicycle=no and smoothness=impassable, i.e. the flow_hi profile routed a road-bike loop over a footpath. This is a routing defect (follow-up bead bike-mapper-41w.13), and the row's 1.1 km on cycle infrastructure and 2.39 expected stops reflect that. BRouter's whole-route ascent (1728 m) and the DEM's (2433 m) also disagree by about 700 m on that route (follow-up bead bike-mapper-41w.14), so climb scores computed on BRouter elevations are indicative only.
+- Out-and-back with an explicit turnaround (Sally Gap) cannot honour the length range: the route is what it is (43.8-46.0 km), the range is only noted, and the climb objective is ignored (flow and climb picked different variants, flow_hi 46.0 km vs flow_lo 43.8 km, with similar ascent, 792 vs 802 m). With no turnaround (Clontarf), `return=free` almost always fell back to `same` (most free attempts rejected for overlapping the out leg by 82-100 %, wrong length or no route), so a truly different return path is rare in this corridor, and the call budget (48) was exhausted.
+- One-way is cheap (1.6 s, 4 calls) but ignores objective and length: flow and flat gave the identical route (31.6 km, 91 m ascent). The DEM tile covers only lon -7..-6, lat 53..54, so 3-12 of 72 grid points had no elevation in the Enniskerry and Clontarf plans.
