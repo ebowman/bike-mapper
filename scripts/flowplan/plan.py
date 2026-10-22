@@ -60,6 +60,7 @@ class _State:
     polar: list = field(default_factory=list)   # objective sets: [(bearing_deg, dist_m)] at scale 1 (param == param0)
     param0: float = 0.0
     scores: list = field(default_factory=list)  # objective sets: via-point scores
+    idx: int = 0            # via-point set index (generation order)
 
 
 def _overlap(a_geom, b_geom, tf, buffer_m=OVERLAP_BUFFER_M) -> float:
@@ -209,6 +210,8 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
             states = [_State(i * 360.0 / bearings, d0) for i in range(bearings)]
         for s in states:
             build(s)
+    for i, s in enumerate(states):
+        s.idx = i   # stable via-point-set index (generation order), part of the route id
     total_factor = 2 if mode == "out-and-back" else 1
 
     def km_of(c):
@@ -300,7 +303,7 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
                         full, ret = cand_free, "free"
             c = full
         c.variant, c.alt = v.name, a
-        plan = {"mode": mode, "heading_deg": s.heading, "via_points": [list(p) for p in s.points[1:-1]]
+        plan = {"mode": mode, "heading_deg": s.heading, "set": s.idx, "via_points": [list(p) for p in s.points[1:-1]]
                 if mode == "loop" else [], "iterations": s.iters, "length_km": round(c.length_m / 1000, 3),
                 "n_via": s.n_via if mode == "loop" else None}
         if mode == "loop":
@@ -315,7 +318,7 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
         c.plan = plan
         cands.append(c)
 
-    # ---- drop disguised out-and-backs, then dedupe (keys made unique per heading) ----
+    # ---- drop disguised out-and-backs, then dedupe (keys made unique per via-point set) ----
     if mode == "loop":
         keep = []
         for c in cands:
@@ -329,11 +332,11 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
         cands = keep
     names = {id(c): c.variant for c in cands}
     for c in cands:
-        c.variant = f"{c.variant}@{c.plan['heading_deg']:g}"
+        c.variant = f"{c.variant}@{c.plan['heading_deg']:g}.{c.plan['set']}"
     kept, dropped = dedupe(cands, region)
     for c in cands:
         c.variant = names[id(c)]
-    # duplicate_of keeps the '@heading' so it equals the kept candidate's route_id
+    # duplicate_of keeps the '@heading.set' so it equals the kept candidate's route_id
     res.kept, res.dropped = kept, res.dropped + dropped
     if not kept:
         res.notes.append("no candidate inside the requested length range")

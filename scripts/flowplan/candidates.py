@@ -1,6 +1,7 @@
 """Generate candidate routes (variants x alternatives) and drop near-duplicates."""
 from __future__ import annotations
 
+import functools
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 
@@ -42,9 +43,14 @@ def lanes_variant(lane_bonus: float = 1.0) -> Variant:
                                           "lane_bonus": round(max(LANES_FLOOR, float(lane_bonus) - LANES_STEP), 4)})
 
 
+@functools.lru_cache(maxsize=8)
+def _transformer(region: str) -> Transformer:
+    return Transformer.from_crs("EPSG:4326", REGION_CRS[region], always_xy=True)
+
+
 def project_line(geometry, region: str = "ireland"):
     """lon/lat polyline -> shapely LineString in the region's metric CRS (empty LineString if < 2 points)."""
-    tf = Transformer.from_crs("EPSG:4326", REGION_CRS[region], always_xy=True)
+    tf = _transformer(region)
     xs, ys = tf.transform([p[0] for p in geometry], [p[1] for p in geometry])
     return shapely.linestrings(list(zip(xs, ys))) if len(xs) > 1 else shapely.LineString()
 
@@ -60,26 +66,20 @@ def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20
            overlap: float = 0.9) -> tuple[list[Candidate], list[Candidate]]:
     """Input order = priority. Drop a candidate if >= overlap of its length lies within
     buffer_m of a kept one; set duplicate_of on dropped ones."""
-    tf = Transformer.from_crs("EPSG:4326", REGION_CRS[region], always_xy=True)
     kept, dropped, buffers = [], [], []
     for c in cands:
-        xs, ys = tf.transform([p[0] for p in c.geometry], [p[1] for p in c.geometry])
-        if len(xs) > 1:
-            line = shapely.linestrings(list(zip(xs, ys)))
-        else:
-            line = shapely.LineString()
+        line = project_line(c.geometry, region)
         dup = None
-        if len(xs) > 1 and line.length > 0:
-            for k, buf in zip(kept, buffers):
-                if shapely.intersection(line, buf).length / line.length >= overlap:
-                    dup = k
-                    break
+        for k, buf in zip(kept, buffers):
+            if overlap_fraction(line, buf) >= overlap:
+                dup = k
+                break
         if dup is not None:
             c.duplicate_of = dup.key
             dropped.append(c)
         else:
             kept.append(c)
-            buffers.append(shapely.buffer(line, buffer_m) if len(xs) > 1 else shapely.Polygon())
+            buffers.append(shapely.buffer(line, buffer_m) if not line.is_empty else shapely.Polygon())
     return kept, dropped
 
 

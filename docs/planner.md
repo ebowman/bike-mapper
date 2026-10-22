@@ -255,7 +255,7 @@ loop, out-and-back and one-way candidates aimed at a length range.
 
 ## MCP server and route ids
 
-The planner logic lives in `scripts/flowplan/service.py` (`PlannerService`), shared by the FastAPI handlers and the MCP server in [mcp.md](mcp.md) (plan, rank, explain and export GPX from Claude Code). Route ids in `/api/plan` responses are unique: `<variant>@<heading>/alt<k>` for loops and out-and-backs (e.g. `flow_hi@150/alt0`), `<variant>/alt<k>` for one-way; `variant` stays bare and `duplicate_of` uses the same ids. `/api/route` ids are unchanged (`<variant>/alt<k>`).
+The planner logic lives in `scripts/flowplan/service.py` (`PlannerService`), shared by the FastAPI handlers and the MCP server in [mcp.md](mcp.md) (plan, rank, explain and export GPX from Claude Code). Route ids in `/api/plan` responses are unique: `<variant>@<heading>.<set>/alt<k>` for loops and out-and-backs (e.g. `flow_hi@150.2/alt0`, `<set>` = 0-based via-point set index, unique even for several sets at one heading), `<variant>/alt<k>` for one-way; `variant` stays bare and `duplicate_of` uses the same ids. `/api/route` ids are unchanged (`<variant>/alt<k>`).
 
 ### Ranking diversity
 

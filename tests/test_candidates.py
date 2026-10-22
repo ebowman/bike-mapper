@@ -209,3 +209,15 @@ def test_straightness_valid(k, v):
 def test_straightness_invalid(k, v):
     with pytest.raises(ValueError):
         brouter.validate_params({k: v})
+
+
+def test_dedupe_overlap_threshold_and_empty():
+    data = json.loads((FIX / "brouter_dublin_fastbike_alt0.json").read_text())
+    c1 = parse_geojson(data, "fastbike", "fastbike", 0)
+    c2 = parse_geojson(data, "x", "fastbike", 1)
+    c3 = parse_geojson(data, "y", "fastbike", 2)
+    c3.geometry = c3.geometry[:1]   # degenerate: kept, never a duplicate
+    c4 = parse_geojson(data, "z", "fastbike", 3)
+    c4.geometry = [(p[0] + 0.01, p[1] + 0.01) for p in c4.geometry]   # ~1.3 km away: below the threshold
+    kept, dropped = dedupe([c1, c2, c3, c4])
+    assert kept == [c1, c3, c4] and dropped == [c2] and c2.duplicate_of == "fastbike/alt0"

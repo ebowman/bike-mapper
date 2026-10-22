@@ -123,3 +123,18 @@ def test_stdio_smoke():
     assert names == sorted(["status", "start_brouter", "geocode", "plan_route", "route_details",
                             "export_gpx", "list_presets"])
     assert sys.platform  # server stdout carried only MCP frames or initialize would have failed
+
+
+@needs_index
+def test_route_details_resolves_same_heading_routes(monkeypatch):
+    from tests.test_plan_api import _two_same_heading
+    _two_same_heading(monkeypatch)
+    out = flow_mcp.plan_route("loop", START, length_km=45, bearings=4, objective="climb", n=6)
+    rows = [r.split("|") for r in out.splitlines() if re.match(r"\| \d+ \|", r)]
+    byid = {r[2].strip(): float(r[5]) for r in rows}
+    same = [i for i in byid if "@90." in i]
+    assert len(same) >= 2 and len(byid) == len(rows)
+    for i in same:
+        d = flow_mcp.route_details(i)
+        assert d.startswith(f"Route {i}: {byid[i]:.1f} km")
+    assert len({byid[i] for i in same}) == len(same)

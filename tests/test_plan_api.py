@@ -187,3 +187,35 @@ def test_duplicate_of_matches_kept_key():
     assert dup
     for c in dup:
         assert "@" in c.duplicate_of and c.duplicate_of in kept
+
+
+def _two_same_heading(monkeypatch):
+    """Climb objective whose DEM selection yields two via-point sets at the same heading, different radii."""
+    from flowplan import plan as plan_mod
+
+    def fake(objective, mode, dem, start, d0, bearings, region, res, target_m):
+        return [plan_mod._State(90.0, d0 * 0.88, polar=[(90.0, d0), (210.0, d0), (330.0, d0)], param0=d0,
+                                scores=[1.0, 1.0, 1.0]),
+                plan_mod._State(90.0, d0 * 0.94, polar=[(90.0, d0), (210.0, d0), (330.0, d0)], param0=d0,
+                                scores=[1.0, 1.0, 1.0])]
+    monkeypatch.setattr(plan_mod, "_objective_states", fake)
+
+
+def test_same_heading_sets_get_unique_ids(index, monkeypatch):
+    _two_same_heading(monkeypatch)
+    j = app(index).get(LOOP + "&objective=climb&n=6").json()
+    ids = [x["id"] for x in j["routes"]]
+    assert len(ids) == len(set(ids))
+    assert {x["plan"]["set"] for x in j["routes"]} == {0, 1}
+    assert all("@90." in i for i in ids)
+    assert len({round(x["stats"]["distance_km"], 3) for x in j["routes"]}) > 1
+
+
+def test_dedupe_does_not_confuse_same_heading_sets(index, monkeypatch):
+    _two_same_heading(monkeypatch)
+    from flowplan.plan import plan_candidates
+    res = plan_candidates(Hilly(), "loop", (-6.2825, 53.2990), length_km=(40.5, 49.5), bearings=4,
+                          objective="climb")
+    kept = {c.route_id for c in res.kept}
+    assert len(kept) == len(res.kept)
+    assert all(c.duplicate_of in kept for c in res.dropped if "@" in (c.duplicate_of or ""))

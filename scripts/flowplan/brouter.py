@@ -51,9 +51,12 @@ class Candidate:
     @property
     def route_id(self) -> str:
         """Unique id within a plan response: planned loops / out-and-backs include the heading
-        (`flow_hi@45/alt0`); one-way and /api/route candidates use the bare key."""
+        and via-point set index (`flow_hi@45.2/alt0`); one-way and /api/route candidates use the bare key."""
         h = (self.plan or {}).get("heading_deg")
-        return self.key if h is None else f"{self.variant}@{h:g}/alt{self.alt}"
+        if h is None:
+            return self.key
+        s = (self.plan or {}).get("set", 0)
+        return f"{self.variant}@{h:g}.{s}/alt{self.alt}"
 
 
 def validate_params(params: dict | None) -> dict:
