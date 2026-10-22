@@ -25,6 +25,7 @@ from .plan import plan_candidates
 from .ranking import (
     DEFAULT_DIVERSITY,
     DEFAULT_TURN_WEIGHT,
+    ELEVATION_SOURCES,
     OBJECTIVES,
     rank,
     score_candidate,
@@ -160,6 +161,7 @@ def route_dict(s, debug_b=False):
         "stats": {"distance_km": c.length_m / 1000, "ascent_m": x["ascent_m"],
                   "descent_m": x["descent_m"], "climbs": x["climbs"],
                   "climb_score": x["climb_score"], "hardest_climb": x["hardest_climb"],
+                  "elevation_source": x["elevation_source"],
                   "brouter_time_s": c.time_s, "expected_stops": sc.expected_stops,
                   "stops_per_km": sc.stops_per_km, "expected_stop_s": sc.expected_stop_s,
                   "by_class": sc.by_class,
@@ -177,6 +179,9 @@ def route_dict(s, debug_b=False):
         r["duplicate_of"] = c.duplicate_of
     if c.plan is not None:
         r["plan"] = c.plan
+    if c.elevations and any(e is not None for e in c.elevations):
+        # parallel to geometry; the profile that climb stats used (stats.elevation_source); the UI GPX writes it
+        r["elevations"] = [None if e is None else round(e, 1) for e in c.elevations]
     if debug_b:
         r.update(explain(c.segments, sc.hits, c.cost))
         r["turn_points"] = sc.turn_points
@@ -269,6 +274,10 @@ class PlannerService:
         div = DEFAULT_DIVERSITY if div_raw is None else parse_float(div_raw, "diversity")
         if not 0.0 <= div <= 1.0:
             raise ServiceError(400, f"'diversity' must be within 0..1 (got {div_raw!r})")
+        elevation_source = get("elevation_source") or "auto"
+        if elevation_source not in ELEVATION_SOURCES:
+            raise ServiceError(400, f"'elevation_source' must be one of {', '.join(ELEVATION_SOURCES)} "
+                                    f"(got {elevation_source!r})")
         scales = get("scales")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         straight = {}
@@ -290,7 +299,7 @@ class PlannerService:
                 raise ServiceError(400, f"derived {ck}={cv} is outside 0..1000")
         return SimpleNamespace(
             m=m, weights=weights, blend_with=blend_with, blend_alpha=blend_alpha, overrides=overrides,
-            guard=guard_v, tw=tw, diversity=div, scales=scales_t, straight=straight, router=router, costs=costs,
+            guard=guard_v, tw=tw, diversity=div, elevation_source=elevation_source, scales=scales_t, straight=straight, router=router, costs=costs,
             profile_params=profile_params,
             refresh=get("refresh") not in (None, "", "0", "false"),
             lanes=get("lanes_variant") not in (None, "", "0", "false"),
@@ -312,11 +321,11 @@ class PlannerService:
                 "lane_exit_cost": st.straight["lane_exit_cost"],
                 "cycleway_base": st.straight["cycleway_base"],
                 "lanes_variant": st.lanes, "turn_weight": st.tw,
-                "diversity": st.diversity}
+                "diversity": st.diversity, "elevation_source": st.elevation_source}
 
     def finish(self, st, kept, dropped, skipped, hit, brouter_ms, t0, t1, n, top_fn, query, extra=None):
         """Score kept candidates, rank via top_fn(scored) -> (response dict, top ScoredCandidates)."""
-        scored = [score_candidate(c, st.m, self.index, self.region) for c in kept]
+        scored = [score_candidate(c, st.m, self.index, self.region, st.elevation_source, self.dem) for c in kept]
         t2 = time.perf_counter()
         top = top_fn(scored)
         out = {"query": query, "weight_set": st.m.weight_set,
@@ -486,4 +495,5 @@ class PlannerService:
                 "turns": sc.turns, "sharp_turns": sc.sharp_turns,
                 "longest_straight_km": sc.longest_straight_km,
                 "ascent_m": x["ascent_m"], "descent_m": x["descent_m"],
-                "climb_score": x["climb_score"], "climbs": x["climbs"]}
+                "climb_score": x["climb_score"], "climbs": x["climbs"],
+                "elevation_source": x["elevation_source"]}

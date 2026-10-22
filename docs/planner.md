@@ -82,7 +82,7 @@ Candidate cache: an in-process LRU of 32 entries keyed by start and end (rounded
 
 ### `GET /api/plan` (loops, out-and-backs, one-way with ranking objectives)
 
-`/api/plan?mode=loop&from=lat,lon&length_km=45&objective=flow` returns the `/api/route` response shape (`routes[]` with `rank`, `id`, `variant`, `alt`, `geometry`, `stats`, `delta_vs_fastest`, `hits`; `settings`, `model`, `cached`, `candidates_total`, `candidates_deduped`, `skipped`, `timings_ms`) plus a per-route `plan` object (mode, heading_deg, via_points, radius_m / turnaround, iterations, length_km, objective, via_scores) and a top-level `plan` block `{mode, objective, return, length_range, calls, notes}`. `stats` gains `descent_m`, `climbs[]` {`start_km`, `end_km`, `length_m`, `gain_m`, `avg_grade_pct`, `max_500m_grade_pct`, `points`, `category`}, `climb_score` (sum of climb points) and `hardest_climb` (or null); `ascent_m` is the hysteresis-filtered ascent from the BRouter elevations (BRouter's own figure only when a route has none). `/api/route` returns the same stats.
+`/api/plan?mode=loop&from=lat,lon&length_km=45&objective=flow` returns the `/api/route` response shape (`routes[]` with `rank`, `id`, `variant`, `alt`, `geometry`, `stats`, `delta_vs_fastest`, `hits`; `settings`, `model`, `cached`, `candidates_total`, `candidates_deduped`, `skipped`, `timings_ms`) plus a per-route `plan` object (mode, heading_deg, via_points, radius_m / turnaround, iterations, length_km, objective, via_scores) and a top-level `plan` block `{mode, objective, return, length_range, calls, notes}`. `stats` gains `descent_m`, `climbs[]` {`start_km`, `end_km`, `length_m`, `gain_m`, `avg_grade_pct`, `max_500m_grade_pct`, `points`, `category`}, `climb_score` (sum of climb points) and `hardest_climb` (or null); `ascent_m` is the hysteresis-filtered ascent (see 'Elevation source'; BRouter's own figure only when a route has none), `stats.elevation_source` (`brouter` or `dem`) says which profile was used, and the route carries `elevations` (parallel to `geometry`, the same profile; the UI GPX writes them as `<ele>`). `/api/route` returns the same stats.
 
 Parameters (400 naming the parameter when invalid):
 - `mode=loop|out_and_back|out-and-back|one_way|one-way` (default `loop`; both spellings are accepted and echoed as `out_and_back` / `one_way`), `from=lat,lon` (required), `to=lat,lon` (required for one-way; for out-and-back it fixes the turnaround, then the length range and `objective` do not apply and a note says so; ignored with a note for loops).
@@ -241,6 +241,10 @@ loop, out-and-back and one-way candidates aimed at a length range.
 - **One-way** delegates to `candidates.generate`; the length range is only noted, not enforced.
 - **Limits**: 3 iterations may miss a narrow range (reported in `skipped`); vias in water or off-network
   (BRouter "island" errors) lose that heading; headings are crow-flies, not terrain-aware (see 41w.4).
+
+### Elevation source (41w.14)
+
+Climb stats (`ascent_m`, `descent_m`, `climbs`, `climb_score`, `hardest_climb`, and the `flat` ranking) come from one elevation profile per route, chosen by the `elevation_source` parameter (validated, echoed in `settings`): `auto` (default) samples the DEM along the route when it covers >= 95 % of the route points (gaps interpolated) and otherwise keeps BRouter's per-node elevations; `brouter` and `dem` force a source (`dem` falls back to BRouter only when no point has a DEM value). The DEM profile replaces the route's elevations, so `stats.elevation_source`, the route's `elevations` array, the UI GPX and the MCP `export_gpx` all carry the same profile as the stats. Hysteresis is 3 m on BRouter elevations and 10 m on DEM elevations (the 30 m DEM is noisier; the 12-route comparison is in `docs/mcp.md`, 'Elevation source comparison'). The setting only affects ranking and stats, not the BRouter candidates, so it is not part of the cache key.
 
 ### Climb seeking and flat routes (41w.4)
 

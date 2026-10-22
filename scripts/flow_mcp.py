@@ -39,6 +39,7 @@ GARMIN_HINT = "Garmin Connect: Training & Planning > Courses > Import, then send
 LATLON = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$")
 # settings accepted by plan_route(settings=...): the /api/plan model/routing/ranking parameters
 SETTING_KEYS = {"weights", "blend_with", "blend", "guard", "turn_weight", "diversity", "scales", "router", "refresh",
+                "elevation_source",
                 "lanes_variant", "lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base",
                 *(f"p_{c}" for c in ("signal", "stop", "give_way", "rb_entry", "xing_signal",
                                      "yield_infer", "yield_equal"))}
@@ -316,7 +317,7 @@ def export_gpx(route_id: str, name: str | None = None, out_dir: str = "~/Downloa
         path, i = folder / f"{stem}-{i}.gpx", i + 1
     write_gpx(path, name, c.geometry, ele, desc)
     return f"Wrote {path} ({path.stat().st_size} bytes, {len(c.geometry)} points" \
-           f"{', with elevation' if ele else ', no elevation data'}).\n{GARMIN_HINT}"
+           f"{', with ' + x.get('elevation_source', 'brouter') + ' elevation' if ele else ', no elevation data'}).\n{GARMIN_HINT}"
 
 
 @tool

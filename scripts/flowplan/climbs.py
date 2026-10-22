@@ -47,7 +47,8 @@ GCAP = 25.0           # %, section gradient cap
 CATS = [(1500, "SHC"), (900, "HC"), (600, "1"), (300, "2"), (150, "3"), (75, "4"), (25, "5")]
 FLAT_GAP = 200.0      # m, a flat stretch (< FLAT_GRAD) longer than this splits an ascent in two
 FLAT_GRAD = 1.0       # %
-HYST = 3.0            # m, hysteresis for ascent/descent
+HYST = 3.0            # m, hysteresis for ascent/descent on BRouter elevations
+DEM_HYST = 10.0       # m, hysteresis on DEM-sampled elevations (41w.14: 3 m inflates flat routes 4x)
 
 
 @dataclass
@@ -258,9 +259,9 @@ def detect_climbs(coords, elevations) -> list[Climb]:
     return detect_on_profile(*r)
 
 
-def elevation_stats(coords, elevations) -> dict:
+def elevation_stats(coords, elevations, hyst: float = HYST) -> dict:
     """{ascent_m, descent_m, max_ele, min_ele}. None elevations are interpolated over distance.
-    Ascent/descent use a 3 m hysteresis filter (see module docstring). max/min are None if no
+    Ascent/descent use a hysteresis filter, 3 m by default (see module docstring). max/min are None if no
     elevation is known."""
     n = min(len(coords), len(elevations))
     if n == 0 or all(v is None for v in elevations[:n]):
@@ -272,9 +273,9 @@ def elevation_stats(coords, elevations) -> dict:
     z = _fill(d, elevations[:n])
     anchor = z[0]; up = down = 0.0
     for v in z[1:]:
-        if v - anchor >= HYST:
+        if v - anchor >= hyst:
             up += v - anchor; anchor = v
-        elif anchor - v >= HYST:
+        elif anchor - v >= hyst:
             down += anchor - v; anchor = v
     return {"ascent_m": float(up), "descent_m": float(down),
             "max_ele": float(z.max()), "min_ele": float(z.min())}

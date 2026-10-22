@@ -125,6 +125,27 @@ class Dem:
         return None if math.isnan(v) else v
 
 
+DEM_COVERAGE_MIN = 0.95   # 'auto' elevation source: DEM when >= this share of route points has a DEM value
+
+
+def dem_route_elevations(dem: Dem, geometry) -> tuple[list | None, float]:
+    """(elevations parallel to geometry, coverage). Elevations come from DEM samples at the geometry points;
+    points without a DEM value are filled by linear interpolation over distance. coverage = share of points
+    that had a DEM value (0..1). Returns (None, 0.0) when no point is covered."""
+    from .climbs import _cum_dist, _fill
+    if len(geometry) < 2:
+        return None, 0.0
+    arr = np.asarray(geometry, dtype="float64")
+    z = dem.sample_many(arr[:, 0], arr[:, 1])
+    ok = ~np.isnan(z)
+    cov = float(ok.mean())
+    if not ok.any():
+        return None, 0.0
+    d = _cum_dist(geometry) + np.arange(len(geometry)) * 1e-9
+    filled = _fill(d, [float(v) if k else None for v, k in zip(z, ok, strict=True)])
+    return [float(v) for v in filled], cov
+
+
 @dataclass
 class ViaPoint:
     lon: float

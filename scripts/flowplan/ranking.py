@@ -1,17 +1,19 @@
 """Rank scored candidates: lowest expected_stops + turn_weight * turns first, with a distance guard."""
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 import shapely
 
 from .brouter import Candidate
 from .candidates import overlap_fraction, project_line
-from .climbs import climb_score, detect_climbs, elevation_stats
+from .climbs import DEM_HYST, HYST, climb_score, detect_climbs, elevation_stats
 from .scoring import RouteScore, score
+from .terrain import DEM_COVERAGE_MIN, dem_route_elevations
 from .turns import turn_metrics
 
 OBJECTIVES = ("flow", "climb", "flat")
+ELEVATION_SOURCES = ("auto", "brouter", "dem")
 
 
 @dataclass
@@ -36,13 +38,33 @@ DEFAULT_DIVERSITY = 0.7
 DIVERSITY_BUFFER_M = 20.0
 
 
-def score_candidate(c: Candidate, model, index, region: str = "ireland") -> ScoredCandidate:
+def choose_elevations(c: Candidate, elevation_source: str = "auto", dem=None) -> tuple[Candidate, str]:
+    """(candidate, source actually used). 'brouter' keeps BRouter's per-node elevations. 'dem' samples the DEM
+    along the geometry (gaps interpolated); with no DEM value at all it falls back to BRouter. 'auto' (default)
+    uses the DEM when it covers >= 95 % of the route points, else BRouter. When the DEM is used a COPY of the
+    candidate carrying the DEM elevations is returned (the cached candidate is never mutated), so climb stats
+    and the GPX export see the same profile."""
+    if elevation_source not in ELEVATION_SOURCES:
+        raise ValueError(f"elevation_source must be one of {', '.join(ELEVATION_SOURCES)}, got {elevation_source!r}")
+    if elevation_source == "brouter" or dem is None:
+        return c, "brouter"
+    ele, cov = dem_route_elevations(dem, c.geometry)
+    if ele is None or (elevation_source == "auto" and cov < DEM_COVERAGE_MIN):
+        return c, "brouter"
+    return replace(c, elevations=ele), "dem"
+
+
+def score_candidate(c: Candidate, model, index, region: str = "ireland",
+                    elevation_source: str = "auto", dem=None) -> ScoredCandidate:
     """Flow score + turn metrics + elevation/climb stats for one candidate (shared by /api/route and /api/plan).
-    extra: ascent_m, descent_m (None without elevations), climbs [dict], climb_score, hardest_climb (dict|None)."""
+    elevation_source auto|brouter|dem with dem (a terrain.Dem) picks the elevation profile, see choose_elevations.
+    extra: ascent_m, descent_m (None without elevations), climbs [dict], climb_score, hardest_climb (dict|None),
+    elevation_source ('brouter'|'dem')."""
+    c, used = choose_elevations(c, elevation_source, dem)
     sc = score(c.geometry, model, index)
     for k, v in turn_metrics(c.geometry, c.segments, sc.hits, region=region).items():
         setattr(sc, k, v)
-    st = elevation_stats(c.geometry, c.elevations)
+    st = elevation_stats(c.geometry, c.elevations, DEM_HYST if used == "dem" else HYST)
     have = st["max_ele"] is not None
     climbs = detect_climbs(c.geometry, c.elevations) if have else []
     cs = climb_score(climbs)
@@ -50,7 +72,8 @@ def score_candidate(c: Candidate, model, index, region: str = "ireland") -> Scor
         "ascent_m": st["ascent_m"] if have else c.ascent_m,
         "descent_m": st["descent_m"] if have else None,
         "climbs": [asdict(x) for x in climbs], "climb_score": cs["score"],
-        "hardest_climb": asdict(cs["hardest"]) if cs["hardest"] else None})
+        "hardest_climb": asdict(cs["hardest"]) if cs["hardest"] else None,
+        "elevation_source": used})
 
 
 def _diverse(pool: list[ScoredCandidate], n: int, diversity: float, region: str) -> list[ScoredCandidate]:
