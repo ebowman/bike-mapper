@@ -66,27 +66,35 @@ Tests: `uv run pytest tests/test_mcp.py` (tools called in-process with a fake BR
 
 Question: climb stats (ascent, climbs, climb score) came from BRouter's per-node elevations; do they match the DEM (`flowplan.terrain.Dem`, GLO-30) sampled along the same geometry? `uv run scripts/compare_elevation_sources.py` re-plans the 12 eval scenarios (ranking on BRouter elevations, so these are the pre-change top routes) and writes `data/samples/elevation_source_comparison.csv` (more columns: raw-node variants, DEM coverage, every cell). DEM coverage was 100 % on all 12 routes.
 
-| name | km | BRouter asc (3 m) | DEM asc (25 m grid, 3 m) | DEM/BRouter | BRouter asc (10 m) | DEM asc (25 m grid, 10 m) | hardest climb gain BRouter / DEM |
-|---|---|---|---|---|---|---|---|
-| loop_rath_40_50_flow | 47.9 | 406 | 561 | 1.38 | 356 | 405 | 193 / 153 |
-| loop_rath_40_50_climb | 45.2 | 778 | 888 | 1.14 | 642 | 662 | 139 / 154 |
-| loop_rath_40_50_flat | 41.1 | 156 | 303 | 1.94 | 82 | 130 | 0 / 0 |
-| loop_rath_70_85_flow | 83.8 | 862 | 1076 | 1.25 | 665 | 681 | 151 / 153 |
-| loop_rath_70_85_climb | 80.7 | 1298 | 1602 | 1.23 | 1055 | 1114 | 183 / 182 |
-| loop_rath_70_85_flat | 75.2 | 264 | 450 | 1.7 | 158 | 178 | 0 / 0 |
-| oab_rath_sallygap_flow | 46.0 | 792 | 957 | 1.21 | 759 | 751 | 312 / 175 |
-| oab_rath_sallygap_climb | 43.8 | 802 | 848 | 1.06 | 759 | 747 | 288 / 347 |
-| oab_clontarf_30_40_flat | 36.0 | 19 | 81 | 4.26 | 0 | 13 | 0 / 0 |
-| oneway_lucan_dalkey_flow | 30.5 | 95 | 386 | 4.06 | 44 | 117 | 0 / 0 |
-| oneway_lucan_dalkey_flat | 30.5 | 95 | 386 | 4.06 | 44 | 117 | 0 / 0 |
-| loop_enniskerry_50_60_climb | 56.2 | 1166 | 1469 | 1.26 | 1017 | 1089 | 244 / 242 |
+| name | km | BRouter asc (3 m) | DEM raw-node asc (10 m) = production | vs BRouter | DEM 25 m grid asc (10 m) | vs BRouter | DEM raw-node asc (3 m) | DEM 25 m grid asc (3 m) | hardest climb gain BRouter / DEM |
+|---|---|---|---|---|---|---|---|---|---|
+| loop_rath_40_50_flow | 47.9 | 406 | 409 | +1 % | 405 | +0 % | 660 | 561 | 193 / 153 |
+| loop_rath_40_50_climb | 45.2 | 778 | 721 | -7 % | 662 | -15 % | 1045 | 888 | 139 / 154 |
+| loop_rath_40_50_flat | 41.1 | 156 | 121 | -22 % | 130 | -17 % | 376 | 303 | 0 / 0 |
+| loop_rath_70_85_flow | 83.8 | 862 | 726 | -16 % | 681 | -21 % | 1270 | 1076 | 151 / 153 |
+| loop_rath_70_85_climb | 80.7 | 1298 | 1231 | -5 % | 1114 | -14 % | 1852 | 1602 | 183 / 182 |
+| loop_rath_70_85_flat | 75.2 | 264 | 202 | -23 % | 178 | -33 % | 528 | 450 | 0 / 0 |
+| oab_rath_sallygap_flow | 46.0 | 792 | 779 | -2 % | 751 | -5 % | 1123 | 957 | 312 / 175 |
+| oab_rath_sallygap_climb | 43.8 | 802 | 735 | -8 % | 747 | -7 % | 953 | 848 | 288 / 347 |
+| oab_clontarf_30_40_flat | 36.0 | 19 | 38 | +100 % | 13 | -32 % | 81 | 81 | 0 / 0 |
+| oneway_lucan_dalkey_flow | 30.5 | 95 | 124 | +31 % | 117 | +23 % | 525 | 386 | 0 / 0 |
+| oneway_lucan_dalkey_flat | 30.5 | 95 | 124 | +31 % | 117 | +23 % | 525 | 386 | 0 / 0 |
+| loop_enniskerry_50_60_climb | 56.2 | 1166 | 1102 | -5 % | 1089 | -7 % | 1709 | 1469 | 244 / 242 |
 
-Findings:
-- With a 3 m hysteresis the DEM reports 1.06-1.4x BRouter's ascent on hilly routes and 1.7-4.3x on flat ones (Lucan-Dalkey 386 vs 87 m, Clontarf 81 vs 19 m, Rathfarnham flat loops 303 vs 151 and 450 vs 247 m). Sampling the DEM at every route node (dense, nearest-cell) is worse still (Lucan-Dalkey 525 m), so the 25 m resample matters. This is DEM noise (30 m cells, surface model, nearest-cell sampling) plus BRouter's smoother profile, not extra real climbing.
-- With a 10 m hysteresis the two sources agree: DEM(10 m) is within 0-18 % of BRouter(3 m) on every hilly route (e.g. Enniskerry 1089 vs 1139, Rathfarnham 70-85 climb 1114 vs 1237, Sally Gap 747 vs 796, 40-50 climb 662 vs 739), while flat routes stay near zero (Clontarf 13 m, Lucan-Dalkey 117 m).
+Column mapping (CSV): `brouter_asc_h3` = BRouter elevations, raw nodes, 3 m hysteresis (the reference and the production BRouter path); `dem_asc_h10` = DEM sampled at the route nodes, 10 m hysteresis (**the production DEM path**: `ranking.score_candidate` -> `climbs.elevation_stats(geometry, elevations, DEM_HYST)` on raw nodes); `dem_asc25_h10` / `dem_asc25_h3` = DEM resampled to a 25 m grid (the `detect_climbs` path, not what ascent uses); `dem_asc_h3` = raw-node DEM at 3 m. The first version of this table showed only the 25 m-grid columns, which are not what production computes.
+
+Findings (percentages are (dem - brouter) / brouter, with brouter = `brouter_asc_h3`):
+- With a 3 m hysteresis the DEM reports 1.06-1.4x BRouter's ascent on hilly routes on the 25 m grid (1.19-1.63x on raw nodes) and 1.7-4.3x on flat ones on the grid (2.0-5.5x on raw nodes; Lucan-Dalkey 386 grid / 525 raw vs 95 m BRouter, Clontarf 81 vs 19 m, Rathfarnham flat loops 303 / 376 vs 156 m and 450 / 528 vs 264 m). This is DEM noise (30 m cells, surface model, nearest-cell sampling) plus BRouter's smoother profile, not extra real climbing.
+- With a 10 m hysteresis on raw nodes (production) the DEM is between -23 % and +1 % of BRouter(3 m) on the 9 routes with >= 150 m BRouter ascent (e.g. Enniskerry 1102 vs 1166 = -5 %, Rathfarnham 70-85 climb 1231 vs 1298 = -5 %, Rathfarnham 70-85 flow 726 vs 862 = -16 %, 40-50 flat 121 vs 156 = -22 %, 70-85 flat 202 vs 264 = -23 %, Sally Gap climb 735 vs 802 = -8 %). It is therefore mostly lower, not equal: up to 23 % below BRouter(3 m). On the 25 m grid the range is -33 % to +0 % (70-85 flat 178 vs 264 = -33 %, 70-85 flow 681 vs 862 = -21 %). The tiny-ascent routes are noisy in relative terms: Clontarf 38 vs 19 m (+100 %, raw) and Lucan-Dalkey 124 vs 95 m (+31 %).
 - Single big climbs agree where the profile is clean (Enniskerry 244 vs 242 m, Rathfarnham 70-85 climb 183 vs 182 m, 70-85 flow 151 vs 153 m); they differ where the DEM splits or merges a climb differently (Sally Gap flow 312 vs 175 m, 40-50 flow 193 vs 153 m, Sally Gap climb 288 vs 347 m), so hardest-climb gain is source-dependent by up to ~40 %.
 
-Decision: `elevation_source` = `auto` by default: use the DEM when it covers >= 95 % of the route points (it is gap-filled by linear interpolation over distance), else BRouter's elevations. The DEM profile replaces the candidate's elevations for climb stats (ascent, descent, climbs, climb score, hardest climb, the `flat` ranking) and for the GPX export, and `stats.elevation_source` says which was used per route. Ascent/descent hysteresis: 3 m for BRouter elevations (unchanged), 10 m for DEM elevations (`climbs.DEM_HYST`), because the table shows 3 m inflates DEM ascent 1.5-4x on flat terrain while 10 m lands on the BRouter(3 m) scale. Climb detection already resamples to 25 m. `brouter` and `dem` force a source (`dem` falls back to BRouter only when no route point has a DEM value). The setting only changes ranking, not the BRouter candidates, so it is not part of the cache key.
+Caveats:
+- The 10 m hysteresis suppresses every roller under 10 m, which is real climbing on rolling roads; the DEM ascent is a lower bound on it, not an unbiased estimate.
+- BRouter(3 m) was the reference the DEM hysteresis was tuned to match, so the ~700 m Enniskerry gap (DEM 3 m 2433 m vs BRouter 3 m 1728 m, reported in the 41w.14 review) was defined away by the choice of 10 m, not recovered; agreement with BRouter is not independent evidence that either source is right.
+- The production path samples raw route nodes (`elevation_stats`), whereas `detect_climbs` resamples to a 25 m grid; the two give different totals (the table shows both), and the comparison above only justified the 10 m value on the 25 m grid originally.
+- `dem_hyst` is a module constant today (`climbs.DEM_HYST`), not a setting.
+
+Decision: `elevation_source` = `auto` by default: use the DEM when it covers >= 95 % of the route points (it is gap-filled by linear interpolation over distance), else BRouter's elevations. The DEM profile replaces the candidate's elevations for climb stats (ascent, descent, climbs, climb score, hardest climb, the `flat` ranking) and for the GPX export, and `stats.elevation_source` says which was used per route. Ascent/descent hysteresis: 3 m for BRouter elevations (unchanged), 10 m for DEM elevations (`climbs.DEM_HYST`), because the table shows 3 m inflates DEM ascent 2.0-5.5x (raw nodes) on flat terrain while 10 m lands at -23 % to +1 % of BRouter(3 m) on routes with >= 150 m ascent (see the caveats above). Climb detection already resamples to 25 m. `brouter` and `dem` force a source (`dem` falls back to BRouter only when no route point has a DEM value). The setting only changes ranking, not the BRouter candidates, so it is not part of the cache key.
 
 Effect on the eval (re-run below): top-route ascent changed on all 12 rows, mostly down: 70-85 flow 862 -> 726 m, Enniskerry 1166 -> 1004 (a different route), 70-85 flat 264 -> 197, 70-85 climb 1298 -> 1231, 40-50 climb 778 -> 721, 40-50 flat 156 -> 120, Sally Gap climb 802 -> 735, Clontarf 19 -> 0, up on Lucan-Dalkey flow 95 -> 124 and 40-50 flow 406 -> 409; climb scores moved up 3-85 points (the DEM resolves more distinct climbs). Six top routes changed because the flat/climb rankings now use the DEM stats (loop_rath_40_50_flat, loop_rath_70_85_flat, oab_rath_sallygap_climb, oab_clontarf_30_40_flat, oneway_lucan_dalkey_flat, loop_enniskerry_50_60_climb). Length hit unchanged at 8/10.
 

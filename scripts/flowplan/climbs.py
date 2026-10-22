@@ -48,7 +48,7 @@ CATS = [(1500, "SHC"), (900, "HC"), (600, "1"), (300, "2"), (150, "3"), (75, "4"
 FLAT_GAP = 200.0      # m, a flat stretch (< FLAT_GRAD) longer than this splits an ascent in two
 FLAT_GRAD = 1.0       # %
 HYST = 3.0            # m, hysteresis for ascent/descent on BRouter elevations
-DEM_HYST = 10.0       # m, hysteresis on DEM-sampled elevations (41w.14: 3 m inflates flat routes 4x)
+DEM_HYST = 10.0       # m, hysteresis on DEM-sampled elevations (41w.14: 3 m inflates flat routes 2.0-5.5x on raw nodes, 1.7-4.3x on the 25 m grid)
 
 
 @dataclass
