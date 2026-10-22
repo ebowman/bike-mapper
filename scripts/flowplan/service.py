@@ -22,7 +22,13 @@ from .brouter import (
 from .candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
 from .explain import explain
 from .plan import plan_candidates
-from .ranking import DEFAULT_TURN_WEIGHT, OBJECTIVES, rank, score_candidate
+from .ranking import (
+    DEFAULT_DIVERSITY,
+    DEFAULT_TURN_WEIGHT,
+    OBJECTIVES,
+    rank,
+    score_candidate,
+)
 from .scoring import FlowIndex
 from .terrain import Dem
 
@@ -256,6 +262,10 @@ class PlannerService:
         tw = DEFAULT_TURN_WEIGHT if turn_weight is None else parse_float(turn_weight, "turn_weight")
         if not 0.0 <= tw <= MAX_TURN_WEIGHT:
             raise ServiceError(400, f"'turn_weight' must be within 0..{MAX_TURN_WEIGHT:g} (got {turn_weight!r})")
+        div_raw = get("diversity")
+        div = DEFAULT_DIVERSITY if div_raw is None else parse_float(div_raw, "diversity")
+        if not 0.0 <= div <= 1.0:
+            raise ServiceError(400, f"'diversity' must be within 0..1 (got {div_raw!r})")
         scales = get("scales")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         straight = {}
@@ -277,7 +287,7 @@ class PlannerService:
                 raise ServiceError(400, f"derived {ck}={cv} is outside 0..1000")
         return SimpleNamespace(
             m=m, weights=weights, blend_with=blend_with, blend_alpha=blend_alpha, overrides=overrides,
-            guard=guard_v, tw=tw, scales=scales_t, straight=straight, router=router, costs=costs,
+            guard=guard_v, tw=tw, diversity=div, scales=scales_t, straight=straight, router=router, costs=costs,
             profile_params=profile_params,
             refresh=get("refresh") not in (None, "", "0", "false"),
             lanes=get("lanes_variant") not in (None, "", "0", "false"),
@@ -298,7 +308,8 @@ class PlannerService:
                 "turn_cost": st.straight["turn_cost"],
                 "lane_exit_cost": st.straight["lane_exit_cost"],
                 "cycleway_base": st.straight["cycleway_base"],
-                "lanes_variant": st.lanes, "turn_weight": st.tw}
+                "lanes_variant": st.lanes, "turn_weight": st.tw,
+                "diversity": st.diversity}
 
     def finish(self, st, kept, dropped, skipped, hit, brouter_ms, t0, t1, n, top_fn, query, extra=None):
         """Score kept candidates, rank via top_fn(scored) -> (response dict, top ScoredCandidates)."""
@@ -358,7 +369,8 @@ class PlannerService:
                 detail += ": " + "; ".join(sorted({s["error"] for s in skipped}))
             raise ServiceError(404, detail)
         return self.finish(st, kept, dropped, skipped, hit is not None, brouter_ms, t0, t1, n,
-                           lambda sc: rank(sc, n=n, guard=st.guard, turn_weight=st.tw),
+                           lambda sc: rank(sc, n=n, guard=st.guard, turn_weight=st.tw, diversity=st.diversity,
+                                           region=self.region),
                            {"from": {"lat": start[1], "lon": start[0]},
                             "to": {"lat": end[1], "lon": end[0]}, "n": n})
 
@@ -448,6 +460,7 @@ class PlannerService:
                  "bearings": bearings, "max_calls": max_calls}
         return self.finish(st, kept, dropped, skipped, hit is not None, brouter_ms, t0, t1, n,
                            lambda sc: rank(sc, n=n, guard=st.guard, turn_weight=st.tw, objective=objective,
+                                           diversity=st.diversity, region=self.region,
                                            length_range=lrange if enforce else None),
                            query, {"plan": block})
 

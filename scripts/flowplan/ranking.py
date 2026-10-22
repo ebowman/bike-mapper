@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 
+import shapely
+
 from .brouter import Candidate
+from .candidates import overlap_fraction, project_line
 from .climbs import climb_score, detect_climbs, elevation_stats
 from .scoring import RouteScore, score
 from .turns import turn_metrics
@@ -29,6 +32,8 @@ class ScoredCandidate:
 
 
 DEFAULT_TURN_WEIGHT = 0.33
+DEFAULT_DIVERSITY = 0.7
+DIVERSITY_BUFFER_M = 20.0
 
 
 def score_candidate(c: Candidate, model, index, region: str = "ireland") -> ScoredCandidate:
@@ -48,14 +53,35 @@ def score_candidate(c: Candidate, model, index, region: str = "ireland") -> Scor
         "hardest_climb": asdict(cs["hardest"]) if cs["hardest"] else None})
 
 
+def _diverse(pool: list[ScoredCandidate], n: int, diversity: float, region: str) -> list[ScoredCandidate]:
+    if diversity <= 0 or n <= 1 or len(pool) <= 1:
+        return pool[:n]
+    selected, skipped, bufs = [], [], []
+    for s in pool:
+        if len(selected) >= n:
+            break
+        line = project_line(s.cand.geometry, region)
+        if any(overlap_fraction(line, b) > diversity for b in bufs):
+            skipped.append(s)
+            continue
+        selected.append(s)
+        bufs.append(shapely.buffer(line, DIVERSITY_BUFFER_M) if not line.is_empty else shapely.Polygon())
+    if len(selected) < n:  # backfill with the best skipped (already in score order)
+        selected += skipped[:n - len(selected)]
+    return selected
+
+
 def rank(scored: list[ScoredCandidate], n: int = 4, guard: float = 1.3,
          min_keep: int = 3, turn_weight: float = DEFAULT_TURN_WEIGHT, objective: str = "flow",
-         length_range: tuple | None = None) -> list[ScoredCandidate]:
+         length_range: tuple | None = None, diversity: float = DEFAULT_DIVERSITY,
+         region: str = "ireland") -> list[ScoredCandidate]:
     """objective flow: expected_stops + turn_weight * turns asc (tie: longer longest_straight_km, then shorter).
     climb: climb_score desc, ties by the flow score. flat: ascent_m asc, ties by the flow score.
     length_range (min_km, max_km) replaces the distance guard (loops, out-and-backs): candidates outside it
     are dropped. Otherwise drop candidates longer than guard x the shortest (guard <= 0 disables) unless that
-    would leave fewer than min_keep. Return the top n with rank (1-based) and delta_vs_fastest
+    would leave fewer than min_keep. diversity (0..1, 0 = off): walking the sorted pool, skip a candidate when
+    more than that fraction of its length lies within 20 m of an already selected route; if fewer than n are
+    selected, backfill with the skipped ones in score order. Return the top n with rank (1-based) and delta_vs_fastest
     ({stops, km, turns} vs the fastbike/alt0 candidate of the same heading, or None)."""
     if objective not in OBJECTIVES:
         raise ValueError(f"objective must be one of {', '.join(OBJECTIVES)}, got {objective!r}")
@@ -80,7 +106,7 @@ def rank(scored: list[ScoredCandidate], n: int = 4, guard: float = 1.3,
         limit = guard * min(s.length_m for s in scored) if guard > 0 else float('inf')  # 0 = off
         within = [s for s in ordered if s.length_m <= limit]
         pool = within if len(within) >= min_keep else ordered
-    top = pool[:max(n, 0)]
+    top = _diverse(pool, max(n, 0), diversity, region)
 
     def heading(s):
         return (s.cand.plan or {}).get("heading_deg")

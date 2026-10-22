@@ -107,6 +107,10 @@ def test_cache_hit_and_turn_weight_rerank(index):
     assert d["cached"] is True and cl.n == n and d["settings"]["turn_weight"] == 1.5
     e = c.get(LOOP + "&objective=climb").json()     # different via-point strategy: re-plans
     assert e["cached"] is False
+    m = cl.n
+    f = c.get(LOOP + "&objective=climb&diversity=0.2").json()       # ranking-only: cache hit
+    assert f["cached"] is True and cl.n == m and f["settings"]["diversity"] == 0.2
+    assert c.get(LOOP).json()["settings"]["diversity"] == 0.7
     assert c.get(LOOP + "&refresh=1").json()["cached"] is False
 
 
@@ -116,7 +120,9 @@ def test_cache_hit_and_turn_weight_rerank(index):
     ("min_km=50", "min_km"), ("min_km=60&max_km=50", "min_km"), ("length_km=45&min_km=40&max_km=50", "length_km"),
     ("length_km=45&n=9", "n"), ("length_km=45&bearings=2", "bearings"), ("length_km=45&bearings=13", "bearings"),
     ("length_km=45&max_calls=97", "max_calls"), ("length_km=45&return=maybe", "return"),
-    ("length_km=45&turn_weight=9", "turn_weight"), ("length_km=45&p_signal=2", "p_signal"),
+    ("length_km=45&turn_weight=9", "turn_weight"),
+    ("length_km=45&diversity=1.5", "diversity"), ("length_km=45&diversity=-0.1", "diversity"),
+    ("length_km=45&diversity=abc", "diversity"), ("length_km=45&p_signal=2", "p_signal"),
 ])
 def test_plan_400s_name_parameter(index, q, name):
     r = app(index).get(f"/api/plan?{FROM}&{q}")

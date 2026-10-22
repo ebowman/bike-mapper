@@ -34,7 +34,7 @@ BROUTER_WAIT_S = 60
 GARMIN_HINT = "Garmin Connect: Training & Planning > Courses > Import, then send to device"
 LATLON = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$")
 # settings accepted by plan_route(settings=...): the /api/plan model/routing/ranking parameters
-SETTING_KEYS = {"weights", "blend_with", "blend", "guard", "turn_weight", "scales", "router", "refresh",
+SETTING_KEYS = {"weights", "blend_with", "blend", "guard", "turn_weight", "diversity", "scales", "router", "refresh",
                 "lanes_variant", "lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base",
                 *(f"p_{c}" for c in ("signal", "stop", "give_way", "rb_entry", "xing_signal",
                                      "yield_infer", "yield_equal"))}

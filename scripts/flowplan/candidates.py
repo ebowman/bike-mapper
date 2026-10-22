@@ -42,6 +42,20 @@ def lanes_variant(lane_bonus: float = 1.0) -> Variant:
                                           "lane_bonus": round(max(LANES_FLOOR, float(lane_bonus) - LANES_STEP), 4)})
 
 
+def project_line(geometry, region: str = "ireland"):
+    """lon/lat polyline -> shapely LineString in the region's metric CRS (empty LineString if < 2 points)."""
+    tf = Transformer.from_crs("EPSG:4326", REGION_CRS[region], always_xy=True)
+    xs, ys = tf.transform([p[0] for p in geometry], [p[1] for p in geometry])
+    return shapely.linestrings(list(zip(xs, ys))) if len(xs) > 1 else shapely.LineString()
+
+
+def overlap_fraction(line, buf) -> float:
+    """Fraction of line's length inside the (buffer) polygon buf; 0 for empty or zero-length lines."""
+    if line.is_empty or line.length <= 0 or buf.is_empty:
+        return 0.0
+    return shapely.intersection(line, buf).length / line.length
+
+
 def dedupe(cands: list[Candidate], region: str = "ireland", buffer_m: float = 20.0,
            overlap: float = 0.9) -> tuple[list[Candidate], list[Candidate]]:
     """Input order = priority. Drop a candidate if >= overlap of its length lies within
