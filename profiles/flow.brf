@@ -46,6 +46,10 @@ assign lane_bonus            = 0.7   # %lane_bonus% | costfactor multiplier for 
 # (valid range 0.5..1.0; 1.0 = no lane preference). 'Plain flow' = turn_cost 150, lane_exit_cost 0, lane_bonus 1.0.
 assign turn_cost             = 400   # %turn_cost% | cost of a 90-degree turn (scaled by turn angle by BRouter; roundabouts 0); was 150 | number
 assign lane_exit_cost        = 150   # %lane_exit_cost% | cost charged when leaving a cycle lane/path onto an ordinary road | number
+# FLOW (41w.19): avoid main roads. Multiplies the base costfactor of highway primary/secondary/trunk (+ _link) ways;
+# 1.0 = off, valid 1.0..5.0 (never < 1, so it cannot cheapen a way). Forbidden classes (>= 10000) are left untouched.
+# Per-request override: &profile:main_road_penalty=<x>.
+assign main_road_penalty     = 1.0   # %main_road_penalty% | costfactor multiplier for primary/secondary/trunk roads (1 = off, 2.5 = strongly avoid) | number
 assign cycleway_base         = 1.0   # %cycleway_base% | base costfactor of highway=cycleway before lane_bonus (stock fastbike 1.3) | number
 
 # Use the following switches to change behaviour
@@ -219,6 +223,8 @@ assign badoneway =
 assign hascycleway = not
   and ( or cycleway= cycleway=no|none ) and ( or cycleway:left= cycleway:left=no ) and ( or cycleway:right= cycleway:right=no ) ( or cycleway:both= cycleway:both=no )
 
+assign main_road_factor = if or or highway=primary highway=primary_link or or highway=secondary highway=secondary_link or highway=trunk highway=trunk_link then main_road_penalty else 1.0
+
 assign lane_factor = if or highway=cycleway hasbikelane then lane_bonus else 1.0
 
 assign onewaypenalty =
@@ -344,7 +350,7 @@ assign costfactor
   add no_river_penalty
   add noise_penalty
 
-  multiply road_loose_factor multiply if greater class_factor 9998 then 1.0 else lane_factor class_factor
+  multiply road_loose_factor multiply if greater class_factor 9998 then 1.0 else multiply lane_factor main_road_factor class_factor
 
 # way priorities used for voice hint generation
 

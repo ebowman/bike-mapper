@@ -40,7 +40,7 @@ LATLON = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$")
 # settings accepted by plan_route(settings=...): the /api/plan model/routing/ranking parameters
 SETTING_KEYS = {"weights", "blend_with", "blend", "guard", "turn_weight", "diversity", "scales", "router", "refresh",
                 "elevation_source",
-                "lanes_variant", "lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base",
+                "lanes_variant", "lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base", "main_road_penalty",
                 *(f"p_{c}" for c in ("signal", "stop", "give_way", "rb_entry", "xing_signal",
                                      "yield_infer", "yield_equal"))}
 PRESETS = [
@@ -50,6 +50,9 @@ PRESETS = [
     {"name": "plain flow", "objective": "flow",
      "description": "Pre-emq.27 behaviour: avoid stops only, no lane preference.",
      "settings": {"turn_cost": 150, "lane_exit_cost": 0, "lane_bonus": 1.0}},
+    {"name": "quiet roads", "objective": "flow",
+     "description": "Penalise primary/secondary roads 2.5x; otherwise the default straight & lanes behaviour",
+     "settings": {"main_road_penalty": 2.5, "lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0}},
     {"name": "climb", "objective": "climb",
      "description": "Rank by climb score (points per the climbs spec); pass objective='climb'.",
      "settings": {}},
@@ -144,15 +147,15 @@ def _cyc(ck: dict) -> float:
 
 def _table(resp: dict) -> str:
     rows = [("| rank | id | variant | mode/heading | km | ascent m | exp. stops | turns | longest straight km "
-            "| climb score | hardest climb (len/gain/grade) | km on cycle infra | warnings |"),
-            "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+            "| climb score | hardest climb (len/gain/grade) | km on cycle infra | main-road km | warnings |"),
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in resp["routes"]:
         s, p = r["stats"], r.get("plan") or {}
         mh = p.get("mode", "?") + (f" {p['heading_deg']:g} deg" if p.get("heading_deg") is not None else "")
         rows.append(f"| {r['rank']} | {r['id']} | {r['variant']} | {mh} | {s['distance_km']:.1f} "
                     f"| {_fmt(s['ascent_m'], '{:.0f}')} | {s['expected_stops']:.2f} | {s['turns']} "
                     f"| {s['longest_straight_km']:.1f} | {s['climb_score']:.0f} | {_climb_str(s['hardest_climb'])} "
-                    f"| {_cyc(s['cycle_km']):.1f} | {'; '.join(r.get('warnings') or []) or '-'} |")
+                    f"| {_cyc(s['cycle_km']):.1f} | {s.get('main_road_km', 0.0):.1f} | {'; '.join(r.get('warnings') or []) or '-'} |")
     return "\n".join(rows)
 
 
@@ -231,7 +234,8 @@ def plan_route(mode: str, start: str, end: str | None = None, length_km: float |
     """Plan routes. mode: loop | out_and_back | one_way. start/end: 'lat,lon' or a place name (geocoded; the
     resolved place is echoed). Loops and out-and-backs need length_km (+-10%) or min_km and max_km; one_way
     needs end and ignores length. objective: flow (fewest stops/turns) | climb | flat. return_mode: same | free.
-    settings: optional dict from list_presets (e.g. turn_cost, lane_bonus, weights). Loops take 30-60 s.
+    settings: optional dict from list_presets (e.g. turn_cost, lane_bonus, weights;
+    main_road_penalty 1..5 multiplies the cost of primary/secondary/trunk roads, 2.5 = 'quiet roads' preset). Loops take 30-60 s.
     Returns a markdown table of ranked routes (use the ids with route_details / export_gpx) plus plan notes."""
     svc = service()
     echo = []

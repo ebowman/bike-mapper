@@ -17,6 +17,7 @@ from .brouter import (
     BRouterClient,
     BRouterUnavailable,
     cycle_km,
+    main_road_km,
     validate_params,
 )
 from .candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
@@ -39,7 +40,8 @@ DEFAULT_SCALES = (0.5, 1.0, 2.0)
 MAX_GUARD = 3.0
 MAX_TURN_WEIGHT = 2.0
 # emq.27 'Straight & lanes' defaults; equal to the profiles/flow.brf globals. Applied to flow variants only.
-STRAIGHT_DEFAULTS = {"lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0, "cycleway_base": 1.0}
+STRAIGHT_DEFAULTS = {"lane_bonus": 0.7, "turn_cost": 400.0, "lane_exit_cost": 150.0, "cycleway_base": 1.0,
+                     "main_road_penalty": 1.0}
 CACHE_SIZE = 32
 PLAN_MODES = ("loop", "out_and_back", "one_way")
 MAX_PLAN_CALLS = 96
@@ -166,6 +168,7 @@ def route_dict(s, debug_b=False):
                   "stops_per_km": sc.stops_per_km, "expected_stop_s": sc.expected_stop_s,
                   "by_class": sc.by_class,
                   "cycle_km": cycle_km(c.segments),
+                  "main_road_km": main_road_km(c.segments),
                   "turns": sc.turns, "turns_per_km": sc.turns_per_km,
                   "sharp_turns": sc.sharp_turns,
                   "longest_straight_km": sc.longest_straight_km,
@@ -281,7 +284,8 @@ class PlannerService:
         scales = get("scales")
         scales_t = DEFAULT_SCALES if scales is None else parse_scales(scales)
         straight = {}
-        for name in ("lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base"):
+        for name in ("lane_bonus", "turn_cost", "lane_exit_cost", "cycleway_base",
+                     "main_road_penalty"):
             raw = get(name)
             v = STRAIGHT_DEFAULTS[name] if raw is None else parse_float(raw, name)
             try:
@@ -320,6 +324,7 @@ class PlannerService:
                 "turn_cost": st.straight["turn_cost"],
                 "lane_exit_cost": st.straight["lane_exit_cost"],
                 "cycleway_base": st.straight["cycleway_base"],
+                "main_road_penalty": st.straight["main_road_penalty"],
                 "lanes_variant": st.lanes, "turn_weight": st.tw,
                 "diversity": st.diversity, "elevation_source": st.elevation_source}
 

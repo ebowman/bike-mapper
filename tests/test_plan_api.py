@@ -318,3 +318,13 @@ def test_plan_baseline_delta_never_null(index):
     assert len(kept) == len(before) and any(c.variant == "fastbike" for c in kept)
     assert resp["routes"] and all(r["delta_vs_fastest"] is not None for r in resp["routes"])
     assert not any(r["warnings"] for r in resp["routes"] if r["variant"] == "fastbike")
+
+
+def test_main_road_penalty_validation(index):
+    c = app(index)
+    for v in ("0.5", "9"):
+        r = c.get(f"/api/plan?mode=one_way&{FROM}&to=53.2210,-6.2150&main_road_penalty={v}")
+        assert r.status_code == 400 and "main_road_penalty" in r.json()["detail"]
+    r = c.get(f"/api/plan?mode=one_way&{FROM}&to=53.2210,-6.2150&main_road_penalty=2.5")
+    assert r.status_code == 200
+    assert r.json()["settings"]["main_road_penalty"] == 2.5

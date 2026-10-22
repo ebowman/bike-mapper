@@ -90,8 +90,9 @@ def test_place_name_geocoded(monkeypatch):
 def test_list_presets_shape():
     import json
     p = json.loads(flow_mcp.list_presets())
-    assert [x["name"] for x in p] == ["straight & lanes", "plain flow", "climb", "flat"]
+    assert [x["name"] for x in p] == ["straight & lanes", "plain flow", "quiet roads", "climb", "flat"]
     assert p[0]["settings"]["turn_cost"] == 400 and p[1]["settings"]["lane_exit_cost"] == 0
+    assert next(x for x in p if x["name"] == "quiet roads")["settings"]["main_road_penalty"] == 2.5
     assert {x["objective"] for x in p} == {"flow", "climb", "flat"}
 
 
@@ -138,3 +139,19 @@ def test_route_details_resolves_same_heading_routes(monkeypatch):
         d = flow_mcp.route_details(i)
         assert d.startswith(f"Route {i}: {byid[i]:.1f} km")
     assert len({byid[i] for i in same}) == len(same)
+
+
+@needs_index
+def test_plan_route_passes_main_road_penalty_to_brouter():
+    seen = []
+
+    class Rec(Hilly):
+        def route(self, points, profile="fastbike", alternativeidx=0, params=None):
+            seen.append(dict(params or {}))
+            return super().route(points, profile, alternativeidx, params)
+
+    flow_mcp.set_service(flow_mcp.build_service(Rec(), Dem(paths=[])))
+    out = flow_mcp.plan_route("one_way", START, end=END, n=1, settings={"main_road_penalty": 2.5})
+    assert not out.startswith("Error") and "main-road km" in out
+    assert any(p.get("main_road_penalty") == 2.5 for p in seen if p.get("flow_scale"))
+    assert all(p.get("main_road_penalty") == 1.0 for p in seen if p.get("flow_scale") == 0)  # baseline fixed

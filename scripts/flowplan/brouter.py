@@ -12,7 +12,8 @@ MAX_FLOW_SCALE = 10.0
 MAX_COST = 1000.0
 MIN_LANE_BONUS, MAX_LANE_BONUS = 0.5, 1.0
 # emq.27 straightness params: name -> (min, max)
-RANGED_PARAMS = {"turn_cost": (0.0, 2000.0), "lane_exit_cost": (0.0, 1000.0), "cycleway_base": (0.5, 2.0)}
+RANGED_PARAMS = {"turn_cost": (0.0, 2000.0), "lane_exit_cost": (0.0, 1000.0), "cycleway_base": (0.5, 2.0),
+                 "main_road_penalty": (1.0, 5.0)}
 
 # Same value sets and precedence as scripts/build_cycle_overlay.py classify() (duplicated: that module imports
 # osmium at top level, which the server does not need). Keep in sync.
@@ -165,6 +166,15 @@ def cycle_km(segments) -> dict:
         if kind:
             km[kind] += d
     return {**{k: v / 1000 for k, v in km.items()}, "total_km": total / 1000}
+
+
+MAIN_ROAD_HIGHWAYS = ("primary", "primary_link", "secondary", "secondary_link", "trunk", "trunk_link")
+
+
+def main_road_km(segments) -> float:
+    """Kilometres of a route on highway primary/secondary/trunk (and their _link ways)."""
+    return sum(float(sg.get("dist_m", 0) or 0) for sg in segments or []
+               if (sg.get("way_tags") or {}).get("highway") in MAIN_ROAD_HIGHWAYS) / 1000
 
 
 def parse_geojson(data: dict, variant: str = "", profile: str = "", alt: int = 0,

@@ -30,6 +30,7 @@ class Variant:
 # (a variant's own params win over profile_params), so request lane_bonus/turn_cost/costs never leak into it.
 # cycleway_base stays at the profile default 1.0 (parity rules); turn_cost 90 = stock fastbike's turncost.
 BASELINE_PARAMS = {"flow_scale": 0, "lane_bonus": 1.0, "lane_exit_cost": 0, "turn_cost": 90, "cycleway_base": 1.0,
+                   "main_road_penalty": 1.0,
                    "cost_signal": 300, "cost_xing_signal": 300, "cost_give_way": 80, "cost_stop": 60,
                    "cost_mini_rb": 80, "cost_rb_entry": 150}
 

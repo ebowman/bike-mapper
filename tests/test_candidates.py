@@ -245,3 +245,21 @@ def test_dedupe_overlap_threshold_and_empty():
     c4.geometry = [(p[0] + 0.01, p[1] + 0.01) for p in c4.geometry]   # ~1.3 km away: below the threshold
     kept, dropped = dedupe([c1, c2, c3, c4])
     assert kept == [c1, c3, c4] and dropped == [c2] and c2.duplicate_of == "fastbike/alt0"
+
+
+@pytest.mark.parametrize("v", [1.0, 2.5, 5.0, "3"])
+def test_main_road_penalty_valid(v):
+    assert brouter.validate_params({"main_road_penalty": v})["main_road_penalty"] == v
+
+
+@pytest.mark.parametrize("v", [0.99, 5.01, 0, float("nan"), float("inf"), "x", None])
+def test_main_road_penalty_invalid(v):
+    with pytest.raises(ValueError, match="main_road_penalty"):
+        brouter.validate_params({"main_road_penalty": v})
+
+
+def test_main_road_km_helper():
+    segs = [{"dist_m": 1000, "way_tags": {"highway": "secondary"}},
+            {"dist_m": 500, "way_tags": {"highway": "tertiary"}}, {"dist_m": 200}]
+    assert brouter.main_road_km(segs) == 1.0
+    assert brouter.main_road_km([{"dist_m": 250, "way_tags": {"highway": "trunk_link"}}]) == 0.25
