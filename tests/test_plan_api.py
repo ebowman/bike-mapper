@@ -235,6 +235,8 @@ def test_ride_warnings_flags_unrideable_ways():
     assert ride_warnings([seg(100, highway="track", smoothness="horrible")]) == [
         "routes over unrideable ways: 0.1 km on ways with smoothness impassable/very_horrible/horrible"]
     assert ride_warnings([]) == [] and ride_warnings([{"dist_m": 5}]) == []
+    fw = ride_warnings([seg(10700, route="ferry"), seg(1000, highway="primary")])
+    assert len(fw) == 1 and "10.7 km on ferry ways" in fw[0]
 
 
 class Segmented(Hilly):

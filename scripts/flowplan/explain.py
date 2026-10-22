@@ -75,7 +75,7 @@ def ride_warnings(segments: list) -> list[str]:
     """Human-readable warnings for a route whose segments include ways a road bike should not use: bicycle=no,
     smoothness impassable/very_horrible/horrible, or highway=path|footway without bicycle=yes|designated.
     One line per kind with the km affected; [] when the route is clean."""
-    km = {"bicycle=no": 0.0, "smoothness": 0.0, "path": 0.0}
+    km = {"bicycle=no": 0.0, "smoothness": 0.0, "path": 0.0, "ferry": 0.0}
     for sg in segments:
         t = sg.get("way_tags") or {}
         d = float(sg.get("dist_m", 0) or 0) / 1000
@@ -85,7 +85,10 @@ def ride_warnings(segments: list) -> list[str]:
             km["smoothness"] += d
         if t.get("highway") in OFFROAD_HIGHWAYS and t.get("bicycle") not in BIKE_OK:
             km["path"] += d
+        if t.get("route") == "ferry":
+            km["ferry"] += d
     msgs = {"bicycle=no": "{:.1f} km on ways tagged bicycle=no",
             "smoothness": "{:.1f} km on ways with smoothness impassable/very_horrible/horrible",
-            "path": "{:.1f} km on highway=path/footway without bicycle=yes|designated"}
+            "path": "{:.1f} km on highway=path/footway without bicycle=yes|designated",
+            "ferry": "{:.1f} km on ferry ways (route=ferry)"}
     return ["routes over unrideable ways: " + msgs[k].format(v) for k, v in km.items() if v > 0]

@@ -50,7 +50,8 @@ assign cycleway_base         = 1.0   # %cycleway_base% | base costfactor of high
 
 # Use the following switches to change behaviour
 assign allow_steps           = true   # %allow_steps% | Set to false to disallow steps | boolean
-assign allow_ferries         = true   # %allow_ferries% | set to false to disallow ferries | boolean
+# bike-mapper-41w.17: default false - a route=ferry way is a boat, not rideable (a Howth loop ranked a 10.7 km Howth<->Dun Laoghaire ferry leg)
+assign allow_ferries         = false  # %allow_ferries% | set to true to allow ferries | boolean
 assign allow_motorways       = false  # %allow_motorways% | Set to true to allow motorways (useful in Asia / Oceania for example) | boolean
 
 assign use_proposed_cycleroutes = false  # %use_proposed_cycleroutes% | Set to true to consider proposed and regular cycleroutes as equals | boolean
