@@ -139,15 +139,15 @@ def _cyc(ck: dict) -> float:
 
 def _table(resp: dict) -> str:
     rows = [("| rank | id | variant | mode/heading | km | ascent m | exp. stops | turns | longest straight km "
-            "| climb score | hardest climb (len/gain/grade) | km on cycle infra |"),
-            "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+            "| climb score | hardest climb (len/gain/grade) | km on cycle infra | warnings |"),
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in resp["routes"]:
         s, p = r["stats"], r.get("plan") or {}
         mh = p.get("mode", "?") + (f" {p['heading_deg']:g} deg" if p.get("heading_deg") is not None else "")
         rows.append(f"| {r['rank']} | {r['id']} | {r['variant']} | {mh} | {s['distance_km']:.1f} "
                     f"| {_fmt(s['ascent_m'], '{:.0f}')} | {s['expected_stops']:.2f} | {s['turns']} "
                     f"| {s['longest_straight_km']:.1f} | {s['climb_score']:.0f} | {_climb_str(s['hardest_climb'])} "
-                    f"| {_cyc(s['cycle_km']):.1f} |")
+                    f"| {_cyc(s['cycle_km']):.1f} | {'; '.join(r.get('warnings') or []) or '-'} |")
     return "\n".join(rows)
 
 

@@ -139,6 +139,19 @@ Per-metre caution: the bonus scales with distance, not per crossing. 0.8 over 10
 Tagging caveat: OSM lanes are tagged on only ~8% of Irish tertiary roads (`docs/research/osm-road-network.md`), so the preference only sees tagged infrastructure and `cycle_km` is a lower bound.
 API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not fastbike, which is the only variant without the lane preference; part of the cache key; echoed in `settings.lane_bonus`), `lanes_variant=1` adds a fifth variant `flow_lanes` (flow_scale 1.0, lane_bonus = max(0.5, requested lane_bonus - 0.2), so it is always stronger than the current setting; label "Flow+lanes"). UI: Settings 'Prefer cycle infrastructure' slider (Off .. Strongest = 0.5, default 0.7, step 0.05, re-routes) and 'Add a lanes-favouring route'; hash keys `lb=`, `lv=1`. Cards show km on cycle paths and on roads with lanes/tracks when non-zero.
 
+## Rideability rules (41w.13)
+
+`profiles/flow.brf` is a road-bike profile. Stock fastbike lets a rider push the bike over any way with foot access, and the first climb-mode result routed a 2.6 km, 16% average loop section over `highway=path` ways tagged `bicycle=no`, `surface=ground`, `smoothness=impassable`. The flow profile therefore treats the following as FORBIDDEN (costfactor 10000, explicit switch before the capped sum, so `lane_factor`, `nodeaccessgranted` and cycle-route relations cannot re-grant them):
+
+- `bicycle=no|private|dismount|use_sidepath` (any way where bike access is false), regardless of foot access or a cycle-route relation.
+- Any way with `smoothness=impassable|very_horrible|horrible|very_bad` or `surface=ground|mud|sand|grass|dirt|earth|clay`.
+- `highway=path|footway` unless `bicycle=yes|designated` AND the surface is `asphalt|paved|concrete|paving_stones`, or the surface is untagged and `smoothness=good|excellent|very_good`.
+- `highway=track` unless `tracktype=grade1` with a paved surface tag. Loose surfaces (`gravel|fine_gravel|compacted|unpaved`) on path/track/footway are therefore forbidden too.
+
+Penalised, not forbidden: loose surfaces (`gravel|fine_gravel|compacted|unpaved`) on ordinary roads get costfactor x 3 on top of the existing unpaved penalties. `highway=cycleway` is also subject to the bike-access rule and to the any-way surface/smoothness rules (a cycleway tagged `surface=ground` is forbidden), and a gravel/compacted cycleway gets the same x3 loose-surface factor as a road.
+
+The stock `fastbike` comparison variant is not changed. In `/api/plan` and the MCP a fastbike candidate with any ride warning (`bicycle=no`, `highway=path|footway` without `bicycle=yes|designated`, or smoothness impassable/very_horrible/horrible) is dropped from the result (a plan note says how many); `delta_vs_fastest` is then null for that heading. As a guard against profile gaps every route carries `warnings` (`routes over unrideable ways: N km ...`) when any segment has `bicycle=no`, `smoothness` impassable/very_horrible/horrible, or `highway=path|footway` without `bicycle=yes|designated`; the UI card shows it in red and the MCP route table has a `warnings` column. Footways explicitly tagged `bicycle=yes` on a paved surface remain allowed (and are not warned).
+
 ## Regenerating the data
 
 Events table (all of Ireland; slow, run once; the command is from the docstring of `scripts/score_route_stops.py` with the Ireland bbox):

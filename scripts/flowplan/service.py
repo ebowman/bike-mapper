@@ -20,7 +20,7 @@ from .brouter import (
     validate_params,
 )
 from .candidates import DEFAULT_VARIANTS, Variant, generate, lanes_variant
-from .explain import explain
+from .explain import explain, ride_warnings
 from .plan import plan_candidates
 from .ranking import (
     DEFAULT_DIVERSITY,
@@ -167,6 +167,7 @@ def route_dict(s, debug_b=False):
                   "longest_straight_km": sc.longest_straight_km,
                   "mean_straight_km": sc.mean_straight_km},
         "delta_vs_fastest": s.delta_vs_fastest,
+        "warnings": ride_warnings(c.segments),
         "hits": [{"lat": h["lat"], "lon": h["lon"], "cause": h["cause"], "p": h["p"]}
                  for h in sc.hits],
     }
@@ -443,6 +444,13 @@ class PlannerService:
         if hit is None:
             self.log_skipped(skipped)
         notes = list(notes)
+        # 41w.13: the stock fastbike baseline knows nothing about road-bike rideability; never offer it as a plan
+        # result when it runs over paths/footways/bicycle=no ways (flow routes are guarded by the profile and only warned)
+        bad_fast = [c for c in kept if c.profile == "fastbike" and ride_warnings(c.segments)]
+        if bad_fast:
+            kept = [c for c in kept if c not in bad_fast]
+            notes.append(f"{len(bad_fast)} stock-fastbike candidate(s) dropped: they ran over paths/footways or "
+                         "bicycle=no ways")
         if mode == "loop" and end is not None:
             notes.append("'to' is ignored for loops")
         if not kept:

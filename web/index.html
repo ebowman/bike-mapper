@@ -729,6 +729,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
         card.appendChild(el('div', 'climb', 'heading ' + Math.round(r.plan.heading_deg) + ' deg (' + cp + ')' + (r.plan.length_km != null ? ', planned ' + r.plan.length_km.toFixed(1) + ' km' : '')));
       }
       card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
+      (r.warnings || []).forEach(function (w) { var we = el('div', 'd', 'WARNING: ' + w); we.style.color = '#b00020'; card.appendChild(we); });
       var ck = s.cycle_km;
       if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
         card.appendChild(el('div', 'd', ck.path.toFixed(1) + ' km on cycle paths, ' + (ck.lane + ck.track).toFixed(1) + ' km on roads with lanes/tracks'));
