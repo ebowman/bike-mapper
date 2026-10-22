@@ -31,6 +31,13 @@ button.on { background: #cde; font-weight: 600; }
 .card .t { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
 .card .d { font-size: 12px; color: #444; }
 .card .delta { font-size: 12px; color: #005; }
+.card .climb { font-size: 12px; color: #444; }
+#notes { font-size: 12px; color: #6a4a00; }
+#notes div { margin-top: 2px; }
+#planOpts input[type=number] { width: 64px; padding: 4px 6px; }
+table.climbs { border-collapse: collapse; font-size: 11px; margin: 6px 0; }
+table.climbs th { background: #eee; text-align: left; padding: 2px 4px; }
+table.climbs td { padding: 1px 4px; border-top: 1px solid #e4e4e4; white-space: nowrap; }
 details#settings { border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; background: #fafafa; }
 details#settings summary { cursor: pointer; font-weight: 600; }
 #setBadge { font-weight: 400; font-size: 12px; background: #e6eefc; border-radius: 8px; padding: 1px 7px; margin-left: 6px; }
@@ -85,6 +92,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   <div id="side">
     <h1>Flow planner</h1>
     <div class="row">
+      <label for="modeSel">Mode</label>
+      <select id="modeSel"><option value="one_way">One way</option><option value="loop">Loop</option><option value="out_and_back">Out and back</option></select>
+    </div>
+    <div class="row">
       <button id="mStart" class="on" title="Next map click sets the start">Set start</button>
       <button id="mEnd" title="Next map click sets the end">Set end</button>
       <button id="swap">Swap</button>
@@ -92,8 +103,17 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     </div>
     <div class="field"><label for="qStart">Start (search or click map)</label>
       <input id="qStart" type="search" autocomplete="off" placeholder="e.g. Trinity College Dublin"><div class="dd" id="ddStart"></div></div>
-    <div class="field"><label for="qEnd">End (search or click map)</label>
+    <div class="field"><label for="qEnd" id="endLab">End (search or click map)</label>
       <input id="qEnd" type="search" autocomplete="off" placeholder="e.g. Greystones"><div class="dd" id="ddEnd"></div></div>
+    <div id="planOpts">
+      <div class="row" id="lenRow"><label for="minKm">Length km</label>
+        <input id="minKm" type="number" min="1" max="500" step="1" aria-label="Minimum length km"> to
+        <input id="maxKm" type="number" min="1" max="500" step="1" aria-label="Maximum length km"></div>
+      <div class="row"><label for="objSel">Objective</label>
+        <select id="objSel"><option value="flow">Flow</option><option value="climb">Climb</option><option value="flat">Flat</option></select>
+        <span id="retWrap"><label for="retSel">return</label>
+        <select id="retSel"><option value="same">same path</option><option value="free">free</option></select></span></div>
+    </div>
     <div class="row">
       <label for="nSel">Routes</label>
       <select id="nSel"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
@@ -153,6 +173,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       <div class="note" id="costs">router costs: ...</div>
     </details>
     <div id="status" role="status"></div>
+    <div id="notes"></div>
     <div id="results"></div>
     <div id="drawer" hidden></div>
     <footer>
@@ -177,6 +198,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   }).addTo(map);
 
   var state = { from: null, to: null, mode: 'from', n: 4, loading: false };
+  var PDEF = { mode: 'one_way', min: 40, max: 50, obj: 'flow', ret: 'same' };
+  var P = JSON.parse(JSON.stringify(PDEF));   // plan options: mode, length range, objective, return
+  var MODES = ['one_way', 'loop', 'out_and_back'], OBJS = ['flow', 'climb', 'flat'], RETS = ['same', 'free'];
+  var PLAN_LS = 'flowplan.plan';
+  function planOn() { return P.mode !== 'one_way'; }
   var reqSeq = 0;   // bumped by every new request and by clear/swap; stale responses are ignored
   var markers = { from: null, to: null };
   var routeLayer = L.layerGroup().addTo(map);
@@ -263,7 +289,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     return o;
   }
   function saveSettings() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { /* storage unavailable */ }
+    try { localStorage.setItem(LS_KEY, JSON.stringify(S)); localStorage.setItem(PLAN_LS, JSON.stringify(P)); } catch (e) { /* storage unavailable */ }
     writeHash();
   }
   function loadSettings(h) {
@@ -282,11 +308,37 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     state.n = S.n;
   }
 
+  function planFromObj(o) {   // o: {mode, min, max, obj, ret} loosely typed; invalid fields fall back to defaults
+    var r = JSON.parse(JSON.stringify(PDEF));
+    if (MODES.indexOf(o.mode) >= 0) r.mode = o.mode;
+    else if (o.mode === 'out-and-back') r.mode = 'out_and_back';
+    else if (o.mode === 'one-way') r.mode = 'one_way';
+    var mn = num(o.min), mx = num(o.max);
+    if (mn !== null && mx !== null && mn > 0 && mx > mn && mx <= 500) { r.min = mn; r.max = mx; }
+    if (OBJS.indexOf(o.obj) >= 0) r.obj = o.obj;
+    if (RETS.indexOf(o.ret) >= 0) r.ret = o.ret;
+    return r;
+  }
+  function loadPlan(h) {
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(PLAN_LS) || 'null'); } catch (e) { stored = null; }
+    var o = stored && typeof stored === 'object' ? stored : {};
+    if (h.mode !== undefined) o.mode = h.mode;
+    if (h.len !== undefined) { var m = /^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/.exec(h.len); if (m) { o.min = m[1]; o.max = m[2]; } }
+    if (h.obj !== undefined) o.obj = h.obj;
+    if (h.ret !== undefined) o.ret = h.ret;
+    P = planFromObj(o);
+  }
+
   // ---------- state <-> hash ----------
   function writeHash() {
     var parts = [];
     if (state.from) parts.push('from=' + fmtLL(state.from));
-    if (state.to) parts.push('to=' + fmtLL(state.to));
+    if (state.to && P.mode !== 'loop') parts.push('to=' + fmtLL(state.to));
+    if (P.mode !== PDEF.mode) parts.push('mode=' + P.mode);
+    if (P.min !== PDEF.min || P.max !== PDEF.max) parts.push('len=' + P.min + '-' + P.max);
+    if (P.obj !== PDEF.obj) parts.push('obj=' + P.obj);
+    if (P.ret !== PDEF.ret) parts.push('ret=' + P.ret);
     var so = settingsToObj();
     var dbgPart = dbgOpen ? ['dbg=1'] : [];
     Object.keys(so).forEach(function (k) { parts.push(k + '=' + encodeURIComponent(so[k]).replace(/%2C/g, ',')); });
@@ -308,7 +360,29 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('mEnd').className = m === 'to' ? 'on' : '';
   }
 
-  function updateGo() { $('go').disabled = state.loading || !(state.from && state.to); }
+  function canRun() { return !!(state.from && (state.to || P.mode !== 'one_way')); }
+  function updateGo() { $('go').disabled = state.loading || !canRun(); }
+  function afterStart() { if (P.mode !== 'loop') setMode('to'); }
+  var MODE_NOUN = { loop: 'a loop', out_and_back: 'an out and back' };
+  function applyMode() {   // show/hide controls for the current mode
+    var loop = P.mode === 'loop', oab = P.mode === 'out_and_back';
+    $('modeSel').value = P.mode;
+    $('qEnd').parentNode.style.display = loop ? 'none' : '';
+    $('mEnd').style.display = loop ? 'none' : '';
+    $('swap').style.display = loop ? 'none' : '';
+    $('mEnd').textContent = oab ? 'Set turnaround' : 'Set end';
+    $('endLab').textContent = oab ? 'Turnaround (optional, search or click map)' : 'End (search or click map)';
+    $('qEnd').placeholder = oab ? 'optional, e.g. Greystones' : 'e.g. Greystones';
+    $('planOpts').style.display = planOn() ? '' : 'none';
+    $('retWrap').style.display = oab ? '' : 'none';
+    $('lenRow').style.display = planOn() ? '' : 'none';
+    $('minKm').value = String(P.min); $('maxKm').value = String(P.max);
+    $('objSel').value = P.obj; $('retSel').value = P.ret;
+    $('go').textContent = loop ? 'Plan loop' : (oab ? 'Plan out and back' : 'Find routes');
+    if (markers.to) { if (loop) map.removeLayer(markers.to); else if (!map.hasLayer(markers.to)) markers.to.addTo(map); }
+    if (loop && state.mode === 'to') setMode('from');
+    updateGo();
+  }
 
   function supersede() { if (state.loading) setStatus(''); reqSeq++; state.loading = false; }
   function setPoint(which, ll, label) {
@@ -337,7 +411,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   map.on('click', function (e) {
     var which = state.mode;
     setPoint(which, [e.latlng.lat, e.latlng.lng]);
-    if (which === 'from') setMode('to');
+    if (which === 'from') afterStart();
   });
   $('mStart').onclick = function () { setMode('from'); };
   $('mEnd').onclick = function () { setMode('to'); };
@@ -353,6 +427,22 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     clearPoint('from'); clearPoint('to'); clearResults(); setStatus('');
     setMode('from'); writeHash(); updateGo();
   };
+  $('modeSel').onchange = function () {
+    reqSeq++; state.loading = false; clearTimeout(routeTimer);
+    P.mode = $('modeSel').value; clearResults(); setStatus('');
+    applyMode(); saveSettings();
+  };
+  function readLen() {
+    var mn = num($('minKm').value), mx = num($('maxKm').value);
+    var ok = mn !== null && mx !== null && mn > 0 && mx > mn && mx <= 500;
+    $('minKm').className = $('maxKm').className = ok ? '' : 'bad';
+    if (ok) { P.min = mn; P.max = mx; saveSettings(); }
+    else setStatus('Length range: min must be above 0 and below max (max 500 km).', true);
+    return ok;
+  }
+  $('minKm').onchange = $('maxKm').onchange = function () { if (readLen()) setStatus(''); };
+  $('objSel').onchange = function () { P.obj = $('objSel').value; saveSettings(); };
+  $('retSel').onchange = function () { P.ret = $('retSel').value; saveSettings(); };
   $('nSel').onchange = function () { state.n = S.n = parseInt($('nSel').value, 10); saveSettings(); scheduleRoute(); };
 
   // ---------- Nominatim search: 600 ms debounce + hard 1 req/s throttle ----------
@@ -396,7 +486,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
               var ll = [parseFloat(it.lat), parseFloat(it.lon)];
               setPoint(which, ll, it.display_name.split(',').slice(0, 2).join(','));
               map.panTo(ll); hide();
-              if (which === 'from' && !state.to) setMode('to');
+              if (which === 'from' && !state.to) afterStart();
             };
             dd.appendChild(d);
           });
@@ -415,7 +505,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   function clearResults() {
     routes = []; lines = []; selected = -1;
     routeLayer.clearLayers(); stopLayer.clearLayers(); dbgLayer.clearLayers(); dbgDrawn = false;
-    $('results').textContent = ''; $('drawer').textContent = ''; $('drawer').hidden = true;
+    $('results').textContent = ''; $('drawer').textContent = ''; $('drawer').hidden = true; $('notes').textContent = '';
   }
 
   function styleLines(hover) {
@@ -502,6 +592,19 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     var r = routes[selected];
     var head = el('h3'); head.appendChild(el('span', null, 'Explain #' + r.rank + ' ' + (LABELS[r.variant] || r.variant)));
     var x = el('button', 'xp', 'Close'); x.onclick = function () { closeDrawer(); }; head.appendChild(x); box.appendChild(head);
+    var cl = r.stats.climbs || [];
+    box.appendChild(el('div', null, cl.length ? 'Climbs (' + cl.length + '), climb score ' + Math.round(r.stats.climb_score || 0) + ':' : 'No categorised climbs on this route.'));
+    if (cl.length) {
+      var ct = el('table', 'climbs'), ch = el('tr');
+      ['start km', 'length km', 'gain m', 'grade %', 'points', 'cat'].forEach(function (c) { ch.appendChild(el('th', null, c)); });
+      ct.appendChild(ch);
+      cl.forEach(function (c) {
+        var tr = el('tr');
+        [c.start_km.toFixed(1), (c.length_m / 1000).toFixed(1), Math.round(c.gain_m), c.avg_grade_pct.toFixed(1), Math.round(c.points), c.category].forEach(function (v) { tr.appendChild(el('td', 'num', String(v))); });
+        ct.appendChild(tr);
+      });
+      box.appendChild(ct);
+    }
     if (!r.segments) { box.appendChild(el('div', null, 'Loading...')); return; }
     var sm = r.summary, total = 0, cls = Object.keys(sm.km_by_highway);
     cls.sort(function (a, b) { return sm.km_by_highway[b] - sm.km_by_highway[a]; });
@@ -566,7 +669,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     if (i !== selected) select(i); else showDrawer();
     if (routes.every(function (r) { return r.segments; })) return;
     var seq = reqSeq;   // re-request with debug=1: the candidates are cached server-side, so this is instant
-    fetch(routeUrl() + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
+    fetch(requestUrl() + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
       if (seq !== reqSeq || !j.routes) return;
       j.routes.forEach(function (nr) {
         routes.forEach(function (r) { if (r.id === nr.id) { r.segments = nr.segments; r.summary = nr.summary; } });
@@ -579,7 +682,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
   }
   function gpxFor(r, idx) {
-    var name = xmlEsc('flow rank ' + r.rank + ' ' + (LABELS[r.variant] || r.variant));
+    var name = xmlEsc('flow rank ' + r.rank + ' ' + (LABELS[r.variant] || r.variant) + (r.plan ? ' ' + r.plan.mode + (r.plan.heading_deg != null ? ' heading ' + Math.round(r.plan.heading_deg) : '') : ''));
     var pts = r.geometry.coordinates.map(function (c) {
       return '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"/>';
     }).join('');
@@ -589,7 +692,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   function downloadGpx(r, idx) {
     var blob = new Blob([gpxFor(r, idx)], { type: 'application/gpx+xml' });
     var url = URL.createObjectURL(blob), a = document.createElement('a');
-    a.href = url; a.download = 'flow-route-' + r.rank + '-' + r.variant + '.gpx';
+    a.href = url; a.download = 'flow-route-' + r.rank + '-' + r.variant + (r.plan && r.plan.heading_deg != null ? '-h' + Math.round(r.plan.heading_deg) : '') + '.gpx';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
@@ -614,7 +717,17 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       xp.onclick = function (ev) { ev.stopPropagation(); if (dbgOpen && selected === i) closeDrawer(); else openDrawer(i); };
       var tools = el('span'); tools.appendChild(xp); tools.appendChild(document.createTextNode(' ')); tools.appendChild(g);
       t.appendChild(tools); card.appendChild(t);
-      card.appendChild(el('div', 'd', s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m'));
+      var head = s.distance_km.toFixed(1) + ' km, ascent ' + Math.round(s.ascent_m) + ' m';
+      if (s.climb_score !== undefined) head += ', climb score ' + Math.round(s.climb_score);
+      card.appendChild(el('div', 'd', head));
+      if (s.climb_score !== undefined) {
+        var hc = s.hardest_climb;
+        card.appendChild(el('div', 'climb', hc ? 'hardest climb ' + (hc.length_m / 1000).toFixed(1) + ' km / ' + Math.round(hc.gain_m) + ' m / ' + hc.avg_grade_pct.toFixed(1) + '% (cat ' + hc.category + ')' : 'no categorised climbs'));
+      }
+      if (r.plan && r.plan.heading_deg != null) {
+        var cp = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(r.plan.heading_deg / 45) % 8];
+        card.appendChild(el('div', 'climb', 'heading ' + Math.round(r.plan.heading_deg) + ' deg (' + cp + ')' + (r.plan.length_km != null ? ', planned ' + r.plan.length_km.toFixed(1) + ' km' : '')));
+      }
       card.appendChild(el('div', 'd', s.expected_stops.toFixed(1) + ' expected stops (' + s.stops_per_km.toFixed(2) + '/km), ~' + mmss(s.expected_stop_s) + ' stopped'));
       var ck = s.cycle_km;
       if (ck && (ck.path > 0 || ck.lane > 0 || ck.track > 0)) {
@@ -640,19 +753,43 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       if (!keepView) map.fitBounds(lines[0].getBounds(), { padding: [30, 30] });
     }
     setStatus(routes.length + ' routes from ' + data.candidates_deduped + ' distinct candidates (' +
-      (data.cached ? 'cached' : 're-routed') + ', ' + (data.timings_ms.total / 1000).toFixed(1) + ' s)');
+      (data.cached ? 'cached' : 're-routed') + ', ' + (data.timings_ms.total / 1000).toFixed(1) + ' s' +
+      (data.plan && data.plan.calls != null ? ', ' + data.plan.calls + ' BRouter calls' : '') + ')');
+    var nb = $('notes');
+    ((data.plan && data.plan.notes) || []).forEach(function (n) { nb.appendChild(el('div', null, n)); });
     afterResponse(data);
   }
 
   function routeUrl() { return '/api/route?from=' + fmtLL(state.from) + '&to=' + fmtLL(state.to) + '&n=' + S.n + settingsQuery(); }
+  function planUrl() {
+    var u = '/api/plan?mode=' + P.mode + '&from=' + fmtLL(state.from) + '&n=' + S.n;
+    if (P.mode === 'out_and_back') u += '&return=' + P.ret;
+    if (P.mode === 'out_and_back' && state.to) u += '&to=' + fmtLL(state.to);   // turnaround fixed: length and objective do not apply
+    else u += '&min_km=' + P.min + '&max_km=' + P.max + '&objective=' + P.obj;
+    return u + settingsQuery();
+  }
+  function requestUrl() { return planOn() ? planUrl() : routeUrl(); }
   function findRoutes(fromSettings) {
-    if (!(state.from && state.to)) return;
+    if (!canRun()) return;
     if (state.loading && fromSettings !== true) return;
+    if (planOn() && !readLen()) return;
     state.loading = true; updateGo();
     if (fromSettings !== true || !routes.length) clearResults();
     var seq = ++reqSeq;
-    setStatus(fromSettings === true ? 'Updating (cached candidates are instant; new probabilities re-route, 5-8 s)' : 'Asking BRouter for candidates, about 5-8 s');
-    var url = routeUrl() + (dbgOpen ? '&debug=1' : '');
+    var t0 = Date.now(), msg;
+    if (planOn()) {
+      var noun = MODE_NOUN[P.mode];
+      msg = fromSettings === true ? 'Updating the plan (cached is instant; routing changes re-plan, 30-60 s)'
+        : 'Planning ' + noun + ': up to 48 BRouter calls, 30-60 s';
+    } else msg = fromSettings === true ? 'Updating (cached candidates are instant; new probabilities re-route, 5-8 s)' : 'Asking BRouter for candidates, about 5-8 s';
+    setStatus(msg);
+    if (planOn()) {
+      var tick = setInterval(function () {
+        if (seq !== reqSeq || !state.loading) { clearInterval(tick); return; }   // superseded, finished or mode changed: stop quietly
+        setStatus(msg + ' (' + Math.round((Date.now() - t0) / 1000) + ' s elapsed)');
+      }, 1000);
+    }
+    var url = requestUrl() + (dbgOpen ? '&debug=1' : '');
     fetch(url).then(function (r) {
       return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
     }).then(function (res) {
@@ -671,7 +808,10 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   var routeTimer = null;
   function scheduleRoute() {
     clearTimeout(routeTimer);
-    routeTimer = setTimeout(function () { findRoutes(true); }, 250);
+    routeTimer = setTimeout(function () {
+      if (planOn() && !routes.length) return;   // never launch a 30-60 s plan from a slider drag; use the Plan button
+      findRoutes(true);
+    }, 250);
   }
   function settingsQuery() {
     var q = '&weights=' + encodeURIComponent(S.w);
@@ -783,6 +923,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     });
     $('resetAll').onclick = function () {
       S.p = {}; S.blend = 0; S.guard = DEF.guard; S.scales = DEF.scales.slice(); S.lane = DEF.lane; S.tc = DEF.tc; S.le = DEF.le; S.tw = DEF.tw; S.lanesVariant = DEF.lanesVariant; lastModelP = null;
+      P.obj = PDEF.obj; P.ret = PDEF.ret; applyMode();
       $('scaleErr').textContent = '';
       Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) { i.className = ''; });
       changed();
@@ -818,18 +959,20 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   // ---------- health (once) + hash restore ----------
   var h = readHash();
   loadSettings(h);
+  loadPlan(h);
   dbgOpen = h.dbg === '1';
   $('nSel').value = String(S.n);
   var f = parseLL(h.from), t = parseLL(h.to);
   if (f) setPoint('from', f);
   if (t) setPoint('to', t);
-  if (f && !t) setMode('to');
-  if (f && t) { setMode('from'); map.fitBounds([f, t], { padding: [40, 40] }); }
+  if (f && !t) afterStart();
+  if (f && (t || planOn())) { setMode('from'); map.fitBounds(t && P.mode !== 'loop' ? [f, t] : [f, f], { padding: [40, 40], maxZoom: 12 }); }
+  applyMode();
   saveSettings();
 
   fetch('/api/health').then(function (r) { return r.json(); }).then(function (j) {
     var b = j.bbox;
-    if (b && !(f && t)) map.fitBounds([[b.lat_min, b.lon_min], [b.lat_max, b.lon_max]]);
+    if (b && !(f && (t || planOn()))) map.fitBounds([[b.lat_min, b.lon_min], [b.lat_max, b.lon_max]]);
     $('foot').textContent = 'Routing: BRouter ' + (j.brouter ? 'up' : 'DOWN (start it with make brouter)') + '. Stop weights: ' + j.weight_set + '.';
   }).catch(function () {
     $('foot').textContent = 'Planner API unreachable.';
@@ -839,7 +982,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     MODEL = j; buildPanel();
   }).catch(function () {
     $('setBadge').textContent = 'model unavailable';
-  }).then(function () { if (f && t) findRoutes(); });
+  }).then(function () { if (canRun() && f) findRoutes(); });
   // ---------- cycle infrastructure overlay (lazy-loaded, off by default) ----------
   (function () {
     var CYC_LS = 'flowplanner.cycleLayers';
