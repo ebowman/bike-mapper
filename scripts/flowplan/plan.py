@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import itertools
 import math
-import re
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
 
@@ -334,9 +333,7 @@ def plan_candidates(client: BRouterClient, mode: str, start, end=None, length_km
     kept, dropped = dedupe(cands, region)
     for c in cands:
         c.variant = names[id(c)]
-    for c in dropped:       # strip the temporary '@heading' so duplicate_of matches a kept key
-        if c.duplicate_of:
-            c.duplicate_of = re.sub(r"@[^/]*", "", c.duplicate_of)
+    # duplicate_of keeps the '@heading' so it equals the kept candidate's route_id
     res.kept, res.dropped = kept, res.dropped + dropped
     if not kept:
         res.notes.append("no candidate inside the requested length range")

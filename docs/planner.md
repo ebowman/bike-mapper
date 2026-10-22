@@ -251,3 +251,7 @@ loop, out-and-back and one-way candidates aimed at a length range.
 - **Measured** (loop 50-60 km from -6.2825, 53.2990, 8 sets, flow variant): flow mean ascent 474 m (max 736);
   climb mean ascent 786 m (max 848), a ratio of 1.66. Climb candidates are fewer-but-steadier: ascent is more
   consistent, but the best single climb score was similar (367 vs 409).
+
+## MCP server and route ids
+
+The planner logic lives in `scripts/flowplan/service.py` (`PlannerService`), shared by the FastAPI handlers and the MCP server in [mcp.md](mcp.md) (plan, rank, explain and export GPX from Claude Code). Route ids in `/api/plan` responses are unique: `<variant>@<heading>/alt<k>` for loops and out-and-backs (e.g. `flow_hi@150/alt0`), `<variant>/alt<k>` for one-way; `variant` stays bare and `duplicate_of` uses the same ids. `/api/route` ids are unchanged (`<variant>/alt<k>`).

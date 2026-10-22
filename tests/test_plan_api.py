@@ -54,6 +54,16 @@ def test_loop_in_range_with_climb_fields(index):
         assert x["plan"]["mode"] == "loop" and "expected_stops" in st and "turns" in st
 
 
+@pytest.mark.parametrize("q", [LOOP, LOOP + "&objective=climb&n=6", LOOP + "&n=6",
+                               f"/api/plan?mode=out_and_back&{FROM}&min_km=50&max_km=60&bearings=4&n=6",
+                               f"/api/plan?mode=one_way&{FROM}&to=53.2210,-6.2150&n=6"])
+def test_route_ids_unique_in_plan(index, q):
+    ids = [x["id"] for x in app(index).get(q).json()["routes"]]
+    assert ids and len(ids) == len(set(ids))
+    if "one_way" not in q:
+        assert all("@" in i for i in ids)
+
+
 def test_objective_climb_orders_by_score(index):
     j = app(index).get(LOOP + "&objective=climb&n=6").json()
     cs = [x["stats"]["climb_score"] for x in j["routes"]]
@@ -165,8 +175,9 @@ def test_duplicate_of_matches_kept_key():
     from tests.test_plan import START
     res = plan_candidates(PlanFake(), "loop", START, length_km=(40, 50), bearings=2,
                           variants=tuple(v for v in DEFAULT_VARIANTS if v.name in ("fastbike", "flow")))
-    kept = {c.key for c in res.kept}
+    kept = {c.route_id for c in res.kept}
+    assert len(kept) == len(res.kept)
     dup = [c for c in res.dropped if c.duplicate_of and "overlap" not in c.duplicate_of]
     assert dup
     for c in dup:
-        assert "@" not in c.duplicate_of and c.duplicate_of in kept
+        assert "@" in c.duplicate_of and c.duplicate_of in kept
