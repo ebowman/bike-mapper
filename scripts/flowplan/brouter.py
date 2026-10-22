@@ -12,7 +12,8 @@ MAX_FLOW_SCALE = 10.0
 MAX_COST = 1000.0
 MIN_LANE_BONUS, MAX_LANE_BONUS = 0.5, 1.0
 # emq.27 straightness params: name -> (min, max)
-RANGED_PARAMS = {"turn_cost": (0.0, 2000.0), "lane_exit_cost": (0.0, 1000.0), "cycleway_base": (0.5, 2.0)}
+RANGED_PARAMS = {"turn_cost": (0.0, 2000.0), "lane_exit_cost": (0.0, 1000.0), "cycleway_base": (0.5, 2.0),
+                 "main_road_penalty": (1.0, 5.0)}
 
 # Same value sets and precedence as scripts/build_cycle_overlay.py classify() (duplicated: that module imports
 # osmium at top level, which the server does not need). Keep in sync.
@@ -39,10 +40,24 @@ class Candidate:
     duplicate_of: str | None = None
     # per-BRouter-message-row dicts (see parse_messages); [] when the response had no messages
     segments: list = field(default_factory=list)
+    # parallel to geometry: metres, or None when the coordinate had no third element
+    elevations: list = field(default_factory=list)
+    # set by flowplan.plan: mode, heading_deg, via_points, radius_m/turnaround, iterations, length_km
+    plan: dict | None = None
 
     @property
     def key(self) -> str:
         return f"{self.variant}/alt{self.alt}"
+
+    @property
+    def route_id(self) -> str:
+        """Unique id within a plan response: planned loops / out-and-backs include the heading
+        and via-point set index (`flow_hi@45.2/alt0`); one-way and /api/route candidates use the bare key."""
+        h = (self.plan or {}).get("heading_deg")
+        if h is None:
+            return self.key
+        s = (self.plan or {}).get("set", 0)
+        return f"{self.variant}@{h:g}.{s}/alt{self.alt}"
 
 
 def validate_params(params: dict | None) -> dict:
@@ -55,8 +70,8 @@ def validate_params(params: dict | None) -> dict:
                 f = float(v)
             except (TypeError, ValueError):
                 raise ValueError(f"flow_scale must be numeric, got {v!r}") from None
-            if not math.isfinite(f) or f <= 0 or f > MAX_FLOW_SCALE:
-                raise ValueError(f"flow_scale must be finite, > 0 and <= {MAX_FLOW_SCALE}, got {v!r}")
+            if not math.isfinite(f) or f < 0 or f > MAX_FLOW_SCALE:
+                raise ValueError(f"flow_scale must be finite, >= 0 and <= {MAX_FLOW_SCALE}, got {v!r}")
         elif k == "lane_bonus":
             try:
                 f = float(v)
@@ -153,17 +168,28 @@ def cycle_km(segments) -> dict:
     return {**{k: v / 1000 for k, v in km.items()}, "total_km": total / 1000}
 
 
+MAIN_ROAD_HIGHWAYS = ("primary", "primary_link", "secondary", "secondary_link", "trunk", "trunk_link")
+
+
+def main_road_km(segments) -> float:
+    """Kilometres of a route on highway primary/secondary/trunk (and their _link ways)."""
+    return sum(float(sg.get("dist_m", 0) or 0) for sg in segments or []
+               if (sg.get("way_tags") or {}).get("highway") in MAIN_ROAD_HIGHWAYS) / 1000
+
+
 def parse_geojson(data: dict, variant: str = "", profile: str = "", alt: int = 0,
                   params: dict | None = None) -> Candidate:
     feat = data["features"][0]
     props = feat["properties"]
-    geom = [(float(c[0]), float(c[1])) for c in feat["geometry"]["coordinates"]]
+    coords = feat["geometry"]["coordinates"]
+    geom = [(float(c[0]), float(c[1])) for c in coords]
+    elevs = [float(c[2]) if len(c) > 2 and c[2] is not None else None for c in coords]
     return Candidate(variant=variant or profile, profile=profile, alt=alt, geometry=geom,
                      length_m=float(props["track-length"]),
                      ascent_m=float(props.get("filtered ascend", 0) or 0),
                      time_s=float(props.get("total-time", 0) or 0),
                      cost=float(props.get("cost", 0) or 0), params=dict(params or {}),
-                     segments=parse_messages(props.get("messages")))
+                     segments=parse_messages(props.get("messages")), elevations=elevs)
 
 
 class BRouterClient:

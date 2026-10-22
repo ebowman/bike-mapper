@@ -1,0 +1,15 @@
+name,mode,from_name,from_lat,from_lon,to_name,to_lat,to_lon,min_km,max_km,objective,return
+loop_rath_40_50_flow,loop,Rathfarnham,53.2990,-6.2825,,,,40,50,flow,same
+loop_rath_40_50_climb,loop,Rathfarnham,53.2990,-6.2825,,,,40,50,climb,same
+loop_rath_40_50_flat,loop,Rathfarnham,53.2990,-6.2825,,,,40,50,flat,same
+loop_rath_70_85_flow,loop,Rathfarnham,53.2990,-6.2825,,,,70,85,flow,same
+loop_rath_70_85_climb,loop,Rathfarnham,53.2990,-6.2825,,,,70,85,climb,same
+loop_rath_70_85_flat,loop,Rathfarnham,53.2990,-6.2825,,,,70,85,flat,same
+oab_rath_sallygap_flow,out_and_back,Rathfarnham,53.2990,-6.2825,Sally Gap,53.1370,-6.3140,55,65,flow,same
+oab_rath_sallygap_climb,out_and_back,Rathfarnham,53.2990,-6.2825,Sally Gap,53.1370,-6.3140,55,65,climb,same
+oab_clontarf_30_40_flat,out_and_back,Clontarf,53.3640,-6.1950,,,,30,40,flat,free
+oneway_lucan_dalkey_flow,one_way,Lucan,53.3570,-6.4480,Dalkey,53.2780,-6.1030,,,flow,same
+oneway_lucan_dalkey_flat,one_way,Lucan,53.3570,-6.4480,Dalkey,53.2780,-6.1030,,,flat,same
+loop_enniskerry_50_60_climb,loop,Enniskerry,53.1930,-6.1700,,,,50,60,climb,same
+loop_howth_63_77_climb,loop,Howth Dungriffin Rd,53.37972,-6.06034,,,,63,77,climb,same
+loop_howth_45_55_flow,loop,Howth Dungriffin Rd,53.37972,-6.06034,,,,45,55,flow,same

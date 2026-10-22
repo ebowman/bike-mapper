@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "flow-planner": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "scripts/flow_mcp.py"]
+    }
+  }
+}

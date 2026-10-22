@@ -1,0 +1,13 @@
+name,top_id,km,dem_coverage,brouter_asc_h3,brouter_asc25_h3,dem_asc_h3,dem_asc25_h3,brouter_asc_h10,brouter_asc25_h10,dem_asc_h10,dem_asc25_h10,ratio_dem_brouter_h3,brouter_hardest_gain,dem_hardest_gain
+loop_rath_40_50_flow,flow_hi@180.4/alt0,47.9,1.0,406,406,660,561,356,353,409,405,1.38,193,153
+loop_rath_40_50_climb,fastbike@150.0/alt0,45.2,1.0,778,739,1045,888,642,656,721,662,1.14,139,154
+loop_rath_40_50_flat,fastbike@15.1/alt0,41.1,1.0,156,151,376,303,82,73,121,130,1.94,0,0
+loop_rath_70_85_flow,flow_hi@315.7/alt0,83.8,1.0,862,828,1270,1076,665,638,726,681,1.25,151,153
+loop_rath_70_85_climb,flow_hi@195.4/alt0,80.7,1.0,1298,1237,1852,1602,1055,1045,1231,1114,1.23,183,182
+loop_rath_70_85_flat,fastbike@15.4/alt0,75.2,1.0,264,247,528,450,158,156,202,178,1.7,0,0
+oab_rath_sallygap_flow,flow@185.294.0/alt0,46.0,1.0,792,782,1123,957,759,744,779,751,1.21,312,175
+oab_rath_sallygap_climb,flow_lo@185.294.0/alt0,43.8,1.0,802,796,953,848,759,726,735,747,1.06,288,347
+oab_clontarf_30_40_flat,flow_lo@105.2/alt0,36.0,1.0,19,13,81,81,0,0,38,13,4.26,0,0
+oneway_lucan_dalkey_flow,flow/alt0,30.5,1.0,95,87,525,386,44,52,124,117,4.06,0,0
+oneway_lucan_dalkey_flat,flow/alt0,30.5,1.0,95,87,525,386,44,52,124,117,4.06,0,0
+loop_enniskerry_50_60_climb,flow@240.7/alt0,56.2,1.0,1166,1139,1709,1469,1017,1002,1102,1089,1.26,244,242

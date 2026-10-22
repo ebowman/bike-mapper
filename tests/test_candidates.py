@@ -5,7 +5,12 @@ from pathlib import Path
 
 import pytest
 from flowplan import brouter, candidates
-from flowplan.brouter import BRouterClient, BRouterUnavailable, parse_geojson
+from flowplan.brouter import (
+    BRouterClient,
+    BRouterUnavailable,
+    parse_geojson,
+    validate_params,
+)
 from flowplan.candidates import DEFAULT_VARIANTS, Variant, dedupe, generate
 from flowplan.scoring import haversine_m
 
@@ -21,7 +26,7 @@ class FakeClient(BRouterClient):
 
     def route(self, points, profile="fastbike", alternativeidx=0, params=None):
         scale = (params or {}).get("flow_scale")
-        name = {None: profile, 0.5: "flow_lo", 1.0: "flow", 2.0: "flow_hi"}[scale]
+        name = {None: profile, 0: "fastbike", 0.5: "flow_lo", 1.0: "flow", 2.0: "flow_hi"}[scale]
         if profile in self.missing:
             return None, "operation failed: profile not found"
         data = json.loads((FIX / f"brouter_dublin_{name}_alt{alternativeidx}.json").read_text())
@@ -61,9 +66,9 @@ def test_dedupe_identical_dropped():
 
 
 def test_missing_profile_skipped():
-    kept, dropped, skipped = generate(FakeClient(missing={"fastbike"}), A, B)
-    assert kept and all(c.profile != "fastbike" for c in kept + dropped)
-    assert len(skipped) == 4 and skipped[0]["variant"] == "fastbike"
+    kept, dropped, skipped = generate(FakeClient(missing={"flow"}), A, B)
+    assert not kept and not dropped
+    assert len(skipped) == 16 and skipped[0]["variant"] == "fastbike"
     assert "profile not found" in skipped[0]["error"]
 
 
@@ -113,7 +118,7 @@ def test_request_params(monkeypatch):
     assert seen["alternativeidx"] == 2 and seen["format"] == "geojson"
 
 
-@pytest.mark.parametrize("bad", [0, -1, math.nan, math.inf, 10.5, "abc", "", None])
+@pytest.mark.parametrize("bad", [-1, math.nan, math.inf, 10.5, "abc", "", None])
 def test_flow_scale_validation(bad):
     with pytest.raises(ValueError):
         BRouterClient().route([A, B], "flow", 0, {"flow_scale": bad})
@@ -121,8 +126,19 @@ def test_flow_scale_validation(bad):
         generate(FakeClient(), A, B, variants=(Variant("v", "flow", {"flow_scale": bad}),))
 
 
+def test_flow_scale_zero_accepted():
+    assert validate_params({"flow_scale": 0}) == {"flow_scale": 0}
+    assert validate_params({"flow_scale": 0.0})
+
+
 def test_default_variants():
     assert [v.name for v in DEFAULT_VARIANTS] == ["fastbike", "flow_lo", "flow", "flow_hi"]
+    base = DEFAULT_VARIANTS[0]
+    assert base.profile == "flow" and base.params["flow_scale"] == 0
+    assert (base.params["lane_bonus"], base.params["lane_exit_cost"], base.params["turn_cost"],
+            base.params["cycleway_base"]) == (1.0, 0, 90, 1.0)
+    assert {k for k in base.params if k.startswith("cost_")} == {
+        "cost_signal", "cost_xing_signal", "cost_give_way", "cost_stop", "cost_mini_rb", "cost_rb_entry"}
     assert candidates.DEFAULT_VARIANTS[1].params == {"flow_scale": 0.5}
 
 
@@ -135,9 +151,17 @@ def test_generate_profile_params_passthrough():
             return super().route(points, profile, alternativeidx, params)
 
     generate(Rec(), A, B, profile_params={"cost_stop": 0})
-    flow = [p for pr, p in seen if pr == "flow"]
-    assert len(flow) == 12 and all(p["cost_stop"] == 0 and "flow_scale" in p for p in flow)
-    assert [p for pr, p in seen if pr == "fastbike"] == [{}] * 4
+    flow = [p for pr, p in seen if pr == "flow" and p["flow_scale"] > 0]
+    assert len(flow) == 12 and all(p["cost_stop"] == 0 for p in flow)
+    # the baseline (flow_scale 0) keeps its own fixed params, request-level profile_params never reach it
+    base = [p for pr, p in seen if pr == "flow" and p["flow_scale"] == 0]
+    assert base == [DEFAULT_VARIANTS[0].params] * 4 and base[0]["cost_stop"] == 60
+    seen.clear()
+    generate(Rec(), A, B, profile_params={"lane_bonus": 0.5, "turn_cost": 400, "lane_exit_cost": 150,
+                                          "cycleway_base": 1.3})
+    base = [p for pr, p in seen if pr == "flow" and p["flow_scale"] == 0]
+    assert base == [DEFAULT_VARIANTS[0].params] * 4
+    assert all(p["lane_bonus"] == 0.5 and p["turn_cost"] == 400 for pr, p in seen if p["flow_scale"] > 0)
     with pytest.raises(ValueError):
         generate(Rec(), A, B, profile_params={"cost_stop": 5000})
 
@@ -209,3 +233,33 @@ def test_straightness_valid(k, v):
 def test_straightness_invalid(k, v):
     with pytest.raises(ValueError):
         brouter.validate_params({k: v})
+
+
+def test_dedupe_overlap_threshold_and_empty():
+    data = json.loads((FIX / "brouter_dublin_fastbike_alt0.json").read_text())
+    c1 = parse_geojson(data, "fastbike", "fastbike", 0)
+    c2 = parse_geojson(data, "x", "fastbike", 1)
+    c3 = parse_geojson(data, "y", "fastbike", 2)
+    c3.geometry = c3.geometry[:1]   # degenerate: kept, never a duplicate
+    c4 = parse_geojson(data, "z", "fastbike", 3)
+    c4.geometry = [(p[0] + 0.01, p[1] + 0.01) for p in c4.geometry]   # ~1.3 km away: below the threshold
+    kept, dropped = dedupe([c1, c2, c3, c4])
+    assert kept == [c1, c3, c4] and dropped == [c2] and c2.duplicate_of == "fastbike/alt0"
+
+
+@pytest.mark.parametrize("v", [1.0, 2.5, 5.0, "3"])
+def test_main_road_penalty_valid(v):
+    assert brouter.validate_params({"main_road_penalty": v})["main_road_penalty"] == v
+
+
+@pytest.mark.parametrize("v", [0.99, 5.01, 0, float("nan"), float("inf"), "x", None])
+def test_main_road_penalty_invalid(v):
+    with pytest.raises(ValueError, match="main_road_penalty"):
+        brouter.validate_params({"main_road_penalty": v})
+
+
+def test_main_road_km_helper():
+    segs = [{"dist_m": 1000, "way_tags": {"highway": "secondary"}},
+            {"dist_m": 500, "way_tags": {"highway": "tertiary"}}, {"dist_m": 200}]
+    assert brouter.main_road_km(segs) == 1.0
+    assert brouter.main_road_km([{"dist_m": 250, "way_tags": {"highway": "trunk_link"}}]) == 0.25

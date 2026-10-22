@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Reproduce the BRouter hands-on (dhy.8). Usage: scripts/run_brouter.sh [setup|serve|route]
+# Reproduce the BRouter hands-on (dhy.8). Usage: scripts/run_brouter.sh [setup|serve|route|profiles]
 # All downloads go under data/brouter/ (gitignored).
 #
 # Segments: PRE-BUILT rd5 tiles from brouter.de are used instead of a local build from
@@ -18,6 +18,11 @@ SEG=$B/segments
 PORT=17777
 PROFDIR=$PWD/$DIST/profiles2
 
+profiles() {   # sync profiles/flow*.brf into the dir the running BRouter reads (PROFDIR)
+  [ -d $DIST/profiles2 ] || { echo "run setup first" >&2; exit 1; }
+  cp profiles/flow*.brf $DIST/profiles2/
+}
+
 setup() {
   mkdir -p $SEG $B/dl $B/dist data/samples
   for t in W10_N50 W10_N55; do
@@ -31,7 +36,7 @@ setup() {
   # flow_lo / flow_hi are NOT separate files: RouteServer 1.7.10 accepts per-request overrides of profile
   # variables as '&profile:<var>=<value>' (verified: &profile=flow&profile:flow_scale=0.5 / 2.0 change the route),
   # so one profile + the flow_scale multiplier gives all three variants. Copy every flow*.brf anyway.
-  cp profiles/flow*.brf $DIST/profiles2/
+  profiles
   mkdir -p $B/customprofiles
 }
 
@@ -43,6 +48,7 @@ setup() {
 THREADS=4
 
 serve() {   # foreground; Ctrl-C or kill to stop
+  profiles
   exec java -Xmx1g -cp $DIST/brouter-$VER-all.jar btools.server.RouteServer \
     $SEG $PROFDIR $PWD/$B/customprofiles $PORT $THREADS
 }
@@ -50,9 +56,12 @@ serve() {   # foreground; Ctrl-C or kill to stop
 route() {   # needs server running; optional output dir ($1, default data/samples)
   local out=${1:-data/samples}; mkdir -p "$out"
   local url="http://localhost:$PORT/brouter?alternativeidx=0&format=gpx"
-  curl -sf "$url&profile=fastbike&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-baseline.gpx
+  # 41w.15: the "Fastest" baseline is the flow profile with node costs off (same definition as the planner's
+  # fastbike variant: flow_scale 0, lane_bonus 1, lane_exit_cost 0, turn_cost 90), so it obeys the rideability rules
+  local base="profile=flow&profile:flow_scale=0&profile:lane_bonus=1&profile:lane_exit_cost=0&profile:turn_cost=90"
+  curl -sf "$url&$base&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-baseline.gpx
   curl -sf "$url&profile=flow&lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" -o "$out"/brouter-wicklow-flow.gpx
-  curl -sf "$url&profile=fastbike&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-baseline.gpx
+  curl -sf "$url&$base&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-baseline.gpx
   curl -sf "$url&profile=flow&lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560" -o "$out"/brouter-dublin-flow.gpx
   # flow_lo / flow_hi: same flow profile with flow_scale overridden per request (0.5 / 2.0; default 1.0)
   local w="lonlats=-6.2957,53.0112|-6.3088,53.1358|-6.1706,53.1928" d="lonlats=-6.2825,53.2990|-6.2150,53.2210|-6.2110,53.2560"

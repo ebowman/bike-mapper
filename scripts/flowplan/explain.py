@@ -63,3 +63,32 @@ def explain(segments: list, hits: list, total_cost: float = 0.0) -> dict:
     return {"segments": rows,
             "summary": {"km_by_highway": by_class, "cycle_km": cycle_km(segments),
                         "n_node_charges": charges, "total_brouter_cost": total_cost}}
+
+
+# ---- rideability warnings (41w.13): server-side guard in case the BRouter profile misses an unrideable way ----
+BAD_SMOOTHNESS = ("impassable", "very_horrible", "horrible")
+OFFROAD_HIGHWAYS = ("path", "footway")
+BIKE_OK = ("yes", "designated")
+
+
+def ride_warnings(segments: list) -> list[str]:
+    """Human-readable warnings for a route whose segments include ways a road bike should not use: bicycle=no,
+    smoothness impassable/very_horrible/horrible, or highway=path|footway without bicycle=yes|designated.
+    One line per kind with the km affected; [] when the route is clean."""
+    km = {"bicycle=no": 0.0, "smoothness": 0.0, "path": 0.0, "ferry": 0.0}
+    for sg in segments:
+        t = sg.get("way_tags") or {}
+        d = float(sg.get("dist_m", 0) or 0) / 1000
+        if t.get("bicycle") == "no":
+            km["bicycle=no"] += d
+        if t.get("smoothness") in BAD_SMOOTHNESS:
+            km["smoothness"] += d
+        if t.get("highway") in OFFROAD_HIGHWAYS and t.get("bicycle") not in BIKE_OK:
+            km["path"] += d
+        if t.get("route") == "ferry":
+            km["ferry"] += d
+    msgs = {"bicycle=no": "{:.1f} km on ways tagged bicycle=no",
+            "smoothness": "{:.1f} km on ways with smoothness impassable/very_horrible/horrible",
+            "path": "{:.1f} km on highway=path/footway without bicycle=yes|designated",
+            "ferry": "{:.1f} km on ferry ways (route=ferry)"}
+    return ["routes over unrideable ways: " + msgs[k].format(v) for k, v in km.items() if v > 0]

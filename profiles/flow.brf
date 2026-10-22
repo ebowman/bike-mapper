@@ -46,11 +46,16 @@ assign lane_bonus            = 0.7   # %lane_bonus% | costfactor multiplier for 
 # (valid range 0.5..1.0; 1.0 = no lane preference). 'Plain flow' = turn_cost 150, lane_exit_cost 0, lane_bonus 1.0.
 assign turn_cost             = 400   # %turn_cost% | cost of a 90-degree turn (scaled by turn angle by BRouter; roundabouts 0); was 150 | number
 assign lane_exit_cost        = 150   # %lane_exit_cost% | cost charged when leaving a cycle lane/path onto an ordinary road | number
+# FLOW (41w.19): avoid main roads. Multiplies the base costfactor of highway primary/secondary/trunk (+ _link) ways;
+# 1.0 = off, valid 1.0..5.0 (never < 1, so it cannot cheapen a way). Forbidden classes (>= 10000) are left untouched.
+# Per-request override: &profile:main_road_penalty=<x>.
+assign main_road_penalty     = 1.0   # %main_road_penalty% | costfactor multiplier for primary/secondary/trunk roads (1 = off, 2.5 = strongly avoid) | number
 assign cycleway_base         = 1.0   # %cycleway_base% | base costfactor of highway=cycleway before lane_bonus (stock fastbike 1.3) | number
 
 # Use the following switches to change behaviour
 assign allow_steps           = true   # %allow_steps% | Set to false to disallow steps | boolean
-assign allow_ferries         = true   # %allow_ferries% | set to false to disallow ferries | boolean
+# bike-mapper-41w.17: default false - a route=ferry way is a boat, not rideable (a Howth loop ranked a 10.7 km Howth<->Dun Laoghaire ferry leg)
+assign allow_ferries         = false  # %allow_ferries% | set to true to allow ferries | boolean
 assign allow_motorways       = false  # %allow_motorways% | Set to true to allow motorways (useful in Asia / Oceania for example) | boolean
 
 assign use_proposed_cycleroutes = false  # %use_proposed_cycleroutes% | Set to true to consider proposed and regular cycleroutes as equals | boolean
@@ -167,19 +172,40 @@ assign footaccess =
                  not or foot=private or foot=no foot=use_sidepath
 
 #
-# if not bike-, but foot-acess, just a moderate penalty,
-# otherwise access is forbidden
+# FLOW (41w.13): this is a ROAD-BIKE planner, so a way the bike may not use is FORBIDDEN, not "push the bike".
+# Stock fastbike gave bicycle=no / dismount / private / use_sidepath ways a penalty of 5-25 when foot access exists
+# (and 15 on any cycle route), which let a 2.6 km, 16% average hike-a-bike climb (highway=path, bicycle=no,
+# smoothness=impassable) into a "flow" route. accesspenalty is therefore 0 or 10000 and the 10000 case is turned into a
+# hard forbidden in costfactor (a sum is capped at 9999, which BRouter still treats as routable), so neither
+# nodeaccessgranted nor any cycle-route relation can re-grant a bicycle=no way.
 #
-assign accesspenalty
-       switch bikeaccess
-              0
-              switch footaccess
-                     5
-                     switch any_cycleroute
-                            15
-                            switch bicycle=use_sidepath
-                                   25
-                                   10000
+assign accesspenalty = switch bikeaccess 0 10000
+
+# FLOW (41w.13) rideability for a road bike. Paved surface tags; anything else is "unknown" or loose/soft.
+assign paved_surface  = surface=asphalt|paved|concrete|paving_stones
+# soft / natural surfaces and very bad smoothness: forbidden on ANY way
+assign bad_surface    = surface=ground|mud|sand|grass|dirt|earth|clay
+assign bad_smoothness = smoothness=impassable|very_horrible|horrible|very_bad
+# loose but firm surfaces: forbidden on path/track/footway, costfactor x 3 on roads
+assign loose_surface  = surface=gravel|fine_gravel|compacted|unpaved
+assign offroad_class  = highway=path|footway
+# highway=path / footway are allowed only when explicitly bicycle=yes|designated AND the surface is paved, or the surface
+# is unknown and smoothness=good|excellent|very_good
+assign offroad_ok =
+  and bicycle=yes|designated
+      or paved_surface and surface= smoothness=good|excellent|very_good
+# highway=track is allowed only as tracktype=grade1 with a paved surface tag
+assign track_ok = and tracktype=grade1 paved_surface
+
+assign unrideable =
+  or not bikeaccess
+  or bad_surface
+  or bad_smoothness
+  or and offroad_class not offroad_ok
+    and highway=track not track_ok
+
+assign road_loose_factor =
+  if and loose_surface not or offroad_class highway=track then 3.0 else 1.0
 
 #
 # handle one-ways. On primary roads, wrong-oneways should
@@ -196,6 +222,8 @@ assign badoneway =
 
 assign hascycleway = not
   and ( or cycleway= cycleway=no|none ) and ( or cycleway:left= cycleway:left=no ) and ( or cycleway:right= cycleway:right=no ) ( or cycleway:both= cycleway:both=no )
+
+assign main_road_factor = if or or highway=primary highway=primary_link or or highway=secondary highway=secondary_link or highway=trunk highway=trunk_link then main_road_penalty else 1.0
 
 assign lane_factor = if or highway=cycleway hasbikelane then lane_bonus else 1.0
 
@@ -311,6 +339,8 @@ assign class_factor =
 assign costfactor
   switch and highway= not route=ferry  10000
   switch or highway=proposed highway=abandoned 10000
+  # FLOW (41w.13): hard forbidden (>= 10000), see unrideable; the min 9999 below must never apply to these
+  switch unrideable 10000
 
   min 9999
   add max onewaypenalty accesspenalty
@@ -320,7 +350,7 @@ assign costfactor
   add no_river_penalty
   add noise_penalty
 
-  multiply if greater class_factor 9998 then 1.0 else lane_factor class_factor
+  multiply road_loose_factor multiply if greater class_factor 9998 then 1.0 else multiply lane_factor main_road_factor class_factor
 
 # way priorities used for voice hint generation
 

@@ -14,12 +14,14 @@ make brouter         # terminal 1, foreground: BRouter on http://localhost:17777
 make planner         # terminal 2, foreground: planner on http://localhost:8081
 ```
 
+BRouter serves profiles from a copy in `data/brouter/dist/brouter-1.7.10/profiles2/`, not from `profiles/`. `make brouter` (at start) and `make planner-profiles` (any time) sync `profiles/flow*.brf` into it. BRouter 1.7.10 re-reads a changed profile file without a restart (verified: editing the copy's `flow_scale` default to 0 changed the next request's cost 26752 -> 19090 and length 13467 -> 13035 m, matching `&profile:flow_scale=0`), so after editing `profiles/flow.brf` run `make planner-profiles`; cached planner candidates still need `refresh=1`.
+
 Open http://localhost:8081. Stop each server with Ctrl-C. `make planner-check` runs pytest, ruff and the UI syntax check (`make ui-check`).
 
 ## Architecture
 
 1. `web/index.html` (Leaflet, served by the planner at `/`) calls `GET /api/route`.
-2. `scripts/flow_server.py` (FastAPI) asks BRouter for candidates: 4 variants x 4 alternatives = 16 requests. Variants: profile `fastbike`, and profile `flow` (`profiles/flow.brf`) at `profile:flow_scale` 0.5 (flow_lo), 1 (flow) and 2 (flow_hi); `alternativeidx` 0-3 for each.
+2. `scripts/flow_server.py` (FastAPI) asks BRouter for candidates: 4 variants x 4 alternatives = 16 requests. Variants (all profile `flow`, `profiles/flow.brf`): `fastbike` (label 'Fastest', the baseline, since 41w.15) at `profile:flow_scale` 0 with `lane_bonus` 1.0, `lane_exit_cost` 0, `turn_cost` 90 (stock fastbike's turncost), `cycleway_base` 1.0 and the six `cost_*` pinned to the profile defaults; then `flow_scale` 0.5 (flow_lo), 1 (flow) and 2 (flow_hi); `alternativeidx` 0-3 for each. The baseline's params are fixed in `flowplan.candidates.BASELINE_PARAMS` and win over the request's `lane_bonus`/`turn_cost`/`lane_exit_cost`/`cycleway_base`/cost settings, so it stays a stable comparison point, yet it obeys the same rideability rules as every other candidate (it used to be BRouter's stock `fastbike` profile).
 3. Near-duplicates are removed (within 20 m of each other over 90 % of the length).
 4. Each surviving candidate is scored outside BRouter: its geometry is matched to the flow index (`data/flow/ireland.index.csv`, directional stop events) and the stop model gives expected stops, stops per km and expected stopped seconds.
 5. Ranking: fewest expected stops first (ties: shorter first). Candidates longer than 1.3x the shortest candidate are dropped, unless that would leave fewer than 3, in which case the guard is ignored. The top `n` (1-6, default 4) are returned, each with its delta against the fastbike alternative 0.
@@ -71,13 +73,29 @@ By default (`router=base`) the server derives BRouter's node costs from the BASE
 
 Optional model parameters on `/api/route` (all validated; a bad value gives 400 naming the parameter):
 - `weights=prior|ireland|combined` (default: the server's model), `blend_with=<set>&blend=<0..1>` (linear blend of p and mean_stop_s from `weights` toward `blend_with`; the two must be given together), `p_<cause>=<0..1>` for any of the seven causes (applied last, after the blend).
-- `guard` (distance guard factor, 0 = off, max 3.0, default 1.3), `scales` (comma-separated `flow_scale` values for the flow variants, default `0.5,1,2`; each must be > 0 and <= 10; fastbike is always included), `n`, `refresh=1` (bypass the candidate cache), `router=base|table` (default `base`; which p-table the router's node costs derive from, see 'Router and scorer use the same table'; any other value gives 400).
+- `guard` (distance guard factor, 0 = off, max 3.0, default 1.3), `scales` (comma-separated `flow_scale` values for the flow variants, default `0.5,1,2`; each must be > 0 and <= 10; the flow_scale 0 'fastbike' baseline is always included), `n`, `refresh=1` (bypass the candidate cache), `router=base|table` (default `base`; which p-table the router's node costs derive from, see 'Router and scorer use the same table'; any other value gives 400).
+- `diversity` (0..1, default 0.7; 0 = off; ranking only, not in the cache key; 400 otherwise), see 'Ranking diversity' under the ranking notes below.
 - `turn_weight` (0..2, default 0.33; ranking only, not in the cache key; 400 otherwise), see 'Turns and straightness'.
 - `lane_bonus` (0.5..1.0, default 0.7; 1.0 = no lane preference), `turn_cost` (0..2000, default 400), `lane_exit_cost` (0..1000, default 150), `cycleway_base` (0.5..2.0, default 1.0) and `lanes_variant=1`, see 'Straightness' and 'Preferring cycle infrastructure'.
 - `debug=1` adds per route `segments[]` {`i`, `lon`, `lat` (end node), `start_km`, `end_km`, `dist_m`, `highway`, `cycleway` (cycleway/cycleway:left/right/both collapsed to one string, or null), `surface`, `maxspeed`, `name`, `cost_per_km`, `node_cost`, `initial_cost`, `turn_cost`, `hits[]` {`cause`, `p`}} and `summary` {`km_by_highway` {class: km}, `cycle_km` (as in stats), `n_node_charges` (segments with node_cost + initial_cost > 0), `total_brouter_cost` (BRouter's route cost)}. Segments come from BRouter's per-node `messages`; each stop hit is attached to the segment whose end node is nearest the hit (within 30 m, else the nearest). Without `debug=1` the payload has neither field; `debug` is not part of the cache key.
-- The response echoes `settings` (`weights`, `blend_with`, `blend`, `overrides`, `guard`, `scales`, `n`, `router`, `brouter_costs`, `lane_bonus`, `turn_cost`, `lane_exit_cost`, `cycleway_base`, `lanes_variant`, `turn_weight`) and `model` (effective p per cause), plus `cached` (bool). `weight_set` is the effective name (e.g. `blend(prior,ireland,0.50)+custom`).
+- The response echoes `settings` (`weights`, `blend_with`, `blend`, `overrides`, `guard`, `scales`, `n`, `router`, `brouter_costs`, `lane_bonus`, `turn_cost`, `lane_exit_cost`, `cycleway_base`, `lanes_variant`, `turn_weight`, `diversity`) and `model` (effective p per cause), plus `cached` (bool). `weight_set` is the effective name (e.g. `blend(prior,ireland,0.50)+custom`).
 
 Candidate cache: an in-process LRU of 32 entries keyed by start and end (rounded to 5 decimals), the `scales` tuple, the BRouter costs actually sent, the four straightness values and `lanes_variant`, holding the generated candidates. A hit skips BRouter (`timings_ms.brouter` = 0, `cached` true); scoring and ranking always run with the request's model. Under the default `router=base` the costs come from the base weight set only, so blend, per-class `p_*`, guard and n re-rank instantly, while changing the weight set (or any slider under `router=table`) changes the costs and re-routes. `refresh=1` bypasses and refills the entry. Requests with no kept candidates are not cached.
+
+### `GET /api/plan` (loops, out-and-backs, one-way with ranking objectives)
+
+`/api/plan?mode=loop&from=lat,lon&length_km=45&objective=flow` returns the `/api/route` response shape (`routes[]` with `rank`, `id`, `variant`, `alt`, `geometry`, `stats`, `delta_vs_fastest`, `hits`; `settings`, `model`, `cached`, `candidates_total`, `candidates_deduped`, `skipped`, `timings_ms`) plus a per-route `plan` object (mode, heading_deg, via_points, radius_m / turnaround, iterations, length_km, objective, via_scores) and a top-level `plan` block `{mode, objective, return, length_range, calls, notes}`. `stats` gains `descent_m`, `climbs[]` {`start_km`, `end_km`, `length_m`, `gain_m`, `avg_grade_pct`, `max_500m_grade_pct`, `points`, `category`}, `climb_score` (sum of climb points) and `hardest_climb` (or null); `ascent_m` is the hysteresis-filtered ascent (see 'Elevation source'; BRouter's own figure only when a route has none), `stats.elevation_source` (`brouter` or `dem`) says which profile was used, and the route carries `elevations` (parallel to `geometry`, the same profile; the UI GPX writes them as `<ele>`). `/api/route` returns the same stats.
+
+Parameters (400 naming the parameter when invalid):
+- `mode=loop|out_and_back|out-and-back|one_way|one-way` (default `loop`; both spellings are accepted and echoed as `out_and_back` / `one_way`), `from=lat,lon` (required), `to=lat,lon` (required for one-way; for out-and-back it fixes the turnaround, then the length range and `objective` do not apply and a note says so; ignored with a note for loops).
+- `length_km=50` (range +-10%, 45-55) or `min_km=45&max_km=55` (give one form, not both; required for loop and out-and-back without `to`; total route length, for an out-and-back out plus back).
+- `objective=flow|climb|flat` (default `flow`): `flow` ranks by `expected_stops + turn_weight * turns`; `climb` by `climb_score` descending (ties: the flow score); `flat` by `ascent_m` ascending (ties: the flow score). For loops and out-and-backs the length range filter replaces the `guard`; one-way keeps the `guard`. `climb` and `flat` also pick the via-points from the DEM (see `flowplan.terrain`), falling back to evenly spaced headings with a note when coverage is thin.
+- `n` (1..6, default 4), `bearings` (3..12, default 8: headings tried), `return=same|free` (out-and-back: come back the same way, or by a different road when it does not overlap too much), `max_calls` (1..96, default 72: budget of BRouter requests for the whole plan; the plan stops with a note and partial results when it runs out).
+- All `/api/route` settings: `weights`, `blend_with`, `blend`, `p_<cause>`, `guard`, `scales`, `lane_bonus`, `turn_cost`, `lane_exit_cost`, `cycleway_base`, `turn_weight`, `diversity`, `router`, `lanes_variant`, `debug`, `refresh`.
+
+Latency: a loop plan makes up to `max_calls` (default 72) BRouter requests in several rounds (length targeting iterates the ring radius up to 4 times per heading, then the other variants run at each converged heading), so expect 30-60 s on a cold cache; lower `bearings` or `max_calls` for a quicker, thinner answer. The HTTP request simply blocks until done.
+
+Plan cache (same LRU as above): keyed by mode, start, end, length range, `bearings`, `objective` (it changes the via-points), `return`, `max_calls`, `scales`, the BRouter costs, the straightness values and `lanes_variant`. A repeated plan and any `turn_weight`, weights, blend, `p_*`, `n` or `debug` change re-score and re-rank from the cache with no BRouter call (`cached` true; `plan.calls` is then the call count of the original plan). Changing `objective` re-plans, because the via-points differ.
 
 `GET /api/model` -> `{default_weight_set, precedence, weight_sets: {name: {cause: {p, p_lo, p_hi, mean_stop_s, note}}}, midway_background_p}` straight from `data/model/stop_model.json`.
 
@@ -98,7 +116,7 @@ Eric's complaint: routes turn far too much (flow variants dodge signals through 
 - `cycleway_base` = 1.0 (was 1.3 for `highway=cycleway`, inherited from fastbike): paths are at parity with tertiary roads before `lane_bonus`.
 - `lane_bonus` = 0.7 (range 0.5..1.0).
 
-'Plain flow' preset (the pre-emq.27 behaviour apart from the cycleway base): `turn_cost` 150, `lane_exit_cost` 0, `lane_bonus` 1.0. The server applies all four to flow variants only (fastbike is untouched so the baseline stays comparable), always sends them explicitly, includes them in the cache key and echoes them in `settings`. UI: Settings 'Straightness' group (Penalise turns 0..1000, Stay on lanes 0..500, Prefer cycle infrastructure Off..x0.50), presets 'Straight & lanes' and 'Plain flow', hash keys `tc=`, `le=`, `lb=`, Reset all restores the defaults.
+'Plain flow' preset (the pre-emq.27 behaviour apart from the cycleway base): `turn_cost` 150, `lane_exit_cost` 0, `lane_bonus` 1.0. The server applies all four to the flow variants only (the Fastest baseline keeps its own fixed values, so it stays comparable), always sends them explicitly, includes them in the cache key and echoes them in `settings`. UI: Settings 'Straightness' group (Penalise turns 0..1000, Stay on lanes 0..500, Prefer cycle infrastructure Off..x0.50), presets 'Straight & lanes' and 'Plain flow', hash keys `tc=`, `le=`, `lb=`, Reset all restores the defaults.
 
 Verified live (InitialCost column of the geojson messages, Dublin and city pairs plus Wicklow): 7 of 7 lane/path -> ordinary-road transitions carried InitialCost 150, no lane entry or continuation carried any.
 
@@ -121,7 +139,20 @@ Limitation: BRouter cannot distinguish left from right turns, so `turn_cost` pen
 costfactor >= 1: BRouter neither rejects nor clamps a costfactor below 1 (verified live with a constant 0.5: `CostPerKm` 500 in the response, route cost halved), so the bonus is applied directly and tertiary roads with a lane really drop to 0.8. The theoretical downside is that a costfactor below 1 makes BRouter's air-distance heuristic optimistic, so a result can in principle be marginally non-optimal; the validated band is 0.5..1.0 and the UI offers 0.7..1.0.
 Per-metre caution: the bonus scales with distance, not per crossing. 0.8 over 10 km of eligible road saves about 2000 cost units, roughly 7 traffic signals at the 300 anchor, so a Strong setting (0.7) can trade a few signals for a noticeably longer, lane-following route. The distance guard still applies in the ranking.
 Tagging caveat: OSM lanes are tagged on only ~8% of Irish tertiary roads (`docs/research/osm-road-network.md`), so the preference only sees tagged infrastructure and `cycle_km` is a lower bound.
-API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not fastbike, which is the only variant without the lane preference; part of the cache key; echoed in `settings.lane_bonus`), `lanes_variant=1` adds a fifth variant `flow_lanes` (flow_scale 1.0, lane_bonus = max(0.5, requested lane_bonus - 0.2), so it is always stronger than the current setting; label "Flow+lanes"). UI: Settings 'Prefer cycle infrastructure' slider (Off .. Strongest = 0.5, default 0.7, step 0.05, re-routes) and 'Add a lanes-favouring route'; hash keys `lb=`, `lv=1`. Cards show km on cycle paths and on roads with lanes/tracks when non-zero.
+API: `lane_bonus` (default 0.7 since emq.27; applied to every flow variant, not the Fastest baseline, which is fixed at 1.0 (no lane preference); part of the cache key; echoed in `settings.lane_bonus`), `lanes_variant=1` adds a fifth variant `flow_lanes` (flow_scale 1.0, lane_bonus = max(0.5, requested lane_bonus - 0.2), so it is always stronger than the current setting; label "Flow+lanes"). UI: Settings 'Prefer cycle infrastructure' slider (Off .. Strongest = 0.5, default 0.7, step 0.05, re-routes) and 'Add a lanes-favouring route'; hash keys `lb=`, `lv=1`. Cards show km on cycle paths and on roads with lanes/tracks when non-zero.
+
+## Rideability rules (41w.13)
+
+`profiles/flow.brf` is a road-bike profile. Stock fastbike lets a rider push the bike over any way with foot access, and the first climb-mode result routed a 2.6 km, 16% average loop section over `highway=path` ways tagged `bicycle=no`, `surface=ground`, `smoothness=impassable`. The flow profile therefore treats the following as FORBIDDEN (costfactor 10000, explicit switch before the capped sum, so `lane_factor`, `nodeaccessgranted` and cycle-route relations cannot re-grant them):
+
+- `bicycle=no|private|dismount|use_sidepath` (any way where bike access is false), regardless of foot access or a cycle-route relation.
+- Any way with `smoothness=impassable|very_horrible|horrible|very_bad` or `surface=ground|mud|sand|grass|dirt|earth|clay`.
+- `highway=path|footway` unless `bicycle=yes|designated` AND the surface is `asphalt|paved|concrete|paving_stones`, or the surface is untagged and `smoothness=good|excellent|very_good`.
+- `highway=track` unless `tracktype=grade1` with a paved surface tag. Loose surfaces (`gravel|fine_gravel|compacted|unpaved`) on path/track/footway are therefore forbidden too.
+
+Penalised, not forbidden: loose surfaces (`gravel|fine_gravel|compacted|unpaved`) on ordinary roads get costfactor x 3 on top of the existing unpaved penalties. `highway=cycleway` is also subject to the bike-access rule and to the any-way surface/smoothness rules (a cycleway tagged `surface=ground` is forbidden), and a gravel/compacted cycleway gets the same x3 loose-surface factor as a road.
+
+Since 41w.15 the `fastbike` comparison variant is the flow profile with flow_scale 0 (see the variants above), so it obeys these rules too and nothing is dropped from `/api/plan` or the MCP results any more (the interim 41w.13 rule that dropped warned stock-fastbike candidates is gone); `delta_vs_fastest` is non-null for every route. `scripts/plan_eval.py` asserts that no baseline candidate carries a ride warning on the 12 scenarios (0 of them did). As a guard against profile gaps every route carries `warnings` (`routes over unrideable ways: N km ...`) when any segment has `bicycle=no`, `smoothness` impassable/very_horrible/horrible, or `highway=path|footway` without `bicycle=yes|designated`; the UI card shows it in red and the MCP route table has a `warnings` column. Footways explicitly tagged `bicycle=yes` on a paved surface remain allowed (and are not warned).
 
 ## Regenerating the data
 
@@ -142,27 +173,27 @@ make flow-index      # data/osm/events_ireland.csv + ireland.osm.pbf -> data/flo
 
 ## Planner evaluation (emq.10, 2026-10-21)
 
-Ten fixed OD pairs (`data/samples/planner_od_pairs.csv`: 4 suburban, 3 Wicklow rural, 3 cross-town), each run through generate -> score -> rank (n=4) by `uv run scripts/planner_eval.py` against a local BRouter. Weight set: `prior` (default). Full rows: `data/samples/planner_eval.csv`. "fastbike" is the fastbike alt-0 candidate (kept whenever its request succeeds; it did for all pairs); "top" is rank 1. Deltas are top vs fastbike, negative = fewer stops.
+Ten fixed OD pairs (`data/samples/planner_od_pairs.csv`: 4 suburban, 3 Wicklow rural, 3 cross-town), each run through generate -> score -> rank (n=4) by `uv run scripts/planner_eval.py` against a local BRouter. Weight set: `prior` (default). Full rows: `data/samples/planner_eval.csv`. "fastbike" is the Fastest baseline alt-0 candidate (since 41w.15 the flow profile with flow_scale 0, lane_bonus 1, lane_exit_cost 0, turn_cost 90; kept whenever its request succeeds; it did for all pairs); "top" is rank 1. Deltas are top vs fastbike, negative = fewer stops.
 
 | pair | fastbike km | fastbike stops | top (variant/alt) | top km | top stops | d stops % | d km % | cands kept/total | wall s |
 |---|---|---|---|---|---|---|---|---|---|
-| rathfarnham_howth | 21.27 | 36.65 | flow_hi/0 | 24.9 | 6.76 | -81.6 | 17.1 | 16/16 | 11.69 |
-| dundrum_phoenixpark | 12.27 | 15.2 | flow_hi/0 | 15.27 | 6.22 | -59.1 | 24.5 | 15/16 | 9.04 |
-| blanchardstown_sandymount | 14.95 | 21.83 | flow/0 | 15.54 | 3.46 | -84.2 | 3.9 | 14/16 | 6.98 |
-| tallaght_malahide | 27.04 | 40.67 | flow_hi/2 | 32.53 | 15.34 | -62.3 | 20.3 | 14/16 | 14.35 |
-| bray_wicklowgap | 41.43 | 5.55 | flow/0 | 42.54 | 1.75 | -68.5 | 2.7 | 9/16 | 4.91 |
-| greystones_roundwood | 18.75 | 4.84 | fastbike/3 | 21.71 | 1.65 | -65.9 | 15.8 | 11/16 | 0.8 |
-| enniskerry_sallygap | 18.39 | 0.72 | fastbike/2 | 20.28 | 0.33 | -54.2 | 10.3 | 4/16 | 0.98 |
-| dunlaoghaire_clontarf | 14.73 | 17.11 | flow_hi/2 | 16.49 | 4.65 | -72.8 | 11.9 | 13/16 | 3.91 |
-| lucan_dalkey | 29.41 | 38.68 | flow_hi/3 | 34.02 | 8.57 | -77.8 | 15.7 | 16/16 | 13.28 |
-| swords_bray | 35.38 | 41.11 | flow/0 | 42.22 | 19.49 | -52.6 | 19.3 | 15/16 | 14.58 |
+| rathfarnham_howth | 21.99 | 19.4 | flow_lo/0 | 22.71 | 14.34 | -26.1 | 3.3 | 13/16 | 5.19 |
+| dundrum_phoenixpark | 12.1 | 15.2 | flow/0 | 12.94 | 11.77 | -22.6 | 6.9 | 15/16 | 3.15 |
+| blanchardstown_sandymount | 15.02 | 20.59 | flow_lo/1 | 16.99 | 10.27 | -50.1 | 13.1 | 13/16 | 4.32 |
+| tallaght_malahide | 26.47 | 38.99 | flow_hi/1 | 34.02 | 16.76 | -57.0 | 28.5 | 14/16 | 7.11 |
+| bray_wicklowgap | 41.34 | 5.61 | flow/0 | 42.51 | 1.69 | -69.9 | 2.8 | 10/16 | 3.19 |
+| greystones_roundwood | 18.71 | 0.91 | fastbike/0 | 18.71 | 0.91 | 0.0 | 0.0 | 10/16 | 0.71 |
+| enniskerry_sallygap | 18.39 | 0.72 | fastbike/1 | 21.26 | 0.39 | -45.8 | 15.6 | 4/16 | 0.89 |
+| dunlaoghaire_clontarf | 14.96 | 13.28 | flow_lo/0 | 15.44 | 11.66 | -12.2 | 3.2 | 11/16 | 2.83 |
+| lucan_dalkey | 29.09 | 39.89 | flow/0 | 30.65 | 18.45 | -53.7 | 5.4 | 16/16 | 8.46 |
+| swords_bray | 35.48 | 50.29 | flow/0 | 39.02 | 28.95 | -42.4 | 10.0 | 16/16 | 8.93 |
 
-- Mean delta stops: -67.9 %, median -67.2 %. Mean delta distance: +14.2 %.
-- Pairs where the top route is the fastbike alt-0 route: 0 of 10. (In greystones_roundwood and enniskerry_sallygap the top is fastbike alt 2/3, a different road than alt 0.)
-- No pair errors, no skipped BRouter requests. Re-run in tv5 with the final defaults (4 server threads, 4 client workers) after correcting the end points of bray_wicklowgap (now 53.0270,-6.4100, was 53.0120,-6.3990, ~1.8 km off the R756 summit) and enniskerry_sallygap (now 53.1370,-6.3140, was 53.1013,-6.3010, ~4 km south of the R759/R115 crossroads); other coordinates routed as given.
-- `combined` weights (`data/samples/planner_eval_combined.csv`): mean delta stops -74.8 %, median -73.4 %, mean delta distance +12.1 %; the rank-1 candidate is the same as under `prior` in 9 of 10 pairs (greystones_roundwood differs), so the ranking is not sensitive to the weight set, only the absolute percentages are.
+- Mean delta stops: -38.0 %, median -44.1 %. Mean delta distance: +8.9 %.
+- Pairs where the top route is the fastbike alt-0 route: 1 of 10 (greystones_roundwood: the baseline wins, delta 0). In enniskerry_sallygap the top is fastbike alt 1, a different road than alt 0.
+- No pair errors, no skipped BRouter requests. Re-run in 41w.15 (previous run: tv5, 2026-10-21, mean -67.9 % / median -67.2 % / +14.2 %). The shift has two causes. (1) The Fastest baseline is now the rideable flow profile with node costs off: its expected stops barely moved on most pairs (bray_wicklowgap 5.55 -> 5.61, enniskerry_sallygap 0.72 -> 0.72, dundrum 15.2 -> 15.2) but fell on pairs where stock fastbike used non-bike ways (rathfarnham_howth 36.65 -> 19.4, greystones_roundwood 4.84 -> 0.91, dunlaoghaire_clontarf 17.11 -> 13.28), and rose on swords_bray (41.11 -> 50.29). (2) The flow variants themselves changed since the previous run (emq.27 straightness defaults turn_cost 400 / lane_bonus 0.7, 41w.13 rideability rules), so the top routes are longer-straighter and not as stop-minimal (e.g. rathfarnham_howth top 6.76 -> 14.34 stops, dunlaoghaire_clontarf 4.65 -> 11.66). This run does not separate the two; the previous percentages are not comparable.
+- `combined` weights (`data/samples/planner_eval_combined.csv`): mean delta stops -37.8 %, median -45.9 %, mean delta distance +8.1 %; the rank-1 candidate is the same as under `prior` in 7 of 10 pairs (different: tallaght_malahide, dunlaoghaire_clontarf, lucan_dalkey), so the ranking is moderately sensitive to the weight set on the pairs where candidates are close.
 
-Interpretation: in the suburbs and cross-town the planner finds large cuts (50-85 % fewer expected stops) for 4-24 % more distance, because fastbike goes straight through signalled junctions that the flow profile detours around. In rural Wicklow the absolute gain is small (fastbike already has 0.03-0.26 stops/km, e.g. 0.72 expected stops over 25 km for enniskerry_sallygap), so the large percentage is a small number of stops and the planner adds little in practice there. These are model-predicted stops from the stop model, not measured rides, and the `prior` percentages depend on its signal probability of 0.40.
+Interpretation: in the suburbs and cross-town the planner finds cuts of 0-70 % in expected stops for 0-28 % more distance (2026-10-22 run with the rideability-compliant baseline; the earlier 50-85 % figures used the stock fastbike baseline), because the baseline goes straight through signalled junctions that the flow profile detours around. In rural Wicklow the absolute gain is small (fastbike already has 0.03-0.26 stops/km, e.g. 0.72 expected stops over 25 km for enniskerry_sallygap), so the large percentage is a small number of stops and the planner adds little in practice there. These are model-predicted stops from the stop model, not measured rides, and the `prior` percentages depend on its signal probability of 0.40.
 
 Caveat found while evaluating (fixed in tv5): `run_brouter.sh serve` used 2 server threads while the planner requests candidates with 4 client threads; on 20-50 km pairs BRouter's "thread-priority-watchdog" killed queued requests (10-13 of 16 skipped in a first run with 4 workers). The server now runs 4 threads (`THREADS` in `run_brouter.sh`), matching `DEFAULT_WORKERS = 4` in `flowplan/candidates.py` (used by `flow_server.py` and `planner_eval.py`). Keep client workers <= server threads. `flow_server` logs a WARNING for every skipped request.
 
@@ -183,3 +214,82 @@ Definitions (`scripts/flowplan/turns.py`, `turn_metrics`):
 - Stats on every route: `turns`, `turns_per_km`, `sharp_turns`, `longest_straight_km`, `mean_straight_km`. With `debug=1` each route also carries `turn_points` [{lat, lon, angle_deg}], drawn as small markers (red > 60 degrees, amber otherwise) in the Explain view.
 
 Ranking formula: `score = expected_stops + turn_weight * turns` (lower is better), `turn_weight` default 0.33 (a turn costs a third of a stop). Ties go to the larger `longest_straight_km`, then the shorter route. The distance guard is unchanged. `delta_vs_fastest.turns` is the turn-count difference to fastbike alt 0. `turn_weight` only affects ranking, so it is not part of the cache key and changing it re-ranks cached candidates instantly. UI: Settings 'Rank turns as a fraction of a stop' (0..1, step 0.01, hash key `tw=` written only when non-default); cards show `N turns (x.x/km), longest straight y.y km` and the turns delta. `planner_eval.py` reports `top_turns` and `top_longest_straight_km`.
+
+## GPX export
+
+`scripts/flowplan/gpx.py` (`gpx_string`, `write_gpx`) writes GPX 1.1: an XML declaration, a `<metadata>` block (name, optional desc, UTC time) and one `<trk>/<trkseg>` of `<trkpt>` with `<ele>` (metres, 1 decimal; omitted where unknown). Coordinates have 6 decimals, all text is XML-escaped, and fewer than 2 or more than 100,000 points raises `ValueError`. Optional course points are written as a `<rte>` of `<rtept>` and are off by default. Elevations come from `Candidate.elevations`, which `parse_geojson` keeps parallel to `geometry`. To use a file on a Garmin: in Garmin Connect go to Training & Planning > Courses > Import, upload the `.gpx`, then send the course to the device.
+
+### Loops and out-and-back (41w.3)
+
+`scripts/flowplan/plan.py: plan_candidates(client, mode, start, end=None, length_km=(min, max), ...)` generates
+loop, out-and-back and one-way candidates aimed at a length range.
+
+- **Loop**: for each of `bearings` headings theta, vias at theta, theta+120, theta+240 on a ring of radius r
+  around the start (projected CRS, so placement is metric); route start -> v1 -> v2 -> v3 -> start. If that
+  fails to route (e.g. a via in the sea), a 2-via loop (theta, theta+180) is tried.
+- **Out-and-back**: a turnaround at distance d along theta, or the explicit `end`. `return_mode='same'`
+  reverses the out leg (one call, palindromic GPX, length and ascent doubled/mirrored); `'free'` routes a second
+  leg back with `alternativeidx=1` and falls back to `'same'` when it overlaps the out leg by more than 70%.
+- **Radius iteration**: r0 = target/(2*pi) * 1.15 (circle radius for the mid-range target times a 1.15 road
+  detour factor); d0 = target/2 * 1.15. After each route r (or d) is scaled by target/measured (clamped 0.5-2),
+  at most 4 routes per heading, stopping once the length is inside the range; once one measurement was below
+  and another above the range, the next scale is the geometric mean of the bracketing ones. Only the `flow` variant
+  is used for this; the other variants are then routed through the same via-points and kept if their length is also
+  in range.
+- **Loop shapes**: every heading gets a *ring* (3 vias 120 deg apart, as above); in addition bearings//2 *petals*
+  (3 vias fanned around one heading: theta-35 / theta / theta+35 deg at 0.75 / 1 / 0.75 x d, at half-step offsets
+  from the ring headings; d chosen so the crow-flies perimeter is target/ROAD_RATIO, see below). Petals reach hills
+  beyond the ring radius (climb/flat petal centres come from DEM points at 0.5-0.95 x REACH) and close from
+  peninsulas (Howth) where ring vias fall in the sea. A petal may share its stem
+  (disguised out-and-back threshold 80% overlap instead of 60%); `plan.shape` and `plan.overlap_pct` are reported.
+  A petal centred on a DEM point (climb/flat) keeps its centre there and, when the loop is too long, first narrows its spread (35 -> 8 deg at side distance 0.75), then pulls the sides in (0.75 -> 0.3 x centre distance); only then does the centre move closer. Length targeting may use at most 70% of max_calls; the rest is for the variants stage. Petals are bearings//2 per plan, offset half a ring step, and are sized with ROAD_RATIO = 1.6 (measured road / crow-flies perimeter around Dublin, 1.6-1.9 observed) rather than the 1.15 detour of the rings: the initial crow-flies perimeter is target / 1.6 and the initial shape is fitted to the centre distance. DEM centres are searched only within REACH = target / 1.6 / 2.008 (a thin petal's perimeter is at least 2.008 x its centre distance), at 0.5-0.95 x REACH. A loop below 50% of the target length has collapsed onto the coast and is discarded. When no heading lands in the
+  range, up to 3 candidates within 25% of the target of the range are returned as the nearest, with a note.
+- **Budget**: `max_calls` (default 72) is a hard cap on BRouter requests (every call counts, including
+  fallbacks and the variants stage); when it bites, results are partial and `notes` says so. Calls within a
+  round run on 4 threads. 8 headings x ~2 iterations + variants typically uses 30-40 calls (~10-40 s).
+- **Dedupe**: the 20 m / 90% rule on the full geometry; loops whose out and back halves overlap > 60% are
+  dropped as disguised out-and-backs. Each candidate has a `plan` dict (mode, heading_deg, via_points,
+  radius_m or turnaround/distance_m, iterations, length_km).
+- **One-way** delegates to `candidates.generate`; the length range is only noted, not enforced.
+- **Limits**: 3 iterations may miss a narrow range (reported in `skipped`); vias in water or off-network
+  (BRouter "island" errors) lose that heading; headings are crow-flies, not terrain-aware (see 41w.4).
+
+### Elevation source (41w.14)
+
+Climb stats (`ascent_m`, `descent_m`, `climbs`, `climb_score`, `hardest_climb`, and the `flat` ranking) come from one elevation profile per route, chosen by the `elevation_source` parameter (validated, echoed in `settings`): `auto` (default) samples the DEM along the route when it covers >= 95 % of the route points (gaps interpolated) and otherwise keeps BRouter's per-node elevations; `brouter` and `dem` force a source (`dem` falls back to BRouter only when no point has a DEM value). The DEM profile replaces the route's elevations, so `stats.elevation_source`, the route's `elevations` array, the UI GPX and the MCP `export_gpx` all carry the same profile as the stats. Hysteresis is 3 m on BRouter elevations and 10 m on DEM elevations (the 30 m DEM is noisier; the 12-route comparison is in `docs/mcp.md`, 'Elevation source comparison'). The setting only affects ranking and stats, not the BRouter candidates, so it is not part of the cache key.
+
+Caveats (details and the corrected table in `docs/mcp.md`): the 10 m DEM hysteresis suppresses rollers under 10 m, which is real climbing on rolling roads; 10 m was tuned to match BRouter(3 m), so the ~700 m Enniskerry gap (2433 vs 1728 m at 3 m) was defined away, not recovered. The production path samples raw route nodes (DEM raw-node, 10 m: -23 % to +1 % of BRouter(3 m) on the routes with >= 150 m ascent), while `detect_climbs` resamples to a 25 m grid; the first comparison table used the 25 m-grid columns. `dem_hyst` is a module constant (`climbs.DEM_HYST`) today, not a setting.
+
+### Climb seeking and flat routes (41w.4)
+
+`plan_candidates(..., objective='flow'|'climb'|'flat', dem=None)`. `flow` is the evenly spaced heading strategy above.
+`climb` and `flat` replace the headings with via-points chosen from a DEM (`scripts/flowplan/terrain.py`).
+
+- **Method.** A polar grid around the start (24 headings x radii 0.5/0.85/1.2 of the nominal ring radius) is
+  sampled. Climb score = `max(0, ele - ele_start) + 0.5 x relief` (relief = max - min of 4 samples 500 m
+  N/E/S/W). Flat score = `-(relief + |ele - ele_start|)`. Higher is better for both. Loops use the best-scoring
+  triples whose bearings from the start are >= 60 degrees apart (at most `bearings` sets, no two sets sharing
+  2 points); out-and-backs use the top points (>= 15 degrees apart) as turnarounds. The length range is still
+  enforced by scaling the chosen via-points radially about the start (same 3-call iteration as `flow`).
+  `Candidate.plan` records `objective` and `via_scores`.
+- **What it is not.** It finds high, rough ground near the start, not catalogued climbs; the route between the
+  via-points is whatever BRouter picks. A climb catalogue is a separate future step (`climbs.md` open questions).
+- **Coverage.** `Dem` reads `data/dem/*.tif` (Copernicus GLO-30) first, then `data/dem/srtm/*.hgt` for cells the
+  GLO-30 tile lacks or has void; nearest-cell sampling. Today that is one GLO-30 tile (lon -7..-6, lat 53..54)
+  plus the matching SRTM N53W007 tile (adds only a sliver to the south, to lat 52.9999). Anything outside returns
+  `None`: those grid points are skipped and counted in a plan note. With fewer than 6 usable points the planner
+  falls back to evenly spaced headings and says so in `PlanResult.notes`. More tiles must be added by hand to
+  `data/dem/`.
+- **Measured** (loop 50-60 km from -6.2825, 53.2990, 8 sets, flow variant): flow mean ascent 474 m (max 736);
+  climb mean ascent 786 m (max 848), a ratio of 1.66. Climb candidates are fewer-but-steadier: ascent is more
+  consistent, but the best single climb score was similar (367 vs 409).
+
+## MCP server and route ids
+
+The planner logic lives in `scripts/flowplan/service.py` (`PlannerService`), shared by the FastAPI handlers and the MCP server in [mcp.md](mcp.md) (plan, rank, explain and export GPX from Claude Code). Route ids in `/api/plan` responses are unique: `<variant>@<heading>.<set>/alt<k>` for loops and out-and-backs (e.g. `flow_hi@150.2/alt0`, `<set>` = 0-based via-point set index, unique even for several sets at one heading), `<variant>/alt<k>` for one-way; `variant` stays bare and `duplicate_of` uses the same ids. `/api/route` ids are unchanged (`<variant>/alt<k>`).
+
+### Ranking diversity
+
+After sorting (and the guard or length-range filter), `rank` walks the list and skips any candidate whose geometry lies more than `diversity` (default 0.7) inside the 20 m buffer of an already selected route (fraction of the new candidate's length, projected in the region CRS, same helper as `dedupe`). This stops the top n being near-variants of one heading (77-82 % overlap passes the 90 % dedupe). If fewer than n routes remain, the best skipped ones backfill in score order. `diversity=0` disables it and gives the old order; it is a ranking-only setting (not in the cache key, echoed in `settings`), valid on `/api/route` and `/api/plan`, 400 outside 0..1.
+
+Pick mode: opening the page with `#pick=<token>&n=<1|2>` shows a banner and sends the next N clicks or search picks to `POST /api/pick/<token>` (in-memory, 10-minute TTL) so the MCP `pick_points` tool can read them; see [mcp.md](mcp.md).

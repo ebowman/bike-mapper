@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- track-length = 37917 filtered ascend = 454 plain-ascend = -92 cost=66629 energy=.2kwh time=2h 21m 13s -->
+<!-- track-length = 37916 filtered ascend = 454 plain-ascend = -92 cost=65472 energy=.2kwh time=2h 21m 13s -->
 <gpx 
  xmlns="http://www.topografix.com/GPX/1/1" 
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -1621,11 +1621,10 @@
    <trkpt lon="-6.172743" lat="53.192541"><ele>80.5</ele></trkpt>
    <trkpt lon="-6.172069" lat="53.192569"><ele>77.75</ele></trkpt>
    <trkpt lon="-6.171069" lat="53.192604"><ele>72.0</ele></trkpt>
-   <trkpt lon="-6.171083" lat="53.192638"><ele>71.25</ele></trkpt>
-   <trkpt lon="-6.170903" lat="53.192682"><ele>70.25</ele></trkpt>
-   <trkpt lon="-6.170825" lat="53.192708"><ele>69.75</ele></trkpt>
-   <trkpt lon="-6.170680" lat="53.192770"><ele>69.0</ele></trkpt>
-   <trkpt lon="-6.170615" lat="53.192808"><ele>68.5</ele></trkpt>
+   <trkpt lon="-6.170912" lat="53.192624"><ele>71.25</ele></trkpt>
+   <trkpt lon="-6.170769" lat="53.192670"><ele>70.25</ele></trkpt>
+   <trkpt lon="-6.170631" lat="53.192727"><ele>69.5</ele></trkpt>
+   <trkpt lon="-6.170554" lat="53.192766"><ele>68.5</ele></trkpt>
   </trkseg>
  </trk>
 </gpx>

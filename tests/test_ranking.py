@@ -71,3 +71,34 @@ def test_turn_weight_drops_turny_candidate():
 def test_tie_break_longest_straight_then_length():
     items = [sct("x", 10000, 2, 0, straight=1.0), sct("y", 10500, 2, 0, straight=2.0)]
     assert rank(items)[0].cand.variant == "y"
+
+
+def line_cand(variant, offset_m, length_m=1000.0):
+    """East-west line at 53N, offset_m north of a reference; ~1 km long."""
+    import math
+    lat = 53.0 + offset_m / 111_320
+    dlon = length_m / (111_320 * math.cos(math.radians(53.0)))
+    geom = [(-6.0 + dlon * i / 10, lat) for i in range(11)]
+    return Candidate(variant, variant, 0, geom, length_m, 0, 0, 0)
+
+
+def lsc(variant, offset_m, stops):
+    return ScoredCandidate(line_cand(variant, offset_m), RouteScore(expected_stops=stops))
+
+
+def test_diversity_skips_overlapping_and_keeps_distinct():
+    items = [lsc("a", 0, 1), lsc("near", 5, 2), lsc("far", 100, 3)]
+    assert [s.cand.variant for s in rank(items, n=2, guard=0)] == ["a", "far"]
+
+
+def test_diversity_zero_reproduces_old_order():
+    items = [lsc("a", 0, 1), lsc("near", 5, 2), lsc("far", 100, 3)]
+    assert [s.cand.variant for s in rank(items, n=3, guard=0, diversity=0)] == ["a", "near", "far"]
+    assert [s.cand.variant for s in rank(items, n=2, guard=0, diversity=0)] == ["a", "near"]
+
+
+def test_diversity_backfills_when_pool_small():
+    items = [lsc("a", 0, 1), lsc("near", 5, 2), lsc("near2", 8, 3), lsc("far", 100, 4)]
+    top = rank(items, n=4, guard=0)
+    assert [s.cand.variant for s in top] == ["a", "far", "near", "near2"]
+    assert [s.rank for s in top] == [1, 2, 3, 4]
