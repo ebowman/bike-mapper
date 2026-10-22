@@ -97,6 +97,16 @@ def test_pick_points_timeout(monkeypatch, mcp_stubs):
     assert out.startswith("Error: timed out") and len(mcp_stubs) == 1
 
 
+def test_pick_points_timeout_unopened_browser_includes_url(monkeypatch):
+    monkeypatch.setattr(flow_mcp.webbrowser, "open", lambda u: False)
+    monkeypatch.setattr(flow_mcp.time, "sleep", lambda s: None)
+    monkeypatch.setenv("FLOW_PLANNER_URL", "http://example.test:9/")
+    monkeypatch.setattr(flow_mcp, "_fetch_pick", lambda t: None)
+    out = flow_mcp.pick_points(n=2, timeout_s=0)
+    assert out.startswith("Error: timed out") and "could not be opened" in out
+    assert "visit http://example.test:9/#pick=" in out and "&n=2" in out
+
+
 def test_pick_points_server_down(monkeypatch, mcp_stubs):
     def boom(t):
         raise requests.ConnectionError("refused")

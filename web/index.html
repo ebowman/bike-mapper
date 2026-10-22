@@ -62,7 +62,7 @@ details#settings summary { cursor: pointer; font-weight: 600; }
 .hint { font-size: 11px; color: #8a4b00; }
 .note { font-size: 11px; color: #555; margin-top: 6px; }
 #scales input { width: 60px; }
-#scales input.bad { border: 2px solid #b00020; }
+#scales input.bad, #minKm.bad, #maxKm.bad { border: 2px solid #b00020; }
 #scaleErr { color: #b00020; font-size: 11px; }
 .card .irish { font-size: 12px; color: #555; }
 .card .xp { font-size: 11px; padding: 1px 6px; }
@@ -201,7 +201,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-  var state = { from: null, to: null, mode: 'from', n: 4, loading: false };
+  var state = { lastQuery: null, from: null, to: null, mode: 'from', n: 4, loading: false };
   var PDEF = { mode: 'one_way', min: 40, max: 50, obj: 'flow', ret: 'same' };
   var P = JSON.parse(JSON.stringify(PDEF));   // plan options: mode, length range, objective, return
   var MODES = ['one_way', 'loop', 'out_and_back'], OBJS = ['flow', 'climb', 'flat'], RETS = ['same', 'free'];
@@ -365,9 +365,15 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   }
 
   function canRun() { return !!(state.from && (state.to || P.mode !== 'one_way')); }
-  function updateGo() { $('go').disabled = state.loading || !canRun(); }
+  function updateGo() { syncLenVis(); $('go').disabled = state.loading || !canRun(); }
   function afterStart() { if (P.mode !== 'loop') setMode('to'); }
   var MODE_NOUN = { loop: 'a loop', out_and_back: 'an out and back' };
+  function syncLenVis() {   // with a turnaround set, length and objective are not sent: hide them
+    var fixed = P.mode === 'out_and_back' && !!state.to;
+    $('lenRow').style.display = planOn() && !fixed ? '' : 'none';
+    $('objSel').style.display = fixed ? 'none' : '';
+    $('objSel').previousElementSibling.style.display = fixed ? 'none' : '';   // only the objective label + select; the return selector stays
+  }
   function applyMode() {   // show/hide controls for the current mode
     var loop = P.mode === 'loop', oab = P.mode === 'out_and_back';
     $('modeSel').value = P.mode;
@@ -379,7 +385,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $('qEnd').placeholder = oab ? 'optional, e.g. Greystones' : 'e.g. Greystones';
     $('planOpts').style.display = planOn() ? '' : 'none';
     $('retWrap').style.display = oab ? '' : 'none';
-    $('lenRow').style.display = planOn() ? '' : 'none';
+    syncLenVis();
     $('minKm').value = String(P.min); $('maxKm').value = String(P.max);
     $('objSel').value = P.obj; $('retSel').value = P.ret;
     $('go').textContent = loop ? 'Plan loop' : (oab ? 'Plan out and back' : 'Find routes');
@@ -510,10 +516,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
             var d = el('div', null, it.display_name);
             d.onclick = function () {
               var ll = [parseFloat(it.lat), parseFloat(it.lon)];
-              setPoint(which, ll, it.display_name.split(',').slice(0, 2).join(','));
-              pickAdd(ll, it.display_name.split(',').slice(0, 2).join(','));
+              var lab = it.display_name.split(',').slice(0, 2).join(',');
+              var tgt = pick ? (pick.pts.length === 0 ? 'from' : 'to') : which;   // pick order decides the marker, not the box used
+              setPoint(tgt, ll, lab);
+              pickAdd(ll, lab);
               map.panTo(ll); hide();
-              if (which === 'from' && !state.to) afterStart();
+              if (tgt === 'from' && !state.to) afterStart();
             };
             dd.appendChild(d);
           });
@@ -530,7 +538,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
 
   // ---------- routes ----------
   function clearResults() {
-    routes = []; lines = []; selected = -1;
+    routes = []; lines = []; selected = -1; state.lastQuery = null;
     routeLayer.clearLayers(); stopLayer.clearLayers(); dbgLayer.clearLayers(); dbgDrawn = false;
     $('results').textContent = ''; $('drawer').textContent = ''; $('drawer').hidden = true; $('notes').textContent = '';
   }
@@ -695,8 +703,9 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     dbgOpen = true; writeHash();
     if (i !== selected) select(i); else showDrawer();
     if (routes.every(function (r) { return r.segments; })) return;
+    if (!state.lastQuery) return;
     var seq = reqSeq;   // re-request with debug=1: the candidates are cached server-side, so this is instant
-    fetch(requestUrl() + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
+    fetch(state.lastQuery + '&debug=1').then(function (r) { return r.json(); }).then(function (j) {
       if (seq !== reqSeq || !j.routes) return;
       j.routes.forEach(function (nr) {
         routes.forEach(function (r) { if (r.id === nr.id) { r.segments = nr.segments; r.summary = nr.summary; } });
@@ -800,7 +809,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
   function findRoutes(fromSettings) {
     if (!canRun()) return;
     if (state.loading && fromSettings !== true) return;
-    if (planOn() && !readLen()) return;
+    if (planOn() && !(P.mode === 'out_and_back' && state.to) && !readLen()) return;
     state.loading = true; updateGo();
     if (fromSettings !== true || !routes.length) clearResults();
     var seq = ++reqSeq;
@@ -817,12 +826,12 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
         setStatus(msg + ' (' + Math.round((Date.now() - t0) / 1000) + ' s elapsed)');
       }, 1000);
     }
-    var url = requestUrl() + (dbgOpen ? '&debug=1' : '');
+    var base = requestUrl(), url = base + (dbgOpen ? '&debug=1' : '');
     fetch(url).then(function (r) {
       return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }, function () { return { ok: r.ok, status: r.status, body: null }; });
     }).then(function (res) {
       if (seq !== reqSeq) return;
-      if (res.ok && res.body && res.body.routes) { render(res.body, fromSettings === true); return; }
+      if (res.ok && res.body && res.body.routes) { render(res.body, fromSettings === true); state.lastQuery = base; return; }
       var d = res.body && res.body.detail;
       if ((res.status === 400 || res.status === 404 || res.status === 503) && typeof d === 'string') setStatus(d, true);
       else setStatus('Something went wrong (HTTP ' + res.status + ').', true);
@@ -915,7 +924,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     }
     refreshPanel();
   }
-  function changed() { saveSettings(); refreshPanel(); scheduleRoute(); }
+  function changed(live) { saveSettings(); refreshPanel(); if (!live || !planOn()) scheduleRoute(); }   // live = slider 'input': plan modes wait for release
+  function onRelease(elm) { elm.addEventListener('change', function () { if (planOn()) scheduleRoute(); }); }
 
   function buildPanel() {
     var box = $('wsets');
@@ -926,7 +936,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + w[1]));
       d.appendChild(lab); d.appendChild(el('div', 'desc', w[2])); box.appendChild(d);
     });
-    $('blend').oninput = function () { S.blend = parseInt($('blend').value, 10) / 100; lastModelP = null; changed(); };
+    $('blend').oninput = function () { S.blend = parseInt($('blend').value, 10) / 100; lastModelP = null; changed(true); };
+    onRelease($('blend'));
     var sl = $('sliders');
     CAUSES.forEach(function (c) {
       var row = el('div', 'srow'), lab = el('div', 'lab'), left = el('span'), right = el('span');
@@ -945,7 +956,8 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
         track.appendChild(tk);
       });
       track.appendChild(inp); row.appendChild(track); sl.appendChild(row);
-      inp.oninput = function () { S.p[c[0]] = parseFloat(inp.value); changed(); };
+      inp.oninput = function () { S.p[c[0]] = parseFloat(inp.value); changed(true); };
+      onRelease(inp);
       reset.onclick = function () { delete S.p[c[0]]; changed(); };
       sliderEls[c[0]] = { input: inp, val: val, ov: ov, reset: reset };
     });
@@ -957,14 +969,14 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       changed();
     };
     $('routerTable').onchange = function () { S.router = $('routerTable').checked ? 'table' : 'base'; changed(); };
-    $('lane').oninput = function () { S.lane = Math.round((1 - parseInt($('lane').value, 10) / 100) * 20) / 20; changed(); };
-    $('tc').oninput = function () { S.tc = parseInt($('tc').value, 10); changed(); };
-    $('tw').oninput = function () { S.tw = parseFloat($('tw').value); changed(); };
-    $('le').oninput = function () { S.le = parseInt($('le').value, 10); changed(); };
+    $('lane').oninput = function () { S.lane = Math.round((1 - parseInt($('lane').value, 10) / 100) * 20) / 20; changed(true); }; onRelease($('lane'));
+    $('tc').oninput = function () { S.tc = parseInt($('tc').value, 10); changed(true); }; onRelease($('tc'));
+    $('tw').oninput = function () { S.tw = parseFloat($('tw').value); changed(true); }; onRelease($('tw'));
+    $('le').oninput = function () { S.le = parseInt($('le').value, 10); changed(true); }; onRelease($('le'));
     $('presetStraight').onclick = function () { S.tc = DEF.tc; S.le = DEF.le; S.lane = DEF.lane; changed(); };
     $('presetPlain').onclick = function () { S.tc = 150; S.le = 0; S.lane = 1; changed(); };
     $('lanesVariant').onchange = function () { S.lanesVariant = $('lanesVariant').checked; changed(); };
-    $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(); };
+    $('guard').oninput = function () { S.guard = parseFloat($('guard').value); changed(true); }; onRelease($('guard'));
     $('guardOff').onchange = function () { S.guard = $('guardOff').checked ? 0 : (num($('guard').value) || DEF.guard); changed(); };
     Array.prototype.forEach.call($('scales').getElementsByTagName('input'), function (i) {
       i.oninput = function () {
@@ -978,8 +990,9 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
         if (bad || !vals.length) { $('scaleErr').textContent = 'Scales must be numbers > 0 and <= 10.'; return; }
         $('scaleErr').textContent = '';
         S.scales = dedupe(vals);
-        saveSettings(); scheduleRoute();
+        saveSettings(); if (!planOn()) scheduleRoute();
       };
+      i.addEventListener('change', function () { if (planOn() && !$('scaleErr').textContent) scheduleRoute(); });
     });
     refreshPanel();
   }
