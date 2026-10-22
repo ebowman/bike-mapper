@@ -1,17 +1,20 @@
 """Flow route planner as an MCP server (stdio). Run: uv run scripts/flow_mcp.py
-Tools: status, start_brouter, geocode, plan_route, route_details, export_gpx, list_presets.
+Tools: status, pick_points, start_brouter, geocode, plan_route, route_details, export_gpx, list_presets.
 Everything is logged to stderr; stdout carries only MCP frames. See docs/mcp.md."""
 from __future__ import annotations
 
 import functools
 import json
 import logging
+import os
 import re
+import secrets
 import subprocess
 import sys
 import tempfile
 import threading
 import time
+import webbrowser
 from collections import OrderedDict
 from pathlib import Path
 
@@ -31,6 +34,7 @@ NOMINATIM = "https://nominatim.openstreetmap.org/search"
 USER_AGENT = "bike-mapper-flow-planner/0.1 (local MCP)"
 SESSION_SIZE = 50
 BROUTER_WAIT_S = 60
+PICK_POLL_S = 2.0
 GARMIN_HINT = "Garmin Connect: Training & Planning > Courses > Import, then send to device"
 LATLON = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$")
 # settings accepted by plan_route(settings=...): the /api/plan model/routing/ranking parameters
@@ -320,6 +324,54 @@ def list_presets() -> str:
     """Settings presets (straight & lanes, plain flow, climb, flat) as dicts: pass `settings` to plan_route
     and `objective` as plan_route's objective argument."""
     return json.dumps(PRESETS, indent=2)
+
+
+def _planner_url() -> str:
+    return os.environ.get("FLOW_PLANNER_URL", "http://localhost:8081").rstrip("/")
+
+
+def _fetch_pick(token: str) -> dict | None:
+    """GET /api/pick/{token} -> payload, or None while nothing was sent (404). Raises on a dead server."""
+    r = requests.get(f"{_planner_url()}/api/pick/{token}", timeout=5)
+    if r.status_code == 404:
+        return None
+    r.raise_for_status()
+    return r.json()
+
+
+@tool
+def pick_points(n: int = 1, timeout_s: float = 300) -> str:
+    """Ask the user to click 1 or 2 points on the planner map (opens the browser at the planner web page, which
+    needs `make planner` running) and wait for them. Returns 'lat,lon' strings to use as start / end in plan_route."""
+    if n not in (1, 2):
+        return "Error: n must be 1 or 2"
+    token = secrets.token_urlsafe(12)
+    try:
+        _fetch_pick(token)   # reachability check before bothering the user
+    except requests.RequestException:
+        return "Error: planner web server not running (make planner)"
+    url = f"{_planner_url()}/#pick={token}&n={n}"
+    try:
+        opened = webbrowser.open(url)
+    except Exception:  # noqa: BLE001
+        opened = False
+    deadline = time.monotonic() + max(0.0, float(timeout_s))
+    while True:
+        try:
+            got = _fetch_pick(token)
+        except requests.RequestException:
+            return "Error: planner web server not running (make planner)"
+        if got and got.get("points"):
+            pts = got["points"][:n]
+            lines = [f"{i}. {p['lat']:.6f},{p['lon']:.6f}" + (f" ({p['label']})" if p.get("label") else "")
+                     for i, p in enumerate(pts, 1)]
+            hint = ("Use the first as start" + (" and the second as end" if len(pts) > 1 else "")
+                    + " in plan_route, e.g. start='" + f"{pts[0]['lat']:.6f},{pts[0]['lon']:.6f}'.")
+            return "Picked " + f"{len(pts)} point(s):\n" + "\n".join(lines) + "\n" + hint
+        if time.monotonic() >= deadline:
+            return (f"Error: timed out after {timeout_s:g} s waiting for {n} point(s) in the browser"
+                    + ("" if opened else f"; the browser could not be opened, visit {url}"))
+        time.sleep(PICK_POLL_S)
 
 
 def main():

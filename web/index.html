@@ -24,6 +24,9 @@ h1 { font-size: 18px; margin: 0; }
 button, select { font-size: 13px; padding: 4px 8px; }
 button.on { background: #cde; font-weight: 600; }
 #go { font-weight: 600; padding: 7px 10px; }
+#pickBar { display: none; background: #fff3cd; border: 1px solid #e0b400; padding: 6px 8px; margin: 6px 0; font-size: 13px; }
+#pickBar.on { display: block; }
+#pickBar button { margin-left: 8px; }
 #status { font-size: 13px; }
 #status.err { color: #b00020; }
 .card { border: 1px solid #ccc; border-left-width: 8px; border-radius: 4px; padding: 6px 8px; cursor: pointer; background: #fff; }
@@ -172,6 +175,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
       <div class="note">Changing flow scales re-routes through BRouter (5-8 s). Guard and route count only re-rank cached candidates (instant).</div>
       <div class="note" id="costs">router costs: ...</div>
     </details>
+    <div id="pickBar" role="status"></div>
     <div id="status" role="status"></div>
     <div id="notes"></div>
     <div id="results"></div>
@@ -408,10 +412,32 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
     $(which === 'from' ? 'qStart' : 'qEnd').value = '';
   }
 
+  // ---------- pick mode: #pick=<token>&n=<1|2> sends the next N clicks / search picks to the MCP assistant ----------
+  var pick = null;   // { token, n, pts: [{lat, lon, label?}] } while active
+  function pickBanner(msg, withCancel) {
+    var b = $('pickBar'); b.textContent = msg || ''; b.className = msg ? 'on' : '';
+    if (msg && withCancel) {
+      var c = el('button', null, 'Cancel'); c.onclick = function () { pick = null; pickBanner(''); };
+      b.appendChild(c);
+    }
+  }
+  function pickText() { return 'Pick ' + pick.n + ' point' + (pick.n > 1 ? 's' : '') + ' for the assistant (' + pick.pts.length + '/' + pick.n + ' chosen): click the map or search.'; }
+  function pickAdd(ll, label) {
+    if (!pick) return;
+    var q = { lat: ll[0], lon: ll[1] }; if (label) q.label = label;
+    pick.pts.push(q);
+    if (pick.pts.length < pick.n) { pickBanner(pickText(), true); return; }
+    var cur = pick; pick = null; pickBanner('Sending...');
+    fetch('/api/pick/' + cur.token, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ points: cur.pts }) })
+      .then(function (r) { pickBanner(r.ok ? 'Sent ' + cur.n + ' point' + (cur.n > 1 ? 's' : '') + ' to the assistant.' : 'Could not send the points (HTTP ' + r.status + ').'); })
+      .catch(function () { pickBanner('Could not reach the planner server to send the points.'); });
+  }
+
   map.on('click', function (e) {
-    var which = state.mode;
+    var which = pick ? (pick.pts.length === 0 ? 'from' : 'to') : state.mode;
     setPoint(which, [e.latlng.lat, e.latlng.lng]);
     if (which === 'from') afterStart();
+    pickAdd([e.latlng.lat, e.latlng.lng]);
   });
   $('mStart').onclick = function () { setMode('from'); };
   $('mEnd').onclick = function () { setMode('to'); };
@@ -485,6 +511,7 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
             d.onclick = function () {
               var ll = [parseFloat(it.lat), parseFloat(it.lon)];
               setPoint(which, ll, it.display_name.split(',').slice(0, 2).join(','));
+              pickAdd(ll, it.display_name.split(',').slice(0, 2).join(','));
               map.panTo(ll); hide();
               if (which === 'from' && !state.to) afterStart();
             };
@@ -959,6 +986,11 @@ footer { font-size: 11px; color: #555; margin-top: auto; }
 
   // ---------- health (once) + hash restore ----------
   var h = readHash();
+  if (/^[A-Za-z0-9_-]{8,64}$/.test(h.pick || '') && (h.n === '1' || h.n === '2')) {
+    pick = { token: h.pick, n: parseInt(h.n, 10), pts: [] };
+    delete h.n;   // in pick mode n is the point count, not the route count
+    pickBanner(pickText(), true);
+  }
   loadSettings(h);
   loadPlan(h);
   dbgOpen = h.dbg === '1';

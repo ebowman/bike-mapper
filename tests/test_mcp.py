@@ -120,7 +120,7 @@ def test_stdio_smoke():
             return sorted(t.name for t in (await s.list_tools()).tools)
 
     names = asyncio.run(asyncio.wait_for(run(), 90))
-    assert names == sorted(["status", "start_brouter", "geocode", "plan_route", "route_details",
+    assert names == sorted(["status", "pick_points", "start_brouter", "geocode", "plan_route", "route_details",
                             "export_gpx", "list_presets"])
     assert sys.platform  # server stdout carried only MCP frames or initialize would have failed
 

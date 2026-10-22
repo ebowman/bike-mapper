@@ -32,6 +32,7 @@ Claude Code reads `.mcp.json` when started in this repo and asks once to approve
 | `route_details(route_id)` | km by road class, cycle-infrastructure km (track/lane/path), stop events by cause with expected stops, turns, climbs list, ascent/descent |
 | `export_gpx(route_id, name=None, out_dir='~/Downloads')` | path and size of the written GPX 1.1 (with elevation) and the Garmin import hint |
 | `list_presets()` | JSON list of presets: `straight & lanes`, `plain flow`, `climb`, `flat`; each has `settings` (pass as `settings`) and `objective` |
+| `pick_points(n=1, timeout_s=300)` | opens the planner page in pick mode, waits for `n` map clicks (or search picks) and returns them as `lat,lon` lines to use as start/end in `plan_route`; errors if the planner web server is not running or the timeout passes |
 
 `start` / `end` accept `lat,lon` or a place name. `length_km` means +-10 %; `min_km`/`max_km` give an explicit range. `settings` takes the `/api/plan` model and routing keys (`weights`, `blend_with`, `blend`, `p_<cause>`, `guard`, `turn_weight`, `diversity` (0..1, default 0.7: skip routes overlapping an already ranked one by more than this; 0 = off), `scales`, `lane_bonus`, `turn_cost`, `lane_exit_cost`, `cycleway_base`, `lanes_variant`, `router`, `refresh`); unknown keys are rejected with a message. Errors (BRouter down, bad input, no route, unknown id, bad out_dir) come back as readable text starting with `Error:`, never tracebacks.
 
@@ -51,6 +52,15 @@ Garmin Connect (web): Training & Planning > Courses > Import, choose the `.gpx`,
 - Nominatim usage: one request per second, descriptive User-Agent; only used when a place name is given.
 
 Tests: `uv run pytest tests/test_mcp.py` (tools called in-process with a fake BRouter; a stdio smoke test starts the server with the mcp client; `RUN_NETWORK_TESTS=1` enables the geocode test).
+
+## Picking points on the map (pick_points)
+
+`pick_points(n=1, timeout_s=300)` lets the user choose 1 or 2 locations by clicking instead of typing coordinates. It needs the planner web server (`make planner`, default http://localhost:8081; override with env `FLOW_PLANNER_URL`); if that is not running it returns `Error: planner web server not running (make planner)`.
+
+1. The tool makes a random token and opens `http://localhost:8081/#pick=<token>&n=<n>` in the default browser.
+2. The user sees a yellow banner "Pick N point(s) for the assistant" with a Cancel button. The next N map clicks (or search selections) drop the usual start/end markers and are POSTed to `/api/pick/<token>`; the banner then says "Sent". The rest of the planner stays usable, and pick mode never starts a plan by itself.
+3. The tool polls `GET /api/pick/<token>` every 2 s and returns the points as `lat,lon` strings (first = start, second = end) with a hint to pass them to `plan_route`.
+4. If nothing arrives within `timeout_s` (default 300 s) it returns a timeout error. The server keeps picks in memory for 10 minutes only; tokens must match `[A-Za-z0-9_-]{8,64}`, at most 2 points per token.
 
 ## Planning modes evaluation (41w.9, 2026-10-22)
 

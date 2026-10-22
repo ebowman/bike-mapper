@@ -273,3 +273,5 @@ The planner logic lives in `scripts/flowplan/service.py` (`PlannerService`), sha
 ### Ranking diversity
 
 After sorting (and the guard or length-range filter), `rank` walks the list and skips any candidate whose geometry lies more than `diversity` (default 0.7) inside the 20 m buffer of an already selected route (fraction of the new candidate's length, projected in the region CRS, same helper as `dedupe`). This stops the top n being near-variants of one heading (77-82 % overlap passes the 90 % dedupe). If fewer than n routes remain, the best skipped ones backfill in score order. `diversity=0` disables it and gives the old order; it is a ranking-only setting (not in the cache key, echoed in `settings`), valid on `/api/route` and `/api/plan`, 400 outside 0..1.
+
+Pick mode: opening the page with `#pick=<token>&n=<1|2>` shows a banner and sends the next N clicks or search picks to `POST /api/pick/<token>` (in-memory, 10-minute TTL) so the MCP `pick_points` tool can read them; see [mcp.md](mcp.md).

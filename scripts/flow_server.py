@@ -12,6 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.staticfiles import StaticFiles
 from flowplan.brouter import DEFAULT_URL
+from flowplan.pick import PickStore
+from flowplan.pick import register as register_pick
 from flowplan.service import (  # noqa: F401 - re-exported for tests/tools
     BBOX,
     DEFAULT_SCALES,
@@ -58,6 +60,8 @@ def create_app(region: str = "ireland", brouter_url: str = DEFAULT_URL, client=N
     @app.get("/api/plan")
     def plan(request: Request):
         return call(svc.plan, request.query_params)
+
+    register_pick(app, PickStore())
 
     # API routes first; the static mount is a catch-all
     if WEB_DIR.is_dir():
